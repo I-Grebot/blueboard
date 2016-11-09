@@ -1,9 +1,16 @@
+# Builde directories
+/Debug/
+/Release/
+
 # Object files
 *.o
 *.ko
 *.obj
 *.elf
 *.elf.launch
+*.elf.hex
+*.elf.map
+*.map
 
 # Precompiled Headers
 *.gch
@@ -32,3 +39,4 @@
 # Debug files
 *.dSYM/
 *.su
+
