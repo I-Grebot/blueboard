@@ -15,6 +15,8 @@
 				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="com.atollic.truestudio.exe.debug.528824999" name="Debug" parent="com.atollic.truestudio.exe.debug" postbuildStep="">
 					<folderInfo id="com.atollic.truestudio.exe.debug.528824999." name="/" resourcePath="">
 						<toolChain id="com.atollic.truestudio.exe.debug.toolchain.1894336381" name="Atollic ARM Tools" nonInternalBuilderId="org.eclipse.cdt.build.core.settings.default.builder" superClass="com.atollic.truestudio.exe.debug.toolchain">
+							<option id="com.atollic.truestudio.toolchain_options.mcu.544841312" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu" value="STM32F746VG" valueType="string"/>
+							<option id="com.atollic.truestudio.toolchain_options.vendor.834720712" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor" value="STMicroelectronics" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.debug.toolchain.platform.1153660007" isAbstract="false" name="Debug platform" superClass="com.atollic.truestudio.exe.debug.toolchain.platform"/>
 							<builder buildPath="${workspace_loc:/BlueBoard}/Debug" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:/Program Files (x86)/Atollic/TrueSTUDIO for ARM 5.4.1/ARMTools/bin|" id="org.eclipse.cdt.build.core.internal.builder.869231699" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
 							<tool id="com.atollic.truestudio.exe.debug.toolchain.as.795588368" name="Assembler" superClass="com.atollic.truestudio.exe.debug.toolchain.as">
@@ -45,7 +47,7 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/FreeRTOS/portable/GCC/ARM_CM7/r0p1}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Aversive/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/inc}"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BlueBoard/src/Application/Strategy}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/Application/Strategy}&quot;"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.1069994411" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.761286335" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" value="STM32F746VG" valueType="enumerated"/>
@@ -64,7 +66,7 @@
 								<option id="com.atollic.truestudio.common_options.target.instr_set.556820288" name="Instruction set" superClass="com.atollic.truestudio.common_options.target.instr_set" value="com.atollic.truestudio.common_options.target.instr_set.thumb2" valueType="enumerated"/>
 								<option id="com.atollic.truestudio.common_options.target.fpucore.1442479916" name="FPU" superClass="com.atollic.truestudio.common_options.target.fpucore" value="FPv5-SP-D16" valueType="enumerated"/>
 								<option id="com.atollic.truestudio.common_options.target.fpu.1430386962" name="Floating point" superClass="com.atollic.truestudio.common_options.target.fpu" value="com.atollic.truestudio.common_options.target.fpu.hard" valueType="enumerated"/>
-								<option id="com.atollic.truestudio.ld.general.clib.472537474" name="Runtime Library:" superClass="com.atollic.truestudio.ld.general.clib"/>
+								<option id="com.atollic.truestudio.ld.general.clib.472537474" name="Runtime Library" superClass="com.atollic.truestudio.ld.general.clib"/>
 								<option id="com.atollic.truestudio.ld.general.scriptfile.1789969217" name="Linker script" superClass="com.atollic.truestudio.ld.general.scriptfile" value="..\link\stm32f7_flash.ld" valueType="string"/>
 								<option id="com.atollic.truestudio.ld.optimization.do_garbage.2585166" name="Dead code removal " superClass="com.atollic.truestudio.ld.optimization.do_garbage" value="true" valueType="boolean"/>
 								<inputType id="com.atollic.truestudio.ld.input.836504406" name="Input" superClass="com.atollic.truestudio.ld.input">
@@ -98,7 +100,7 @@
 								<option id="com.atollic.truestudio.common_options.target.instr_set.1066972207" name="Instruction set" superClass="com.atollic.truestudio.common_options.target.instr_set" value="com.atollic.truestudio.common_options.target.instr_set.thumb2" valueType="enumerated"/>
 								<option id="com.atollic.truestudio.common_options.target.fpucore.587481575" name="FPU" superClass="com.atollic.truestudio.common_options.target.fpucore" value="FPv5-SP-D16" valueType="enumerated"/>
 								<option id="com.atollic.truestudio.common_options.target.fpu.492599312" name="Floating point" superClass="com.atollic.truestudio.common_options.target.fpu" value="com.atollic.truestudio.common_options.target.fpu.hard" valueType="enumerated"/>
-								<option id="com.atollic.truestudio.ld.general.cclib.2044259311" name="Runtime Library:" superClass="com.atollic.truestudio.ld.general.cclib"/>
+								<option id="com.atollic.truestudio.ld.general.cclib.2044259311" name="Runtime Library" superClass="com.atollic.truestudio.ld.general.cclib"/>
 								<option id="com.atollic.truestudio.ldcc.optimization.do_garbage.693462868" name="Dead code removal" superClass="com.atollic.truestudio.ldcc.optimization.do_garbage" value="true" valueType="boolean"/>
 								<option id="com.atollic.truestudio.ldcc.general.scriptfile.2015194027" name="Linker script" superClass="com.atollic.truestudio.ldcc.general.scriptfile" value="..\stm32f7_flash.ld" valueType="string"/>
 							</tool>
