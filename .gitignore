@@ -1,6 +1,6 @@
-# Builde directories
-/Debug/
-/Release/
+# Build directories
+/debug/
+/release/
 
 # Object files
 *.o
@@ -40,3 +40,4 @@
 *.dSYM/
 *.su
 
+/debug/

@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -83,6 +83,10 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
+/*----------------------------------------------------------
+ * FreeRTOS Core
+ *---------------------------------------------------------*/
+
 #define configUSE_PREEMPTION					1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION	1
 #define configUSE_QUEUE_SETS					1
@@ -131,6 +135,16 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelay				        1
 #define INCLUDE_eTaskGetState			        1
 #define INCLUDE_xTimerPendFunctionCall	        1
+
+/*----------------------------------------------------------
+ * FreeRTOS-Plus
+ *---------------------------------------------------------*/
+
+#define configCOMMAND_INT_MAX_OUTPUT_SIZE		( 128 )
+
+/*----------------------------------------------------------
+ * Macros & Misc.
+ *---------------------------------------------------------*/
 
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS
