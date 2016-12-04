@@ -131,7 +131,6 @@ void HW_PowerUp(void)
     /* Enable H-bridges power */
   //  MOT_RESET_WRITE(MOT_RESET_OFF);
 
-    printf("Hello from BlueBoard!\r\n");
 }
 
 /**

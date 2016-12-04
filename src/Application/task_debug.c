@@ -35,7 +35,7 @@ static xQueueHandle xDebugMsgQueue;
 
 void OS_CreateDebugTask(void)
 {
-    xTaskCreate(OS_DebugTask, "DEBUG", 250, NULL, OS_TASK_PRIORITY_DEBUG, NULL );
+    xTaskCreate(OS_DebugTask, "DEBUG", 250, NULL, OS_TASK_PRIORITY_SHELL, NULL );
     xDebugMsgQueue = xQueueCreate( MAX_MSG_IN_QUEUE, (unsigned portBASE_TYPE) (MAX_MSG_LENGTH *sizeof(char)));
     if(xDebugMsgQueue==NULL)
     {

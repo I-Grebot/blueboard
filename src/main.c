@@ -49,12 +49,14 @@ int main( void )
     HW_PowerUp();
 
     /* Start software tasks */
-    OS_CreateDebugTask();
+
+    //OS_CreateDebugTask();
+    OS_SHL_Start();
     OS_CreateLedTask();
-    OS_CreateMotionTask();
+    /*OS_CreateMotionTask();
     OS_CreateStrategyTask();
     OS_CreateAvoidanceTask();
-    OS_CreateASVTask();
+    OS_CreateASVTask();*/
     //OS_CreateDSVTask();
 
 

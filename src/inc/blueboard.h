@@ -26,6 +26,18 @@
  extern "C" {
 #endif
 
+ /**
+ ********************************************************************************
+ **
+ **  Firmware identification
+ **
+ ********************************************************************************
+ */
+
+#define YEAR_STR          "2017"
+#define BUILD_VERSION_STR "v1.0"
+#define ROBOT_NAME_STR    "R1"
+
 /**
 ********************************************************************************
 **
@@ -72,6 +84,8 @@
 #include "motion.h"
 #include "strategy.h"
 
+
+
 /**
 ********************************************************************************
 **
@@ -81,7 +95,7 @@
 */
 
 /* OS Tasks Priorities. Higher value means higher priority */
-#define OS_TASK_PRIORITY_DEBUG     ( tskIDLE_PRIORITY + 1  )
+#define OS_TASK_PRIORITY_SHELL     ( tskIDLE_PRIORITY + 1  )
 #define OS_TASK_PRIORITY_LED       ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_ASV       ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_DSV       ( tskIDLE_PRIORITY + 2  )
@@ -94,6 +108,43 @@
  /* Events periodicity */
 #define MOTION_CONTROL_PERIOD_MS      50 /* Tests purpose */
 #define AVERSIVE_PERIOD_MS            50 /* Tests purpose */
+
+ /**
+ ********************************************************************************
+ **
+ **  Shell Constants
+ **
+ ********************************************************************************
+ */
+
+/* Dimensions the buffer into which input characters are placed. */
+#define SHELL_MAX_INPUT_SIZE		50
+
+/* DEL acts as a backspace. */
+#define SHELL_ASCII_DEL				( 0x7F )
+
+/* The maximum time to wait for the mutex that guards the UART to become
+available. */
+#define SHELL_MAX_MUTEX_WAIT		pdMS_TO_TICKS( 300 )
+
+/* End-Of-Line characters that should be used */
+#define SHELL_EOL 						"\n\r"
+
+/* String displayed after each output */
+#define SHELL_END_OF_OUTPUT_STR 		"\n\r> "
+
+/* The welcome message display at shell's startup */
+#define SHELL_WELCOME_MESSAGE "\f"\
+	"-----------------------------------------------------------\n\r"\
+	"  IgreBot "YEAR_STR" ~ Command Shell\n\r"\
+	"-----------------------------------------------------------\n\r"\
+	"  Robot : "ROBOT_NAME_STR"\n\r"\
+	"  Build : "BUILD_VERSION_STR"\n\r"\
+	"-----------------------------------------------------------\n\r"\
+	" Type 'help' for the list of available commands\n\r"\
+	"-----------------------------------------------------------\n\r\n\r"\
+	"> "
+
 /**
 ********************************************************************************
 **
@@ -233,9 +284,13 @@ int32_t HW_MON_ConvertTempValueToDegree(const uint32_t vsense);
 /* Debug */
 void HW_DBG_Init(USART_InitTypeDef * USART_InitStruct);
 void HW_DBG_Put(uint8_t ch);
-void HW_DBG_Puts(char *str);
+void HW_DBG_Puts(const char *str);
 uint8_t HW_DBG_Get(void);
 void OS_DebugTaskPrint( char ppcMessageToSend[] );
+
+void OS_SHL_RegisterCommands( void );
+void OS_SHL_Start( void );
+void OS_SHL_OutputString( const char * const pcMessage );
 
 /* Digital Servo */
 void HW_DSV_Init(USART_InitTypeDef * USART_InitStruct);

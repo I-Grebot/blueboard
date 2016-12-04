@@ -94,7 +94,7 @@ void HW_DBG_Put(uint8_t ch)
   * @param  str: string to send
   * @retval None
   */
-void HW_DBG_Puts(char *str)
+void HW_DBG_Puts(const char *str)
 {
     while (*str)
     {
