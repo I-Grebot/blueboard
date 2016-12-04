@@ -55,9 +55,10 @@ static void HW_ConfigAll(void)
     Debug_Config.USART_Mode                = USART_Mode_Rx | USART_Mode_Tx;
     Debug_Config.USART_BaudRate            = 115200;
     Debug_Config.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    Debug_Config.USART_Parity              = USART_Parity_No;
+    Debug_Config.USART_Parity              = USART_Parity_Even;
     Debug_Config.USART_StopBits            = USART_StopBits_1;
-    Debug_Config.USART_WordLength          = USART_WordLength_8b;
+    Debug_Config.USART_WordLength          = USART_WordLength_9b;
+
 
     /*
      * Configure the Digital Servo UART init structure:

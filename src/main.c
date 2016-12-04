@@ -61,6 +61,7 @@ int main( void )
     /* Start FreeRTOS Scheduler */
     vTaskStartScheduler();
 
+
     /* Infinite loop */
     for( ;; );
 

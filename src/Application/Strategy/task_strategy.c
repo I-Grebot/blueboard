@@ -57,11 +57,24 @@ static void OS_StrategyTask( void *pvParameters )
     ASV_DeployParasol(parasol_pos);
     strategy_init();
 
+    uint32_t tick_cnt = 0;
+    char str[64];
+
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
 
     /* Initialise xNextWakeTime - this only needs to be done once. */
     xNextWakeTime = xTaskGetTickCount();
+
+    LedSetColor(HW_LED_BLUE);
+    //OS_DebugTaskPrint("Starting!\n");
+
+    // TEMP
+    while(1) {
+    	sprintf(str, "Tick %lu\n", tick_cnt++);
+    	OS_DebugTaskPrint(str);
+    	vTaskDelayUntil( &xNextWakeTime, 1000);
+    }
 
     for( ;; )
     {
@@ -77,6 +90,8 @@ static void OS_StrategyTask( void *pvParameters )
     		{
         		vTaskDelay(READY_DELAY_MSEC/portTICK_RATE_MS);
     			match.state = MATCH_STATE_READY;
+
+
     		}
         break;
         // --------------------

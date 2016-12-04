@@ -101,8 +101,8 @@ typedef enum
   */ 
 
 #define USART_WordLength_8b                  ((uint32_t)0x00000000)
-#define USART_WordLength_9b                  USART_CR1_M /* should be ((uint32_t)0x00001000) */
-#define USART_WordLength_7b                  ((uint32_t)0x10001000) /*!< only available for STM32F072 and STM32F030 devices */
+#define USART_WordLength_9b                  USART_CR1_M_0
+#define USART_WordLength_7b                  (USART_CR1_M_1 | USART_CR1_M_0)
 #define IS_USART_WORD_LENGTH(LENGTH) (((LENGTH) == USART_WordLength_8b) || \
                                       ((LENGTH) == USART_WordLength_9b) || \
                                       ((LENGTH) == USART_WordLength_7b))

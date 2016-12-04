@@ -84,7 +84,7 @@ void HW_DBG_Init(USART_InitTypeDef * USART_InitStruct)
   */
 void HW_DBG_Put(uint8_t ch)
 {
-      USART_SendData(DBG_COM, (uint8_t) ch);
+      USART_SendData(DBG_COM, (uint16_t) ch);
       while(USART_GetFlagStatus(DBG_COM, USART_FLAG_TC) == RESET);
 }
 
