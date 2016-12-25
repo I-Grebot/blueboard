@@ -97,3 +97,4 @@ void HW_CPU_CACHE_Enable(void)
   /* Enable D-Cache */
   SCB_EnableDCache();
 }
+

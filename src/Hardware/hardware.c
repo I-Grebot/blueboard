@@ -112,21 +112,14 @@ void HW_InitAll(void)
   */
 void HW_PowerUp(void)
 {
-    int i = 0;
-
-    /* TEMPORARY */
 
     //MOT_SLEEP_WRITE(MOT_SLEEP_OFF);
     //MOT_RESET_WRITE(MOT_RESET_ON);
 
     /* Enable powers */
-    for(i = 10000000; i; i--);
     HW_PWR_Enable(HW_PWR_VP1);
-    for(i = 10000000; i; i--);
     HW_PWR_Enable(HW_PWR_VP2);
-    for(i = 10000000; i; i--);
     HW_PWR_Enable(HW_PWR_VP3);
-    for(i = 50000000; i; i--);
 
     /* Enable H-bridges power */
   //  MOT_RESET_WRITE(MOT_RESET_OFF);

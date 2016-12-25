@@ -11,11 +11,7 @@
  *    This file contains definitions for the BlueBoard hardware.
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev: 1470 $
- * $LastChangedBy: Pierrick_Boissard $
- * $LastChangedDate: 2016-05-06 00:47:14 +0200 (ven., 06 mai 2016) $
+ * Repository: https://github.com/I-Grebot/firm_blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -35,7 +31,7 @@
  */
 
 #define YEAR_STR          "2017"
-#define BUILD_VERSION_STR "v1.0"
+#define BUILD_VERSION_STR "v1.1"
 #define ROBOT_NAME_STR    "R1"
 
 /**
@@ -58,6 +54,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/times.h>
+#include <string.h>
 
 /* Main Configuration file for STM32F7xx devices
  * This will also include the stm32f7xx_hal_conf file which defines
@@ -79,6 +76,22 @@
 #include "FreeRTOS_CLI.h"
 #include "task.h"
 #include "semphr.h"
+
+/* Aversive files */
+#include "aversive.h"
+
+#include "pid.h"
+#include "biquad.h"
+#include "quadramp.h"
+#include "quadramp_derivate.h"
+#include "ramp.h"
+#include "angle_distance.h"
+
+#include "blocking_detection_manager.h"
+#include "control_system_manager.h"
+#include "position_manager.h"
+#include "robot_system.h"
+#include "trajectory_manager.h"
 
 /* User application files */
 #include "motion.h"
@@ -133,6 +146,12 @@ available. */
 /* String displayed after each output */
 #define SHELL_END_OF_OUTPUT_STR 		"\n\r> "
 
+/* Delimiter for hierarchical paths */
+#define SHELL_PATH_DELIM                 "."
+
+/* Delimiter for multiple variables output */
+#define SHELL_VAR_DELIM                  ":"
+
 /* The welcome message display at shell's startup */
 #define SHELL_WELCOME_MESSAGE "\f"\
 	"-----------------------------------------------------------\n\r"\
@@ -157,7 +176,7 @@ available. */
 typedef enum {
     HW_PWR_VP1 = 0,
     HW_PWR_VP2 = 1,
-    HW_PWR_VP3 = 2,
+    HW_PWR_VP3 = 2
 } HW_PWR_TypeDef;
 
 /* List of available Analog Servo channels */
@@ -242,6 +261,7 @@ void HW_PowerDown(void);
 /* System */
 void HW_SystemClock_Config(void);
 void HW_CPU_CACHE_Enable(void);
+void HW_JumpToBootloader(void);
 
 /* Power modules */
 void HW_PWR_Init(void);
@@ -291,6 +311,9 @@ void OS_DebugTaskPrint( char ppcMessageToSend[] );
 void OS_SHL_RegisterCommands( void );
 void OS_SHL_Start( void );
 void OS_SHL_OutputString( const char * const pcMessage );
+
+BaseType_t OS_SHL_SetVariable(char* path, char* value);
+BaseType_t OS_SHL_GetVariable(char* path, char* value, size_t valueLength);
 
 /* Digital Servo */
 void HW_DSV_Init(USART_InitTypeDef * USART_InitStruct);

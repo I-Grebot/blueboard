@@ -21,84 +21,11 @@
 
 #include "blueboard.h"
 
-/* Aversive files */
-#include "aversive.h"
 
-#include "pid.h"
-#include "biquad.h"
-#include "quadramp.h"
-#include "quadramp_derivate.h"
-#include "ramp.h"
-#include "angle_distance.h"
 
-#include "blocking_detection_manager.h"
-#include "control_system_manager.h"
-#include "position_manager.h"
-#include "robot_system.h"
-#include "trajectory_manager.h"
-
-/**
-********************************************************************************
-**
-**  Custom structures
-**
-********************************************************************************
-*/
-
-/* Aversive's Control System manager structure
- * Contains all required control variables for the robot motion
- */
-
-typedef struct {
-
-    /* General */
-    int8_t cs_events;
-
-    /* Positioning */
-    struct robot_system rs;
-    struct robot_position pos;
-    struct trajectory traj;
-
-    /* Control system in Angle */
-    struct cs cs_a;
-    struct pid_filter pid_a;
-    struct quadramp_filter qr_a;
-
-    /* Control system in Distance */
-    struct cs cs_d;
-    struct pid_filter pid_d;
-    struct quadramp_filter qr_d;
-
-    /* Blocking detection */
-    struct blocking_detection bd_l;
-    struct blocking_detection bd_r;
-
-    /* Control variables */
-    int32_t pwm_l;
-    int32_t pwm_r;
-
-    /* Speed */
-    volatile int16_t speed_a;
-    volatile int16_t speed_d;
-
-    /* Acceleration */
-    volatile int16_t acceleration_a;
-    volatile int16_t acceleration_d;
-
-} AVS_ControlSystemTypeDef;
-
-/* Main Robot structure */
-typedef struct {
-
-    /* Control system */
-    AVS_ControlSystemTypeDef cs;
-
-    /* Other robot variables come here */
-
-} RobotTypeDef;
 
 /* Main robot structure containing all operational variables */
-static RobotTypeDef robot;
+RobotTypeDef robot;
 static double traj_near_window_d = TRAJECTORY_NEAR_WINDOW_D;
 static double traj_near_window_a = TRAJECTORY_NEAR_WINDOW_A;
 

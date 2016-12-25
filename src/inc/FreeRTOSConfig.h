@@ -140,7 +140,7 @@ to exclude the API function. */
  * FreeRTOS-Plus
  *---------------------------------------------------------*/
 
-#define configCOMMAND_INT_MAX_OUTPUT_SIZE		( 128 )
+#define configCOMMAND_INT_MAX_OUTPUT_SIZE		( 500 )
 
 /*----------------------------------------------------------
  * Macros & Misc.

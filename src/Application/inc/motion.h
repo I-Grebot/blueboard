@@ -1,30 +1,62 @@
-/* -----------------------------------------------------------------------------
- * Igreplane
- * I-Grebot backplane board
- * -----------------------------------------------------------------------------
- * File        : motion.h
- * Language    : C
- * Author      : Paul M.
- * Date        : 2015-04-05
- * -----------------------------------------------------------------------------
- * Description
- *   See main module file
- * -----------------------------------------------------------------------------
- * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:: 1376                                                                 $
- * $LastChangedBy:: Paul.M                                                     $
- * $LastChangedDate:: 2015-05-14 20:08:41 +0200 (jeu., 14 mai 2015)            $
- * -----------------------------------------------------------------------------
- * Version     Comment                                   Author       Date
- * 1.0         Creation                                  Paul M.      2015-04-05
- * -----------------------------------------------------------------------------
+#ifndef _MOTION_H_
+#define _MOTION_H_
+
+// -----------------------------------------------------------------------------
+// MOTION & ROBOT STRUCTURES
+// -----------------------------------------------------------------------------
+
+
+/* Aversive's Control System manager structure
+ * Contains all required control variables for the robot motion
  */
 
-#ifndef MOTION_H_
-#define	MOTION_H_
+typedef struct {
 
+    /* General */
+    int8_t cs_events;
+
+    /* Positioning */
+    struct robot_system rs;
+    struct robot_position pos;
+    struct trajectory traj;
+
+    /* Control system in Angle */
+    struct cs cs_a;
+    struct pid_filter pid_a;
+    struct quadramp_filter qr_a;
+
+    /* Control system in Distance */
+    struct cs cs_d;
+    struct pid_filter pid_d;
+    struct quadramp_filter qr_d;
+
+    /* Blocking detection */
+    struct blocking_detection bd_l;
+    struct blocking_detection bd_r;
+
+    /* Control variables */
+    int32_t pwm_l;
+    int32_t pwm_r;
+
+    /* Speed */
+    volatile int16_t speed_a;
+    volatile int16_t speed_d;
+
+    /* Acceleration */
+    volatile int16_t acceleration_a;
+    volatile int16_t acceleration_d;
+
+} AVS_ControlSystemTypeDef;
+
+/* Main Robot structure */
+typedef struct {
+
+    /* Control system */
+    AVS_ControlSystemTypeDef cs;
+
+    /* Other robot variables come here */
+
+} RobotTypeDef;
 
 // -----------------------------------------------------------------------------
 // MOTION-CONTROLLER
@@ -91,7 +123,7 @@ typedef struct {
 
     // Flags
     bool trajectory_must_finish;
-    
+
 } wp_t;
 
 // Number of waypoints that can be stored in the motion controller's FIFO
@@ -99,5 +131,5 @@ typedef struct {
 #define MOTION_WP_FIFO_SIZE 8
 
 
-#endif	/* MOTION_H_ */
 
+#endif /* _MOTION_H_ */

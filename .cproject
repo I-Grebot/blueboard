@@ -18,7 +18,7 @@
 							<option id="com.atollic.truestudio.toolchain_options.mcu.544841312" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu" value="STM32F746VG" valueType="string"/>
 							<option id="com.atollic.truestudio.toolchain_options.vendor.834720712" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor" value="STMicroelectronics" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.debug.toolchain.platform.1153660007" isAbstract="false" name="Debug platform" superClass="com.atollic.truestudio.exe.debug.toolchain.platform"/>
-							<builder buildPath="${workspace_loc:/BlueBoard}/Debug" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:/Program Files (x86)/Atollic/TrueSTUDIO for ARM 5.4.1/ARMTools/bin|" id="org.eclipse.cdt.build.core.internal.builder.869231699" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+							<builder buildPath="${workspace_loc:/BlueBoard}/Debug" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:/Program Files (x86)/Atollic/TrueSTUDIO for ARM 6.0.0/ARMTools/bin|" id="org.eclipse.cdt.build.core.internal.builder.869231699" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
 							<tool id="com.atollic.truestudio.exe.debug.toolchain.as.795588368" name="Assembler" superClass="com.atollic.truestudio.exe.debug.toolchain.as">
 								<option id="com.atollic.truestudio.common_options.target.endianess.1994283067" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.750316334" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" value="STM32F746VG" valueType="enumerated"/>
@@ -38,18 +38,16 @@
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
 								</option>
 								<option id="com.atollic.truestudio.gcc.directories.select.1021936128" name="Include path" superClass="com.atollic.truestudio.gcc.directories.select" valueType="includePath">
-									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/startup}"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/xl_320/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/inc}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/CMSIS/Include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/CMSIS/Device/ST/STM32F7xx/Include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/SPL/inc}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/FreeRTOS/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/FreeRTOS/portable/GCC/ARM_CM7/r0p1}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/FreeRTOS-Plus/FreeRTOS-Plus-CLI}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Aversive/include}"/>
-									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/inc}"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/Application/Strategy}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/FreeRTOS-Plus/FreeRTOS-Plus-CLI}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;/${ProjName}/src/Application/Strategy&quot;"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Application/inc}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/xl_320/inc}"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.1069994411" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.761286335" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" value="STM32F746VG" valueType="enumerated"/>
@@ -140,7 +138,7 @@
 							<option id="com.atollic.truestudio.toolchain_options.mcu.815960808" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu" value="STM32F746VG" valueType="string"/>
 							<option id="com.atollic.truestudio.toolchain_options.vendor.2035956971" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor" value="STMicroelectronics" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.release.toolchain.platform.1970812939" isAbstract="false" name="release platform" superClass="com.atollic.truestudio.exe.release.toolchain.platform"/>
-							<builder buildPath="${workspace_loc:/BlueBoard}/Release" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:/Program Files (x86)/Atollic/TrueSTUDIO for ARM 5.4.0/ARMTools/bin|" id="com.atollic.truestudio.mbs.builder1.377670083" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="com.atollic.truestudio.mbs.builder1"/>
+							<builder buildPath="${workspace_loc:/BlueBoard}/Release" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:/Program Files (x86)/Atollic/TrueSTUDIO for ARM 6.0.0/ARMTools/bin|" id="com.atollic.truestudio.mbs.builder1.377670083" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="com.atollic.truestudio.mbs.builder1"/>
 							<tool id="com.atollic.truestudio.exe.release.toolchain.as.1990940881" name="Assembler" superClass="com.atollic.truestudio.exe.release.toolchain.as">
 								<option id="com.atollic.truestudio.common_options.target.endianess.657669396" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.957885163" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" value="STM32F746VG" valueType="enumerated"/>
@@ -157,15 +155,16 @@
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
 								</option>
 								<option id="com.atollic.truestudio.gcc.directories.select.2104591508" name="Include path" superClass="com.atollic.truestudio.gcc.directories.select" valueType="includePath">
-									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/startup}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/inc}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/CMSIS/Include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/CMSIS/Device/ST/STM32F7xx/Include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/SPL/inc}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/FreeRTOS/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/FreeRTOS/portable/GCC/ARM_CM7/r0p1}"/>
-									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/inc}"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/FreeRTOS-Plus/FreeRTOS-Plus-CLI}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;/${ProjName}/src/Application/Strategy&quot;"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/FreeRTOS-Plus/FreeRTOS-Plus-CLI}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Aversive/include}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Application/inc}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/xl_320/inc}"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.1886288720" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.732107166" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" value="STM32F746VG" valueType="enumerated"/>

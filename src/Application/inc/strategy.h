@@ -13,10 +13,6 @@
  * Versionning informations
  * Repository: http://svn2.assembla.com/svn/paranoid_android/
  * -----------------------------------------------------------------------------
- * $Rev$
- * $LastChangedBy$
- * $LastChangedDate$
- * -----------------------------------------------------------------------------
  */
 
 #ifndef STRATEGY_H_
