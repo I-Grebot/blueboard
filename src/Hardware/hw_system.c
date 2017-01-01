@@ -21,6 +21,8 @@
 
 #include "blueboard.h"
 
+static uint16_t sysTimerCnt;
+
 /**
   * @brief  System Clock Configuration
   *         The system Clock is configured as follow :
@@ -79,7 +81,6 @@ void HW_SystemClock_Config(void)
   SystemCoreClockUpdate();
 }
 
-
 /**
   * @brief  CPU L1-Cache enable.
   * @param  None
@@ -98,3 +99,134 @@ void HW_CPU_CACHE_Enable(void)
   SCB_EnableDCache();
 }
 
+void HW_SYS_TimerRunTime_Config(void)
+{
+    TIM_TimeBaseInitTypeDef TIM_BaseStruct;
+
+    /* Enable timer clock */
+    SYS_RUNSTATS_TIM_CLK_ENABLE();
+
+    /* Setup timer */
+    TIM_BaseStruct.TIM_ClockDivision        = SYS_RUNSTATS_CKDIV;
+    TIM_BaseStruct.TIM_Prescaler            = SYS_RUNSTATS_PRESCALER;
+    TIM_BaseStruct.TIM_Period               = 0xFFFF;
+    TIM_BaseStruct.TIM_RepetitionCounter    = 0;
+    TIM_TimeBaseInit(SYS_RUNSTATS_TIM, &TIM_BaseStruct);
+
+    /* Configure interrupt */
+    TIM_ITConfig(SYS_RUNSTATS_TIM, TIM_IT_Update, ENABLE);
+    NVIC_SetPriority(SYS_RUNSTATS_IRQn, OS_ISR_PRIORITY_SYS_RUNSTATS);
+    NVIC_EnableIRQ(SYS_RUNSTATS_IRQn);
+
+    /* Clear and start timer */
+    sysTimerCnt = 0;
+    TIM_SetCounter(SYS_RUNSTATS_TIM, 0);
+    TIM_Cmd(SYS_RUNSTATS_TIM, ENABLE);
+
+}
+
+uint32_t HW_SYS_GetRunTimeTicks(void)
+{
+    uint32_t ret;
+    ret = (((uint32_t) sysTimerCnt) << 16UL) + TIM_GetCounter(SYS_RUNSTATS_TIM);
+    return ret;
+}
+
+/*
+ * Run-Time Timer Interrupt Sub-routine
+ * Required to implement a 32bits timer.
+ * sysTimerCnt is used as the 16 MSB of the timer.
+ */
+void SYS_RUNSTATS_ISR (void)
+{
+    NVIC_ClearPendingIRQ(SYS_RUNSTATS_IRQn);
+    TIM_ClearITPendingBit(SYS_RUNSTATS_TIM, TIM_IT_Update);
+    sysTimerCnt++;
+}
+
+/* This example demonstrates how a human readable table of run time stats
+information is generated from raw data provided by uxTaskGetSystemState().
+The human readable table is written to pcWriteBuffer.  (see the vTaskList()
+API function which actually does just this). */
+void HW_SYS_GetRunTimeStats(char *pcWriteBuffer)
+{
+    const char * const pcHeader =
+                "Task                  Abs. Time    % Time"SHELL_EOL;
+    const char * const pcLineSeparator =
+                "-----------------------------------------"SHELL_EOL;
+
+    TaskStatus_t *pxTaskStatusArray;
+    volatile UBaseType_t uxArraySize, x;
+    uint32_t ulTotalRunTime;
+    uint32_t ulStatsAsPercentage;
+
+   /* Make sure the write buffer does not contain a string. */
+   *pcWriteBuffer = 0x00;
+
+   /* Take a snapshot of the number of tasks in case it changes while this
+   function is executing. */
+   uxArraySize = uxTaskGetNumberOfTasks();
+
+   /* Allocate a TaskStatus_t structure for each task.  An array could be
+   allocated statically at compile time. */
+   pxTaskStatusArray = pvPortMalloc( uxArraySize * sizeof( TaskStatus_t ) );
+
+   if( pxTaskStatusArray != NULL )
+   {
+      /* Generate raw status information about each task. */
+      uxArraySize = uxTaskGetSystemState( pxTaskStatusArray,
+                                 uxArraySize,
+                                 &ulTotalRunTime );
+
+      /* For percentage calculations. */
+      ulTotalRunTime /= 100UL;
+
+      /* Avoid divide by zero errors. */
+      if( ulTotalRunTime > 0 )
+      {
+          /* Header */
+          sprintf( pcWriteBuffer, pcHeader );
+          pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
+          sprintf( pcWriteBuffer, pcLineSeparator );
+          pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
+
+          /* For each populated position in the pxTaskStatusArray array,
+          format the raw data as human readable ASCII data. */
+         for( x = 0; x < uxArraySize; x++ )
+         {
+            /* What percentage of the total run time has the task used?
+            This will always be rounded down to the nearest integer.
+            ulTotalRunTimeDiv100 has already been divided by 100. */
+            ulStatsAsPercentage =
+                  pxTaskStatusArray[ x ].ulRunTimeCounter / ulTotalRunTime;
+
+            if( ulStatsAsPercentage > 0UL )
+            {
+               sprintf( pcWriteBuffer, "%-20s %10lu   %3lu%%"SHELL_EOL,
+                                 pxTaskStatusArray[ x ].pcTaskName,
+                                 pxTaskStatusArray[ x ].ulRunTimeCounter,
+                                 ulStatsAsPercentage );
+            }
+            else
+            {
+               /* If the percentage is zero here then the task has
+               consumed less than 1% of the total run time. */
+               sprintf( pcWriteBuffer, "%-20s %10lu    <1%%"SHELL_EOL,
+                                 pxTaskStatusArray[ x ].pcTaskName,
+                                 pxTaskStatusArray[ x ].ulRunTimeCounter );
+            }
+
+            pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
+         }
+
+         /* Footer */
+         sprintf( pcWriteBuffer, pcLineSeparator );
+         pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
+         sprintf( pcWriteBuffer,"%-20s %10lu   %3lu%%"SHELL_EOL, "TOTAL", 100*ulTotalRunTime, 100UL);
+         pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
+      }
+
+      /* The array is no longer needed, free the memory it consumes. */
+      vPortFree( pxTaskStatusArray );
+   }
+}

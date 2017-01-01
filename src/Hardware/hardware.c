@@ -21,6 +21,7 @@
  *      o USART3                for [DSV] Digital Servo bus Interface
  *      o ADC1 / TIM2 / DMA2    for [MON] Analog monitoring (Scan-mode with DMA, auto)
  *      o USB_OTG               for [USB] USB OTG High-Speed 2.0 Interface
+ *      o TIM6                  for [SYS] Run-Time statistics
  * -----------------------------------------------------------------------------
  * Versionning informations
  * Repository: http://svn2.assembla.com/svn/paranoid_android/

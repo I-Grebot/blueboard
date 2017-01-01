@@ -18,12 +18,44 @@
 
 /* External variables; for setting and probing */
 extern RobotTypeDef robot;
+extern OS_SHL_ConfigTypeDef OS_SHL_Config;
 
 /*
  * Decode a variable path/name and update it with the provided value
  */
-BaseType_t OS_SHL_SetVariable(char* path, char* value)
+BaseType_t OS_SHL_SetVariable(char* path, char* value, char* ret, size_t retLength)
 {
+
+    char* item;
+
+    /* 1st level decoding */
+    item = strsep(&path, SHELL_PATH_DELIM);
+
+    if(!strcasecmp(item, "sys")) {
+       if((item = strsep(&path, SHELL_PATH_DELIM))) {
+
+           if(!strcasecmp(item, "shell")) {
+               if((item = strsep(&path, SHELL_PATH_DELIM))) {
+
+                   if(!strcasecmp(item, "echo")) {
+                       // TODO: bool fetcher
+                       if(!strcasecmp(value, "1")) {
+                           OS_SHL_Config.echo = true;
+                       }
+                       else if(!strcasecmp(value, "0")) {
+                           OS_SHL_Config.echo = false;
+                       }
+
+
+                   }
+               }
+
+           } // shell
+       }
+
+   } // sys
+
+    snprintf(ret, retLength, "");
     return pdFALSE;
 }
 
@@ -31,9 +63,14 @@ BaseType_t OS_SHL_SetVariable(char* path, char* value)
  * Decode a variable path/name and write its current value
  * into the result string.
  */
-BaseType_t OS_SHL_GetVariable(char* path, char* value, size_t valueLength)
+BaseType_t OS_SHL_GetVariable(char* path, char* ret, size_t retLength)
 {
     char* item;
+
+    /*snprintf(ret, retLength, "%d"SHELL_VAR_DELIM"%d"SHELL_VAR_DELIM"%d"SHELL_EOL,
+                                        robot.cs.pos.pos_s16.x,
+                                        robot.cs.pos.pos_s16.y,
+                                        robot.cs.pos.pos_s16.a);*/
 
     /* 1st level decoding */
     item = strsep(&path, SHELL_PATH_DELIM);
@@ -48,16 +85,16 @@ BaseType_t OS_SHL_GetVariable(char* path, char* value, size_t valueLength)
                         if((item = strsep(&path, SHELL_PATH_DELIM))) {
 
                             if(!strcasecmp(item, "x")) {
-                                snprintf(value, valueLength, "%d"SHELL_EOL, robot.cs.pos.pos_s16.x);
+                                snprintf(ret, retLength, "%d"SHELL_EOL, robot.cs.pos.pos_s16.x);
                             }
                             else if(!strcasecmp(item, "y")) {
-                                snprintf(value, valueLength, "%d"SHELL_EOL, robot.cs.pos.pos_s16.y);
+                                snprintf(ret, retLength, "%d"SHELL_EOL, robot.cs.pos.pos_s16.y);
                             }
                             else if(!strcasecmp(item, "a")) {
-                                snprintf(value, valueLength, "%d"SHELL_EOL, robot.cs.pos.pos_s16.a);
+                                snprintf(ret, retLength, "%d"SHELL_EOL, robot.cs.pos.pos_s16.a);
                             }
                         } else {
-                            snprintf(value, valueLength, "%d"SHELL_VAR_DELIM"%d"SHELL_VAR_DELIM"%d"SHELL_EOL,
+                            snprintf(ret, retLength, "robot.cs.pos=%d"SHELL_VAR_DELIM"%d"SHELL_VAR_DELIM"%d"SHELL_EOL,
                                     robot.cs.pos.pos_s16.x,
                                     robot.cs.pos.pos_s16.y,
                                     robot.cs.pos.pos_s16.a);
@@ -69,38 +106,45 @@ BaseType_t OS_SHL_GetVariable(char* path, char* value, size_t valueLength)
 
                             if(!strcasecmp(item, "consign"))
                             {
-                                snprintf(value, valueLength, "%ld"SHELL_EOL, robot.cs.cs_a.consign_value);
+                                snprintf(ret, retLength, "%ld"SHELL_EOL, robot.cs.cs_a.consign_value);
                             }
                             else if(!strcasecmp(item, "out"))
                             {
-                                snprintf(value, valueLength, "%ld"SHELL_EOL, robot.cs.cs_a.out_value);
+                                snprintf(ret, retLength, "%ld"SHELL_EOL, robot.cs.cs_a.out_value);
                             }
 
                         }
 
                     }
 
-                } else {
-                    printf("robot.cs base structure"SHELL_EOL);
                 }
 
             }
 
-        } else {
-
-            printf("robot base structure"SHELL_EOL);
         }
 
     } // robot
-    else if(!strcasecmp(item, "system")) {
-        printf("system structure"SHELL_EOL);
-    }
+    else if(!strcasecmp(item, "sys")) {
+        if((item = strsep(&path, SHELL_PATH_DELIM))) {
+
+            if(!strcasecmp(item, "shell")) {
+                if((item = strsep(&path, SHELL_PATH_DELIM))) {
+
+                    if(!strcasecmp(item, "echo")) {
+                        snprintf(ret, retLength, "%u"SHELL_EOL, OS_SHL_Config.echo);
+                    }
+                }
+
+            } // shell
+        }
+
+    } // sys
 
     // If this point is reached; there was an error
     return pdFALSE;
 
 error:
-    snprintf(value, valueLength, "Error: unrecognized value"SHELL_EOL);
+    snprintf(ret, retLength, "Error: unrecognized value"SHELL_EOL);
     return pdFALSE;
 
    //printf("* %s"SHELL_EOL, item);

@@ -29,6 +29,8 @@ static const char * const pcNewLine 			= SHELL_EOL;
 more than one task. */
 static SemaphoreHandle_t xTxMutex = NULL;
 
+OS_SHL_ConfigTypeDef OS_SHL_Config;
+
 /* -----------------------------------------------------------------------------
  * Shell creation
  * -----------------------------------------------------------------------------
@@ -43,10 +45,13 @@ void OS_SHL_Start( void )
 	/* Register Shell Commands */
 	OS_SHL_RegisterCommands();
 
+	/* Initialize configuration with default settings */
+	OS_SHL_Config.echo = true;
+
 	/* Create that task that handles the console itself. */
 	xTaskCreate( 	OS_SHL_Task,				/* The task that implements the command console. */
-					"SHL",						/* Text name assigned to the task.  This is just to assist debugging.  The kernel does not use this name itself. */
-					250,						/* The size of the stack allocated to the task. */
+					"SHELL",	    			/* Text name assigned to the task.  This is just to assist debugging.  The kernel does not use this name itself. */
+					500,						/* The size of the stack allocated to the task. */
 					NULL,						/* The parameter is not used, so NULL is passed. */
 					OS_TASK_PRIORITY_SHELL,		/* The priority allocated to the task. */
 					NULL );						/* A handle is not required, so just pass NULL. */
@@ -65,7 +70,6 @@ static void OS_SHL_Task( void *pvParameters )
 	static char cInputString[ SHELL_MAX_INPUT_SIZE ], cLastInputString[ SHELL_MAX_INPUT_SIZE ];
 	BaseType_t xReturned;
 
-
 	( void ) pvParameters;
 
 	/* Obtain the address of the output buffer.  Note there is no mutual
@@ -79,23 +83,25 @@ static void OS_SHL_Task( void *pvParameters )
 	for( ;; )
 	{
 		/* Wait for the next character.  The while loop is used in case
-		INCLUDE_vTaskSuspend is not set to 1 - in which case portMAX_DELAY will
+		INCLUDE_vTaskSuspend is not set to 1 - in which case the RX Timeout will
 		be a genuine block time rather than an infinite block time. */
-		//while( xSerialGetChar( xPort, &cRxedChar, portMAX_DELAY ) != pdPASS );
-		cRxedChar = (char) HW_DBG_Get();
+		while( HW_DBG_Get(&cRxedChar) != pdPASS );
 
 		/* Ensure exclusive access to the UART Tx. */
 		if( xSemaphoreTake( xTxMutex, SHELL_MAX_MUTEX_WAIT ) == pdPASS )
 		{
 			/* Echo the character back. */
-			//xSerialPutChar( xPort, cRxedChar, portMAX_DELAY );
-			HW_DBG_Put(cRxedChar);
+			//if(OS_SHL_Config.echo) {
+			    HW_DBG_Put(cRxedChar);
+			//}
 
 			/* Was it the end of the line? */
 			if( cRxedChar == '\n' || cRxedChar == '\r' )
 			{
 				/* Just to space the output from the input. */
-				HW_DBG_Puts(pcNewLine);
+			    //if(OS_SHL_Config.echo) {
+			        HW_DBG_Puts(pcNewLine);
+			    //}
 
 				/* See if the command is empty, indicating that the last command
 				is to be executed again. */
@@ -126,7 +132,10 @@ static void OS_SHL_Task( void *pvParameters )
 				strcpy( cLastInputString, cInputString );
 				ucInputIndex = 0;
 				memset( cInputString, 0x00, SHELL_MAX_INPUT_SIZE );
-				HW_DBG_Puts(pcEndOfOutputMessage);
+
+				//if(OS_SHL_Config.echo) {
+				    HW_DBG_Puts(pcEndOfOutputMessage);
+				//}
 			}
 			else
 			{

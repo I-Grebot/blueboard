@@ -64,7 +64,8 @@ int _read (int file, char *ptr, int len)
     for (DataIdx = 0; DataIdx < len; DataIdx++)
     {
         //*ptr++ = __io_getchar();
-        *ptr++ = HW_DBG_Get();
+        //*ptr++ = HW_DBG_Get();
+        HW_DBG_Get((ptr++));
     }
 
 return len;

@@ -123,4 +123,18 @@
 /* IND reading scanning time */
 #define IND_SCAN_PERIOD_TICK	100
 
+/**
+********************************************************************************
+**
+**  Debug Interface
+**
+********************************************************************************
+*/
+
+#define DBG_RX_QUEUE_LEN     64
+#define DBG_TX_QUEUE_LEN    256 // That's only because we like to transmit
+
+#define DBG_RX_TIMEOUT      pdMS_TO_TICKS( 10 )
+#define DBG_TX_TIMEOUT      pdMS_TO_TICKS( 10 )
+
 #endif /* __HARDWARE_CONST_H */

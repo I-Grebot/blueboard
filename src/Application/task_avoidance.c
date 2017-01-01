@@ -37,7 +37,7 @@ static void av_mask_sensor_from_wall(int16_t a, int16_t wall_a);
 void OS_CreateAvoidanceTask(void)
 {
 
-    xTaskCreate(OS_AvoidanceTask, "Avoidance", 250, NULL, OS_TASK_PRIORITY_AVOIDANCE, NULL );
+    xTaskCreate(OS_AvoidanceTask, "AVOIDANCE", 250, NULL, OS_TASK_PRIORITY_AVOIDANCE, NULL );
 }
 
 static void OS_AvoidanceTask( void *pvParameters )

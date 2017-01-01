@@ -51,7 +51,7 @@ void OS_CreateDSVTask(void)
     	printf("insufficient heap RAM available for DSVMsgQueue\r\n");
     	while(1);
     }
-	xTaskCreate(OS_DSVTask, "Digital servo", 350, NULL, OS_TASK_PRIORITY_DSV, NULL );
+	xTaskCreate(OS_DSVTask, "DIGITAL SERVO", 350, NULL, OS_TASK_PRIORITY_DSV, NULL );
 
     DSV_Create(&servo1, 23, 0, 1023);
     DSV_Create(&servo2, 42, 0, 1023);

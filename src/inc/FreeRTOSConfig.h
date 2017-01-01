@@ -111,7 +111,9 @@
 #define configUSE_TICKLESS_IDLE					0
 
 /* Run-time stats */
-#define configGENERATE_RUN_TIME_STATS	        0
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() HW_SYS_TimerRunTime_Config()
+#define portGET_RUN_TIME_COUNTER_VALUE()         HW_SYS_GetRunTimeTicks()
+#define configGENERATE_RUN_TIME_STATS	        1
 #define configUSE_STATS_FORMATTING_FUNCTIONS	1
 
 /* Co-routine definitions. */

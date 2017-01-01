@@ -61,7 +61,7 @@ void OS_CreateASVTask(void)
 
 
 
-	xTaskCreate(OS_ASVTask, "Analog servo", 350, NULL, OS_TASK_PRIORITY_ASV, NULL );
+	xTaskCreate(OS_ASVTask, "ANALOG SERVO", 350, NULL, OS_TASK_PRIORITY_ASV, NULL );
 }
 
 static void OS_ASVTask( void *pvParameters )

@@ -59,8 +59,9 @@ static const CLI_Command_Definition_t xSys =
     SHELL_EOL
     "sys [command]: Run a system command."SHELL_EOL
     " List of available commands:"SHELL_EOL
-    "  - 'reset' : Reset the microcontroller"SHELL_EOL
-    "  - 'tasks' : Display tasks info"SHELL_EOL
+    "  - 'reset'      : Reset the microcontroller"SHELL_EOL
+    "  - 'tasks-list' : Display tasks info"SHELL_EOL
+    "  - 'tasks-stats' : Display tasks statistics"SHELL_EOL
     ,OS_SHL_SysCmd,
     1
 };
@@ -275,10 +276,11 @@ void OS_SHL_RegisterCommands( void )
 
 static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
-    const char *const pcHeader =
+    const char *const pcHeader_list =
                 "   State   Prio.   Stack   #"SHELL_EOL
                 "------------------------------------------"SHELL_EOL;
     BaseType_t xSpacePadding;
+
 
     char* pcParameter1;
     BaseType_t xParameter1StringLength;
@@ -295,8 +297,8 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
         NVIC_SystemReset(); /* Auto-kill */
         return pdFALSE;
 
-    /* 'TASKS' Sub-command: display tasks informations */
-    } else if(!strcasecmp(pcParameter1, "tasks")) {
+    /* 'TASKS-LIST' Sub-command: display tasks informations */
+    } else if(!strcasecmp(pcParameter1, "tasks-list")) {
 
         /* Generate a table of task stats. */
         strcpy( pcWriteBuffer, "Task" );
@@ -314,11 +316,13 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             /* Ensure always terminated. */
             *pcWriteBuffer = 0x00;
         }
-        strcpy( pcWriteBuffer, pcHeader );
-        vTaskList( pcWriteBuffer + strlen( pcHeader ) );
+        strcpy( pcWriteBuffer, pcHeader_list );
+        vTaskList( pcWriteBuffer + strlen( pcHeader_list ) );
+        return pdFALSE;
 
-        /* There is no more data to return after this single string, so return
-        pdFALSE. */
+    /* 'TASKS-STATS' Sub-command: display tasks statistics */
+    } else if(!strcasecmp(pcParameter1, "tasks-stats")) {
+        HW_SYS_GetRunTimeStats( pcWriteBuffer );
         return pdFALSE;
 
     /* Error case */
@@ -331,7 +335,21 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 static BaseType_t OS_SHL_SetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
-    return pdFALSE;
+    char* pcParameter1;
+    char* pcParameter2;
+    BaseType_t xParameter1StringLength;
+    BaseType_t xParameter2StringLength;
+
+    /* Get parameters */
+    pcParameter1 = (char*) FreeRTOS_CLIGetParameter(pcCommandString, 1, &xParameter1StringLength);
+    pcParameter2 = (char*) FreeRTOS_CLIGetParameter(pcCommandString, 2, &xParameter2StringLength);
+
+    /* Terminate both strings */
+    pcParameter1[ xParameter1StringLength ] = 0x00;
+    pcParameter2[ xParameter2StringLength ] = 0x00;
+
+    /* Decode variable path */
+    return OS_SHL_SetVariable(pcParameter1, pcParameter2, pcWriteBuffer, xWriteBufferLen);
 }
 
 static BaseType_t OS_SHL_GetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
@@ -342,14 +360,11 @@ static BaseType_t OS_SHL_GetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     /* Get parameters */
     pcParameter1 = (char*) FreeRTOS_CLIGetParameter(pcCommandString, 1, &xParameter1StringLength);
 
-    /* Terminate both strings */
+    /* Terminate string */
     pcParameter1[ xParameter1StringLength ] = 0x00;
 
     /* Decode variable path */
     return OS_SHL_GetVariable(pcParameter1, pcWriteBuffer, xWriteBufferLen);
-//        snprintf( pcWriteBuffer, xWriteBufferLen, "Error: could not get variable %s"SHELL_EOL, pcParameter1);
-        //return pdFALSE;
-
 
 }
 

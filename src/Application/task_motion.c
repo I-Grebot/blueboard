@@ -58,6 +58,7 @@ void OS_CreateMotionTask(void)
 	vCreateAllMutex();
     AVS_Init();
 	xTaskCreate(AVS_CsTask, "AVERSIVE", 500, NULL, OS_TASK_PRIORITY_AVERSIVE, NULL );
+
 	xWaypointQueue = xQueueCreate( MAX_WP_IN_QUEUE, sizeof(wp_t));
     if(xWaypointQueue==NULL)
     {
@@ -65,6 +66,7 @@ void OS_CreateMotionTask(void)
     	while(1);
     }
 	xTaskCreate(OS_MotionTask, "MOTION", 500, NULL, OS_TASK_PRIORITY_MOTION, NULL );
+
 }
 
 static void OS_MotionTask( void *pvParameters )
@@ -208,7 +210,7 @@ void AVS_CsTask(void *pvParameters)
     {
 
     	if(robot.cs.cs_events & DO_RS) {
-    		/* Manage Robot System */
+    		// Manage Robot System
     		rs_update(&robot.cs.rs);
 
 			robot.cs.speed_a = rs_get_angle(&robot.cs.rs) - old_a;
@@ -224,14 +226,13 @@ void AVS_CsTask(void *pvParameters)
 
 		if (robot.cs.cs_events & DO_POWER)
 		{
-			/* Main CS Management */
+			// Main CS Management
 			vLockDistanceConsign();
 			cs_manage(&robot.cs.cs_d);
 			vUnlockDistanceConsign();
 			vLockAngleConsign();
 			cs_manage(&robot.cs.cs_a);
 			vUnlockAngleConsign();
-			/* Position manager */
 		}
 		else
 		{
@@ -242,6 +243,9 @@ void AVS_CsTask(void *pvParameters)
 		if(robot.cs.cs_events & DO_POS)
 		{
 			position_manage(&robot.cs.pos);
+			/*printf("robot.cs.pos=%d:%d:%d\n",  robot.cs.pos.pos_s16.x,
+                                               robot.cs.pos.pos_s16.y,
+                                               robot.cs.pos.pos_s16.a);*/
 		}
 
 		/* Blocking-detection manager: TO BE ADDED */

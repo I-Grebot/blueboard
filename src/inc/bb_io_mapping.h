@@ -739,6 +739,7 @@
 #define DBG_CLK_ENABLE()                RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE)
 #define DBG_CLK_DISABLE()               RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, DISABLE)
 #define DBG_IRQn                        USART1_IRQn
+#define DBG_ISR                         USART1_IRQHandler
 
 /* UART_RX Mapped on PA10 */
 #define DBG_RX_GPIO_PORT                GPIOA

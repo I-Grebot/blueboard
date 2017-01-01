@@ -31,8 +31,9 @@
  */
 
 #define YEAR_STR          "2017"
-#define BUILD_VERSION_STR "v1.1"
 #define ROBOT_NAME_STR    "R1"
+#define BUILD_VERSION_STR __DATE__" @ "__TIME__
+
 
 /**
 ********************************************************************************
@@ -96,7 +97,7 @@
 /* User application files */
 #include "motion.h"
 #include "strategy.h"
-
+#include "shell.h"
 
 
 /**
@@ -116,53 +117,43 @@
 #define OS_TASK_PRIORITY_STRATEGY  ( tskIDLE_PRIORITY + 3  )
 #define OS_TASK_PRIORITY_MOTION    ( tskIDLE_PRIORITY + 3  )
 #define OS_TASK_PRIORITY_AVOIDANCE ( tskIDLE_PRIORITY + 4  )
-#define OS_TASK_PRIORITY_AVERSIVE  ( tskIDLE_PRIORITY + 5  )
+#define OS_TASK_PRIORITY_AVERSIVE  ( tskIDLE_PRIORITY + 4  )
+
+ /* NVIC Priorities. Lower value means higher priority.
+  * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY
+  * and higher than configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY when using
+  * ISR Save FreeRTOS API Routines!
+  */
+#define OS_ISR_PRIORITY_SER             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 )
+#define OS_ISR_PRIORITY_SYS_RUNSTATS    ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY )
 
  /* Events periodicity */
-#define MOTION_CONTROL_PERIOD_MS      50 /* Tests purpose */
-#define AVERSIVE_PERIOD_MS            50 /* Tests purpose */
+#define MOTION_CONTROL_PERIOD_MS      50
+#define AVERSIVE_PERIOD_MS            50
 
- /**
- ********************************************************************************
- **
- **  Shell Constants
- **
- ********************************************************************************
+
+/**
+********************************************************************************
+**
+**  Run-time Statistics
+**
+********************************************************************************
+*/
+
+/* Timer to be used for run-time statistics */
+#define SYS_RUNSTATS_TIM                    TIM6
+#define SYS_RUNSTATS_TIM_CLK_ENABLE()       RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
+#define SYS_RUNSTATS_TIM_CLK_DISABLE()      RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, DISABLE)
+#define SYS_RUNSTATS_IRQn                   TIM6_DAC_IRQn
+#define SYS_RUNSTATS_ISR                    TIM6_DAC_IRQHandler
+
+/* Clock-divider and prescaler config to adjust the run-time timer frequency
+ * APB1 Timers Running at   96000 kHz
+ * System ticks running at      1 kHz
  */
+#define SYS_RUNSTATS_CKDIV          TIM_CKD_DIV4
+#define SYS_RUNSTATS_PRESCALER      (1199) // 20 kHz
 
-/* Dimensions the buffer into which input characters are placed. */
-#define SHELL_MAX_INPUT_SIZE		50
-
-/* DEL acts as a backspace. */
-#define SHELL_ASCII_DEL				( 0x7F )
-
-/* The maximum time to wait for the mutex that guards the UART to become
-available. */
-#define SHELL_MAX_MUTEX_WAIT		pdMS_TO_TICKS( 300 )
-
-/* End-Of-Line characters that should be used */
-#define SHELL_EOL 						"\n\r"
-
-/* String displayed after each output */
-#define SHELL_END_OF_OUTPUT_STR 		"\n\r> "
-
-/* Delimiter for hierarchical paths */
-#define SHELL_PATH_DELIM                 "."
-
-/* Delimiter for multiple variables output */
-#define SHELL_VAR_DELIM                  ":"
-
-/* The welcome message display at shell's startup */
-#define SHELL_WELCOME_MESSAGE "\f"\
-	"-----------------------------------------------------------\n\r"\
-	"  IgreBot "YEAR_STR" ~ Command Shell\n\r"\
-	"-----------------------------------------------------------\n\r"\
-	"  Robot : "ROBOT_NAME_STR"\n\r"\
-	"  Build : "BUILD_VERSION_STR"\n\r"\
-	"-----------------------------------------------------------\n\r"\
-	" Type 'help' for the list of available commands\n\r"\
-	"-----------------------------------------------------------\n\r\n\r"\
-	"> "
 
 /**
 ********************************************************************************
@@ -261,7 +252,9 @@ void HW_PowerDown(void);
 /* System */
 void HW_SystemClock_Config(void);
 void HW_CPU_CACHE_Enable(void);
-void HW_JumpToBootloader(void);
+void HW_SYS_TimerRunTime_Config(void);
+uint32_t HW_SYS_GetRunTimeTicks(void);
+void HW_SYS_GetRunTimeStats(char *pcWriteBuffer);
 
 /* Power modules */
 void HW_PWR_Init(void);
@@ -303,17 +296,17 @@ int32_t HW_MON_ConvertTempValueToDegree(const uint32_t vsense);
 
 /* Debug */
 void HW_DBG_Init(USART_InitTypeDef * USART_InitStruct);
-void HW_DBG_Put(uint8_t ch);
-void HW_DBG_Puts(const char *str);
-uint8_t HW_DBG_Get(void);
+BaseType_t HW_DBG_Put(char ch);
+BaseType_t HW_DBG_Puts(const char *str);
+BaseType_t HW_DBG_Get(const char* str);
 void OS_DebugTaskPrint( char ppcMessageToSend[] );
 
 void OS_SHL_RegisterCommands( void );
 void OS_SHL_Start( void );
 void OS_SHL_OutputString( const char * const pcMessage );
 
-BaseType_t OS_SHL_SetVariable(char* path, char* value);
-BaseType_t OS_SHL_GetVariable(char* path, char* value, size_t valueLength);
+BaseType_t OS_SHL_SetVariable(char* path, char* value, char* ret, size_t retLength);
+BaseType_t OS_SHL_GetVariable(char* path, char* ret, size_t retLength);
 
 /* Digital Servo */
 void HW_DSV_Init(USART_InitTypeDef * USART_InitStruct);
