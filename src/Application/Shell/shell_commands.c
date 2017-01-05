@@ -27,6 +27,7 @@
 static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 
 /* Parameters and variables management */
+static BaseType_t OS_SHL_VarCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 static BaseType_t OS_SHL_SetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 static BaseType_t OS_SHL_GetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 static BaseType_t OS_SHL_StoCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
@@ -64,6 +65,16 @@ static const CLI_Command_Definition_t xSys =
     "  - 'tasks-stats' : Display tasks statistics"SHELL_EOL
     ,OS_SHL_SysCmd,
     1
+};
+
+// Variable list command
+static const CLI_Command_Definition_t xVar =
+{
+    "var",
+    SHELL_EOL
+    "var: Display the list of available variables)."SHELL_EOL
+    ,OS_SHL_VarCmd,
+    0
 };
 
 // Variable set command
@@ -253,6 +264,7 @@ static const CLI_Command_Definition_t xStr =
 void OS_SHL_RegisterCommands( void )
 {
     FreeRTOS_CLIRegisterCommand( &xSys );
+    FreeRTOS_CLIRegisterCommand( &xVar );
     FreeRTOS_CLIRegisterCommand( &xSet );
     FreeRTOS_CLIRegisterCommand( &xGet );
     FreeRTOS_CLIRegisterCommand( &xSto );
@@ -333,12 +345,19 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 }
 
+static BaseType_t OS_SHL_VarCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
+{
+    return OS_SHL_GetVariablesList(pcWriteBuffer, xWriteBufferLen);
+
+}
+
 static BaseType_t OS_SHL_SetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
     char* pcParameter1;
     char* pcParameter2;
     BaseType_t xParameter1StringLength;
     BaseType_t xParameter2StringLength;
+    OS_SHL_VarItemTypeDef* var;
 
     /* Get parameters */
     pcParameter1 = (char*) FreeRTOS_CLIGetParameter(pcCommandString, 1, &xParameter1StringLength);
@@ -348,14 +367,32 @@ static BaseType_t OS_SHL_SetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     pcParameter1[ xParameter1StringLength ] = 0x00;
     pcParameter2[ xParameter2StringLength ] = 0x00;
 
-    /* Decode variable path */
-    return OS_SHL_SetVariable(pcParameter1, pcParameter2, pcWriteBuffer, xWriteBufferLen);
+    /* Find the variable by its name */
+        if(OS_SHL_FindVariableByName(pcParameter1, &var) == pdTRUE)
+        {
+            if(OS_SHL_SetVariable(var, pcParameter2) == pdTRUE)
+            {
+                snprintf(pcWriteBuffer, xWriteBufferLen, "");
+
+            /* Error during set */
+            } else {
+                snprintf( pcWriteBuffer, xWriteBufferLen, "Error while setting variable '%s' to %s"SHELL_EOL, pcParameter1, pcParameter2);
+            }
+
+        /* Not found */
+        } else {
+            snprintf( pcWriteBuffer, xWriteBufferLen, "Could not find variable '%s'"SHELL_EOL, pcParameter1);
+        }
+
+        /* This is always a one-shot print */
+        return pdFALSE;
 }
 
 static BaseType_t OS_SHL_GetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
     char* pcParameter1;
     BaseType_t xParameter1StringLength;
+    OS_SHL_VarItemTypeDef* var;
 
     /* Get parameters */
     pcParameter1 = (char*) FreeRTOS_CLIGetParameter(pcCommandString, 1, &xParameter1StringLength);
@@ -363,8 +400,21 @@ static BaseType_t OS_SHL_GetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     /* Terminate string */
     pcParameter1[ xParameter1StringLength ] = 0x00;
 
-    /* Decode variable path */
-    return OS_SHL_GetVariable(pcParameter1, pcWriteBuffer, xWriteBufferLen);
+    /* Find the variable by its name */
+    if(OS_SHL_FindVariableByName(pcParameter1, &var) == pdTRUE)
+    {
+        if(OS_SHL_GetVariable(var, pcWriteBuffer, xWriteBufferLen) != pdTRUE)
+        {
+            snprintf( pcWriteBuffer, xWriteBufferLen, "Error while reading variable '%s'"SHELL_EOL, pcParameter1);
+        }
+
+    /* Not found */
+    } else {
+        snprintf( pcWriteBuffer, xWriteBufferLen, "Could not find variable '%s'"SHELL_EOL, pcParameter1);
+    }
+
+    /* This is always a one-shot print */
+    return pdFALSE;
 
 }
 

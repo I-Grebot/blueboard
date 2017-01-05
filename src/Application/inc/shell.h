@@ -4,18 +4,6 @@
 /**
  ********************************************************************************
  **
- **  Types definition
- **
- ********************************************************************************
- */
-
-typedef struct {
-    bool echo;
-} OS_SHL_ConfigTypeDef;
-
-/**
- ********************************************************************************
- **
  **  Shell Constants
  **
  ********************************************************************************
@@ -54,5 +42,46 @@ available. */
     " Type 'help' for the list of available commands\n\r"\
     "-----------------------------------------------------------\n\r\n\r"\
     "> "
+
+
+/**
+ ********************************************************************************
+ **
+ **  Types definition
+ **
+ ********************************************************************************
+ */
+
+typedef struct {
+    bool echo;
+} OS_SHL_ConfigTypeDef;
+
+typedef enum {
+    TYPE_BOOL,
+    TYPE_CHAR,
+    TYPE_UINT8,
+    TYPE_INT8,
+    TYPE_UINT16,
+    TYPE_INT16,
+    TYPE_UINT32,
+    TYPE_INT32,
+    TYPE_UINT64,
+    TYPE_INT64,
+    TYPE_FLOAT,
+    TYPE_DOUBLE
+} OS_SHL_VarTypeEnum;
+
+typedef enum {
+    ACC_WR, // Write / Read
+    ACC_RD, // Read-Only
+    ACC_RQ // Request (Write then auto-reset)
+} OS_SHL_VarAccessEnum;
+
+typedef struct {
+    char* name;                     // Name
+    OS_SHL_VarTypeEnum type;        // Type enum (for fast lookup)
+    OS_SHL_VarAccessEnum access;    // Access type of the variable
+    const void* var;                // Pointer on the variable
+} OS_SHL_VarItemTypeDef;
 
 #endif /* _SHELL_H_ */
