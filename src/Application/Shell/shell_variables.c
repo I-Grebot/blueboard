@@ -17,8 +17,8 @@
 #include "blueboard.h"
 
 /* Variables definition list holder */
-extern const OS_SHL_VarItemTypeDef varList[];
-extern const size_t varListLength;
+extern const OS_SHL_VarItemTypeDef OS_SHL_varList[];
+extern const size_t OS_SHL_varListLength;
 
 /*
  * Converts a type into a printable string
@@ -85,8 +85,8 @@ const char* OS_SHL_GetAccessAsString(const OS_SHL_VarAccessEnum acc)
  */
 BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
 {
-    const char* header = "ID. Type     Acc.  Name                Value"SHELL_EOL
-                         "------------------------------------------------"SHELL_EOL;
+    const char* header = "      ID. Type     Acc.  Name                 Unit    Value"SHELL_EOL
+                         "      --------------------------------------------------------"SHELL_EOL;
 
     /* Local handlers for outputting variables one at a time */
     static const OS_SHL_VarItemTypeDef* var = NULL;
@@ -94,7 +94,7 @@ BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
 
     if(var == NULL)
     {
-        var = varList;
+        var = OS_SHL_varList;
         id = 0;
 
         /* Header */
@@ -103,11 +103,12 @@ BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
     }
 
     /* Display the variable */
-    snprintf(ret, retLength, "%3u %-8s %-5s %-20s",
+    snprintf(ret, retLength, SHELL_VAR_PFX"%3u %-8s %-5s %-20s %-8s",
             id,
             OS_SHL_GetTypeAsString(var->type),
             OS_SHL_GetAccessAsString(var->access),
-            var->name);
+            var->name,
+            var->unit);
     ret += strlen(ret);
     OS_SHL_GetVariable(var, ret, retLength);
     ret += strlen(ret);
@@ -115,7 +116,7 @@ BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
 
     /* There are still items to process, move to the next one */
     id++;
-    if(id < varListLength)
+    if(id < OS_SHL_varListLength)
     {
         var++;
         return pdTRUE;
@@ -136,7 +137,7 @@ BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
  */
 BaseType_t OS_SHL_FindVariableByName(char* name, const OS_SHL_VarItemTypeDef** var)
 {
-    OS_SHL_VarItemTypeDef* lookup = varList;
+    OS_SHL_VarItemTypeDef* lookup = OS_SHL_varList;
     size_t id = 0;
 
     do {
@@ -150,7 +151,7 @@ BaseType_t OS_SHL_FindVariableByName(char* name, const OS_SHL_VarItemTypeDef** v
         id++;
         lookup++;
 
-    } while(id < varListLength);
+    } while(id < OS_SHL_varListLength);
 
     /* Not found */
     return pdFALSE;
@@ -161,9 +162,9 @@ BaseType_t OS_SHL_FindVariableByName(char* name, const OS_SHL_VarItemTypeDef** v
  */
 BaseType_t OS_SHL_FindVariableById(size_t id, const OS_SHL_VarItemTypeDef** var)
 {
-    if(id < varListLength)
+    if(id < OS_SHL_varListLength)
     {
-        *var = varList + id;
+        *var = OS_SHL_varList + id;
         return pdTRUE;
     } else {
         return pdFALSE;

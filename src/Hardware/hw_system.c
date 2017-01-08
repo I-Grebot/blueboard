@@ -151,9 +151,9 @@ API function which actually does just this). */
 void HW_SYS_GetRunTimeStats(char *pcWriteBuffer)
 {
     const char * const pcHeader =
-                "Task                  Abs. Time    % Time"SHELL_EOL;
+                    SHELL_SYS_PFX"Task                  Abs. Time    % Time"SHELL_EOL;
     const char * const pcLineSeparator =
-                "-----------------------------------------"SHELL_EOL;
+                    SHELL_SYS_PFX"-----------------------------------------"SHELL_EOL;
 
     TaskStatus_t *pxTaskStatusArray;
     volatile UBaseType_t uxArraySize, x;
@@ -202,7 +202,7 @@ void HW_SYS_GetRunTimeStats(char *pcWriteBuffer)
 
             if( ulStatsAsPercentage > 0UL )
             {
-               sprintf( pcWriteBuffer, "%-20s %10lu   %3lu%%"SHELL_EOL,
+               sprintf( pcWriteBuffer, SHELL_SYS_PFX"%-20s %10lu   %3lu%%"SHELL_EOL,
                                  pxTaskStatusArray[ x ].pcTaskName,
                                  pxTaskStatusArray[ x ].ulRunTimeCounter,
                                  ulStatsAsPercentage );
@@ -211,7 +211,7 @@ void HW_SYS_GetRunTimeStats(char *pcWriteBuffer)
             {
                /* If the percentage is zero here then the task has
                consumed less than 1% of the total run time. */
-               sprintf( pcWriteBuffer, "%-20s %10lu    <1%%"SHELL_EOL,
+               sprintf( pcWriteBuffer, SHELL_SYS_PFX"%-20s %10lu    <1%%"SHELL_EOL,
                                  pxTaskStatusArray[ x ].pcTaskName,
                                  pxTaskStatusArray[ x ].ulRunTimeCounter );
             }
@@ -222,7 +222,7 @@ void HW_SYS_GetRunTimeStats(char *pcWriteBuffer)
          /* Footer */
          sprintf( pcWriteBuffer, pcLineSeparator );
          pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
-         sprintf( pcWriteBuffer,"%-20s %10lu   %3lu%%"SHELL_EOL, "TOTAL", 100*ulTotalRunTime, 100UL);
+         sprintf( pcWriteBuffer,SHELL_SYS_PFX"%-20s %10lu   %3lu%%"SHELL_EOL, "TOTAL", 100*ulTotalRunTime, 100UL);
          pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
       }
 

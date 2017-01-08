@@ -22,6 +22,17 @@ available. */
 /* End-Of-Line characters that should be used */
 #define SHELL_EOL                       "\n\r"
 
+/* Prefixes for returned strings */
+#define SHELL_ERR_PFX           "[ERR] "    // For all errors
+
+#define SHELL_SYS_PFX           "[SYS] "    // For returns of Sys command
+#define SHELL_GET_PFX           "[GET] "    // For returns of Get command
+#define SHELL_PRB_PFX           "[PRB] "    // For returns of Prb command
+#define SHELL_SET_PFX           "[SET] "    // For returns of Set command
+#define SHELL_VAR_PFX           "[VAR] "    // For returns of Var command
+#define SHELL_POW_PFX           "[POW] "    // For returns of Pow command
+#define SHELL_LED_PFX           "[LED] "    // For returns of Led command
+
 /* String displayed after each output */
 #define SHELL_END_OF_OUTPUT_STR         "\n\r> "
 
@@ -82,6 +93,7 @@ typedef struct {
     OS_SHL_VarTypeEnum type;        // Type enum (for fast lookup)
     OS_SHL_VarAccessEnum access;    // Access type of the variable
     const void* var;                // Pointer on the variable
+    char* unit;                     // Unit of the variable (if relevant)
 } OS_SHL_VarItemTypeDef;
 
 #endif /* _SHELL_H_ */

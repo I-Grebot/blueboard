@@ -30,6 +30,7 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 static BaseType_t OS_SHL_VarCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 static BaseType_t OS_SHL_SetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 static BaseType_t OS_SHL_GetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
+static BaseType_t OS_SHL_PrbCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 static BaseType_t OS_SHL_StoCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 
 /* Hardware low-level modules management */
@@ -94,10 +95,21 @@ static const CLI_Command_Definition_t xGet =
 {
     "get",
     SHELL_EOL
-    "get [name]: Retrieve a variable value (from RAM)."SHELL_EOL
+    "get [name] : Retrieve variable value (from RAM)."SHELL_EOL
     " - [name]  : Name of the variable to get"SHELL_EOL
     ,OS_SHL_GetCmd,
-    1
+    1 // Variable
+};
+
+// Variable probe command
+static const CLI_Command_Definition_t xPrb =
+{
+    "prb",
+    SHELL_EOL
+    "prb [id1]... [idN] : Retrieve N values (from RAM)."SHELL_EOL
+    " - [id]  : Id of the variable to get"SHELL_EOL
+    ,OS_SHL_PrbCmd,
+    -1 // Variable
 };
 
 // Variable store command
@@ -267,6 +279,7 @@ void OS_SHL_RegisterCommands( void )
     FreeRTOS_CLIRegisterCommand( &xVar );
     FreeRTOS_CLIRegisterCommand( &xSet );
     FreeRTOS_CLIRegisterCommand( &xGet );
+    FreeRTOS_CLIRegisterCommand( &xPrb );
     FreeRTOS_CLIRegisterCommand( &xSto );
     FreeRTOS_CLIRegisterCommand( &xPow );
     FreeRTOS_CLIRegisterCommand( &xMot );
@@ -289,8 +302,8 @@ void OS_SHL_RegisterCommands( void )
 static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
     const char *const pcHeader_list =
-                "   State   Prio.   Stack   #"SHELL_EOL
-                "------------------------------------------"SHELL_EOL;
+                        SHELL_SYS_PFX"   State   Prio.   Stack   #"SHELL_EOL
+                        SHELL_SYS_PFX"------------------------------------------"SHELL_EOL;
     BaseType_t xSpacePadding;
 
 
@@ -305,7 +318,7 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     /* 'RESET' Sub-command: reset the microcontroller */
     if(!strcasecmp(pcParameter1, "reset")) {
-        snprintf( pcWriteBuffer, xWriteBufferLen, "Resetting..."SHELL_EOL);
+        snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_SYS_PFX"Resetting..."SHELL_EOL);
         NVIC_SystemReset(); /* Auto-kill */
         return pdFALSE;
 
@@ -328,6 +341,7 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             /* Ensure always terminated. */
             *pcWriteBuffer = 0x00;
         }
+        // TODO add SHELL_SYS_PFX for each entry
         strcpy( pcWriteBuffer, pcHeader_list );
         vTaskList( pcWriteBuffer + strlen( pcHeader_list ) );
         return pdFALSE;
@@ -339,7 +353,7 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     /* Error case */
     } else {
-        snprintf( pcWriteBuffer, xWriteBufferLen, "Error: unknown system command %s"SHELL_EOL, pcParameter1);
+        snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unknown system command %s"SHELL_EOL, pcParameter1);
         return pdFALSE;
     }
 
@@ -376,12 +390,12 @@ static BaseType_t OS_SHL_SetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
             /* Error during set */
             } else {
-                snprintf( pcWriteBuffer, xWriteBufferLen, "Error while setting variable '%s' to %s"SHELL_EOL, pcParameter1, pcParameter2);
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Error while setting variable '%s' to %s"SHELL_EOL, pcParameter1, pcParameter2);
             }
 
         /* Not found */
         } else {
-            snprintf( pcWriteBuffer, xWriteBufferLen, "Could not find variable '%s'"SHELL_EOL, pcParameter1);
+            snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not find variable '%s'"SHELL_EOL, pcParameter1);
         }
 
         /* This is always a one-shot print */
@@ -392,7 +406,10 @@ static BaseType_t OS_SHL_GetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 {
     char* pcParameter1;
     BaseType_t xParameter1StringLength;
+
     OS_SHL_VarItemTypeDef* var;
+    char valueStr[32];
+    const size_t valueStrLen = sizeof(valueStr) / sizeof(char);
 
     /* Get parameters */
     pcParameter1 = (char*) FreeRTOS_CLIGetParameter(pcCommandString, 1, &xParameter1StringLength);
@@ -403,20 +420,69 @@ static BaseType_t OS_SHL_GetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     /* Find the variable by its name */
     if(OS_SHL_FindVariableByName(pcParameter1, &var) == pdTRUE)
     {
-        if(OS_SHL_GetVariable(var, pcWriteBuffer, xWriteBufferLen) != pdTRUE)
+        if(OS_SHL_GetVariable(var, valueStr, valueStrLen) == pdTRUE)
         {
-            snprintf( pcWriteBuffer, xWriteBufferLen, "Error while reading variable '%s'"SHELL_EOL, pcParameter1);
+            snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_GET_PFX"%s=%s"SHELL_EOL, var->name, valueStr);
+        } else {
+            snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Error while reading variable '%s'"SHELL_EOL, pcParameter1);
         }
 
     /* Not found */
     } else {
-        snprintf( pcWriteBuffer, xWriteBufferLen, "Could not find variable '%s'"SHELL_EOL, pcParameter1);
+        snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not find variable '%s'"SHELL_EOL, pcParameter1);
     }
 
     /* This is always a one-shot print */
     return pdFALSE;
+}
+
+static BaseType_t OS_SHL_PrbCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
+{
+
+    const char *pcParameter;
+    BaseType_t lParameterStringLength;
+    UBaseType_t lParameterNumber;
+
+    uint32_t id;
+    OS_SHL_VarItemTypeDef* var;
+    char valueStr[32];
+    const size_t valueStrLen = sizeof(valueStr) / sizeof(char);
+
+    snprintf(pcWriteBuffer, xWriteBufferLen, SHELL_PRB_PFX);
+    pcWriteBuffer += strlen(pcWriteBuffer);
+
+    // Get parameters one by one
+    lParameterNumber = 1;
+    while((pcParameter = FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength )) != NULL)
+    {
+       // Convert ID string to int
+       id = strtoul(pcParameter, NULL, 10);
+
+       if(OS_SHL_FindVariableById(id, &var) == pdTRUE)
+       {
+           if(OS_SHL_GetVariable(var, valueStr, valueStrLen) == pdTRUE)
+           {
+               snprintf(pcWriteBuffer, xWriteBufferLen, "%s ", valueStr);
+           } else {
+               snprintf(pcWriteBuffer, xWriteBufferLen, "--");
+           }
+
+       // Not found
+       } else {
+           snprintf(pcWriteBuffer, xWriteBufferLen, "--");
+       }
+
+       pcWriteBuffer += strlen(pcWriteBuffer);
+       lParameterNumber++;
+    }
+
+    // Always one-shot
+    return pdFALSE;
 
 }
+
+
+
 
 static BaseType_t OS_SHL_StoCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
@@ -450,7 +516,7 @@ static BaseType_t OS_SHL_PowCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     } else if(!strcasecmp(pcParameter1, "ALL")) {
         allSupplies = 1;
     } else {
-        snprintf( pcWriteBuffer, xWriteBufferLen, "Error: could not define power-supply no to %s"SHELL_EOL, pcParameter1);
+        snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not define power-supply no to %s"SHELL_EOL, pcParameter1);
         return pdFALSE;
     }
 
@@ -472,11 +538,11 @@ static BaseType_t OS_SHL_PowCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             HW_PWR_Enable(HW_PWR_VP3);
         }
     } else {
-        snprintf( pcWriteBuffer, xWriteBufferLen, "Error: could not define power-supply state to %s"SHELL_EOL, pcParameter2);
+        snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not define power-supply state to %s"SHELL_EOL, pcParameter2);
         return pdFALSE;
     }
 
-    snprintf( pcWriteBuffer, xWriteBufferLen, "Defined power-supply %s to %s"SHELL_EOL, pcParameter1, pcParameter2);
+    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_POW_PFX"Defined power-supply %s to %s"SHELL_EOL, pcParameter1, pcParameter2);
     return pdFALSE;
 }
 
@@ -600,7 +666,7 @@ static BaseType_t OS_SHL_LedCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     } else if(!strcasecmp(pcParameter1, "BLINK_FAST")) {
         LedSetMode(HW_LED_BLINK_FAST);
     } else {
-        snprintf( pcWriteBuffer, xWriteBufferLen, "Error: could not set LED mode to %s"SHELL_EOL, pcParameter1);
+        snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not set LED mode to %s"SHELL_EOL, pcParameter1);
         return pdFALSE;
     }
 
@@ -622,11 +688,11 @@ static BaseType_t OS_SHL_LedCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     } else if(!strcasecmp(pcParameter2, "YELLOW")) {
         LedSetColor(HW_LED_YELLOW);
     } else {
-        snprintf( pcWriteBuffer, xWriteBufferLen, "Error: could not set LED color to %s"SHELL_EOL, pcParameter2);
+        snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not set LED color to %s"SHELL_EOL, pcParameter2);
         return pdFALSE;
     }
 
-    snprintf( pcWriteBuffer, xWriteBufferLen, "Defined LED to %s %s"SHELL_EOL, pcParameter1, pcParameter2);
+    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_LED_PFX"Defined LED to %s %s"SHELL_EOL, pcParameter1, pcParameter2);
     return pdFALSE;
 }
 
