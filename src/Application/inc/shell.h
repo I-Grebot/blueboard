@@ -92,7 +92,7 @@ typedef struct {
     char* name;                     // Name
     OS_SHL_VarTypeEnum type;        // Type enum (for fast lookup)
     OS_SHL_VarAccessEnum access;    // Access type of the variable
-    const void* var;                // Pointer on the variable
+    const volatile void* var;       // Pointer on the variable
     char* unit;                     // Unit of the variable (if relevant)
 } OS_SHL_VarItemTypeDef;
 

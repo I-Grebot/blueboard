@@ -5392,176 +5392,175 @@ LOAD c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib
 .iplt           0x080123d0        0x0
  .iplt          0x080123d0        0x0 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16/crtbegin.o
 
-.rodata         0x080123d0     0x1b48
+.rodata         0x080123d0     0x2170
                 0x080123d0                . = ALIGN (0x4)
  *(.rodata)
  .rodata        0x080123d0      0xb79 src\Application\Shell\shell_commands.o
  *fill*         0x08012f49        0x3 
- .rodata        0x08012f4c      0x140 src\Application\Shell\shell_variables.o
- .rodata        0x0801308c       0x4c src\Application\Shell\shell_variables_list.o
- .rodata        0x080130d8       0x24 src\Application\freertos_hooks.o
- .rodata        0x080130fc       0x41 src\Application\task_ASV.o
- *fill*         0x0801313d        0x3 
- .rodata        0x08013140       0x42 src\Application\task_DSV.o
- *fill*         0x08013182        0x2 
- .rodata        0x08013184        0xa src\Application\task_avoidance.o
- *fill*         0x0801318e        0x2 
- .rodata        0x08013190       0x43 src\Application\task_motion.o
- *fill*         0x080131d3        0x1 
- .rodata        0x080131d4      0x1ae src\Application\task_shell.o
- *fill*         0x08013382        0x2 
- .rodata        0x08013384        0xb src\Aversive\trajectory_manager.o
- *fill*         0x0801338f        0x1 
- .rodata        0x08013390       0x31 src\FreeRTOS\portable\GCC\ARM_CM7\r0p1\port.o
- *fill*         0x080133c1        0x3 
- .rodata        0x080133c4       0x2a src\FreeRTOS\portable\MemMang\heap_4.o
- *fill*         0x080133ee        0x2 
- .rodata        0x080133f0       0x18 src\FreeRTOS\queue.o
- .rodata        0x08013408       0x48 src\FreeRTOS\tasks.o
- .rodata        0x08013450       0x29 src\FreeRTOS\timers.o
- *fill*         0x08013479        0x3 
- .rodata        0x0801347c      0x114 src\FreeRTOS-Plus\FreeRTOS-Plus-CLI\FreeRTOS_CLI.o
- .rodata        0x08013590       0xaa src\Hardware\hw_system.o
- *fill*         0x0801363a        0x2 
- .rodata        0x0801363c      0x200 src\xl_320\src\xl_320.o
+ .rodata        0x08012f4c      0x178 src\Application\Shell\shell_variables.o
+ .rodata        0x080130c4      0x3e0 src\Application\Shell\shell_variables_list.o
+ .rodata        0x080134a4       0x24 src\Application\freertos_hooks.o
+ .rodata        0x080134c8       0x41 src\Application\task_ASV.o
+ *fill*         0x08013509        0x3 
+ .rodata        0x0801350c       0x42 src\Application\task_DSV.o
+ *fill*         0x0801354e        0x2 
+ .rodata        0x08013550        0xa src\Application\task_avoidance.o
+ *fill*         0x0801355a        0x2 
+ .rodata        0x0801355c       0x43 src\Application\task_motion.o
+ *fill*         0x0801359f        0x1 
+ .rodata        0x080135a0      0x1ae src\Application\task_shell.o
+ *fill*         0x0801374e        0x2 
+ .rodata        0x08013750        0xb src\Aversive\trajectory_manager.o
+ *fill*         0x0801375b        0x1 
+ .rodata        0x0801375c       0x31 src\FreeRTOS\portable\GCC\ARM_CM7\r0p1\port.o
+ *fill*         0x0801378d        0x3 
+ .rodata        0x08013790       0x2a src\FreeRTOS\portable\MemMang\heap_4.o
+ *fill*         0x080137ba        0x2 
+ .rodata        0x080137bc       0x18 src\FreeRTOS\queue.o
+ .rodata        0x080137d4       0x48 src\FreeRTOS\tasks.o
+ .rodata        0x0801381c       0x29 src\FreeRTOS\timers.o
+ *fill*         0x08013845        0x3 
+ .rodata        0x08013848      0x114 src\FreeRTOS-Plus\FreeRTOS-Plus-CLI\FreeRTOS_CLI.o
+ .rodata        0x0801395c       0xaa src\Hardware\hw_system.o
+ *fill*         0x08013a06        0x2 
+ .rodata        0x08013a08      0x200 src\xl_320\src\xl_320.o
  *(.rodata*)
- .rodata.xSys   0x0801383c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xVar   0x0801384c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xSet   0x0801385c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xGet   0x0801386c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xPrb   0x0801387c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xSto   0x0801388c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xPow   0x0801389c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xMot   0x080138ac       0x10 src\Application\Shell\shell_commands.o
- .rodata.xDsv   0x080138bc       0x10 src\Application\Shell\shell_commands.o
- .rodata.xAsv   0x080138cc       0x10 src\Application\Shell\shell_commands.o
- .rodata.xMon   0x080138dc       0x10 src\Application\Shell\shell_commands.o
- .rodata.xDio   0x080138ec       0x10 src\Application\Shell\shell_commands.o
- .rodata.xHmi   0x080138fc       0x10 src\Application\Shell\shell_commands.o
- .rodata.xLed   0x0801390c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xAvs   0x0801391c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xAvd   0x0801392c       0x10 src\Application\Shell\shell_commands.o
- .rodata.xStr   0x0801393c       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xSys   0x08013c08       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xVar   0x08013c18       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xSet   0x08013c28       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xGet   0x08013c38       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xPrb   0x08013c48       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xSto   0x08013c58       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xPow   0x08013c68       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xMot   0x08013c78       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xDsv   0x08013c88       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xAsv   0x08013c98       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xMon   0x08013ca8       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xDio   0x08013cb8       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xHmi   0x08013cc8       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xLed   0x08013cd8       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xAvs   0x08013ce8       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xAvd   0x08013cf8       0x10 src\Application\Shell\shell_commands.o
+ .rodata.xStr   0x08013d08       0x10 src\Application\Shell\shell_commands.o
  .rodata.OS_SHL_varList
-                0x0801394c       0x40 src\Application\Shell\shell_variables_list.o
-                0x0801394c                OS_SHL_varList
+                0x08013d18      0x2a0 src\Application\Shell\shell_variables_list.o
+                0x08013d18                OS_SHL_varList
  .rodata.OS_SHL_varListLength
-                0x0801398c        0x4 src\Application\Shell\shell_variables_list.o
-                0x0801398c                OS_SHL_varListLength
+                0x08013fb8        0x4 src\Application\Shell\shell_variables_list.o
+                0x08013fb8                OS_SHL_varListLength
  .rodata.APBAHBPrescTable
-                0x08013990       0x10 src\Drivers\SPL\src\stm32f7xx_rcc.o
-                0x08013990                APBAHBPrescTable
+                0x08013fbc       0x10 src\Drivers\SPL\src\stm32f7xx_rcc.o
+                0x08013fbc                APBAHBPrescTable
  .rodata.xHelpCommand
-                0x080139a0       0x10 src\FreeRTOS-Plus\FreeRTOS-Plus-CLI\FreeRTOS_CLI.o
+                0x08013fcc       0x10 src\FreeRTOS-Plus\FreeRTOS-Plus-CLI\FreeRTOS_CLI.o
  .rodata.HW_PWR_PIN
-                0x080139b0        0x6 src\Hardware\hw_power.o
- *fill*         0x080139b6        0x2 
+                0x08013fdc        0x6 src\Hardware\hw_power.o
+ *fill*         0x08013fe2        0x2 
  .rodata.AHBPrescTable
-                0x080139b8       0x10 src\Hardware\system_stm32f7xx.o
-                0x080139b8                AHBPrescTable
+                0x08013fe4       0x10 src\Hardware\system_stm32f7xx.o
+                0x08013fe4                AHBPrescTable
  .rodata.str1.1
-                0x080139c8        0x2 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-impure.o)
- *fill*         0x080139ca        0x2 
+                0x08013ff4        0x2 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-impure.o)
+ *fill*         0x08013ff6        0x2 
  .rodata._global_impure_ptr
-                0x080139cc        0x4 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-impure.o)
-                0x080139cc                _global_impure_ptr
+                0x08013ff8        0x4 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-impure.o)
+                0x08013ff8                _global_impure_ptr
  .rodata.str1.1
-                0x080139d0        0x2 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-puts.o)
- *fill*         0x080139d2        0x2 
+                0x08013ffc        0x2 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-puts.o)
+ *fill*         0x08013ffe        0x2 
  .rodata.fpi.5345
-                0x080139d4       0x14 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-strtod.o)
+                0x08014000       0x14 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-strtod.o)
  .rodata.str1.1
-                0x080139e8        0x2 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-strtod.o)
+                0x08014014        0x2 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-strtod.o)
                                   0xc (size before relaxing)
  .rodata.fpinan.5381
-                0x080139e8       0x14 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-strtod.o)
- *fill*         0x080139fc        0x4 
+                0x08014014       0x14 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-strtod.o)
  .rodata.tinytens
-                0x08013a00       0x28 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-strtod.o)
+                0x08014028       0x28 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-strtod.o)
  .rodata.zeroes.7045
-                0x08013a28       0x10 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-svfprintf.o)
+                0x08014050       0x10 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-svfprintf.o)
  .rodata.str1.1
-                0x08013a38       0x34 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-svfprintf.o)
+                0x08014060       0x34 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-svfprintf.o)
  .rodata.blanks.7044
-                0x08013a6c       0x10 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-svfprintf.o)
+                0x08014094       0x10 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-svfprintf.o)
  .rodata._ctype_
-                0x08013a7c      0x101 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-ctype_.o)
-                0x08013a7c                _ctype_
+                0x080140a4      0x101 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-ctype_.o)
+                0x080140a4                _ctype_
  .rodata.str1.1
-                0x08013b7d        0xd c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-dtoa.o)
+                0x080141a5        0xd c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-dtoa.o)
                                   0xf (size before relaxing)
- *fill*         0x08013b8a        0x2 
+ *fill*         0x080141b2        0x2 
  .rodata.__sf_fake_stdin
-                0x08013b8c       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-findfp.o)
-                0x08013b8c                __sf_fake_stdin
+                0x080141b4       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-findfp.o)
+                0x080141b4                __sf_fake_stdin
  .rodata.__sf_fake_stdout
-                0x08013bac       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-findfp.o)
-                0x08013bac                __sf_fake_stdout
+                0x080141d4       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-findfp.o)
+                0x080141d4                __sf_fake_stdout
  .rodata.__sf_fake_stderr
-                0x08013bcc       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-findfp.o)
-                0x08013bcc                __sf_fake_stderr
+                0x080141f4       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-findfp.o)
+                0x080141f4                __sf_fake_stderr
  .rodata.str1.1
-                0x08013bec        0x8 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-locale.o)
+                0x08014214        0x8 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-locale.o)
                                   0xb (size before relaxing)
- *fill*         0x08013bf4        0x4 
+ *fill*         0x0801421c        0x4 
  .rodata.__mprec_tens
-                0x08013bf8       0xc8 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-mprec.o)
-                0x08013bf8                __mprec_tens
+                0x08014220       0xc8 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-mprec.o)
+                0x08014220                __mprec_tens
  .rodata.__mprec_bigtens
-                0x08013cc0       0x28 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-mprec.o)
-                0x08013cc0                __mprec_bigtens
+                0x080142e8       0x28 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-mprec.o)
+                0x080142e8                __mprec_bigtens
  .rodata.p05.5388
-                0x08013ce8        0xc c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-mprec.o)
+                0x08014310        0xc c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libc.a(lib_a-mprec.o)
  .rodata.str1.1
-                0x08013cf4        0x5 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-w_sqrt.o)
- *fill*         0x08013cf9        0x3 
+                0x0801431c        0x5 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-w_sqrt.o)
+ *fill*         0x08014321        0x3 
  .rodata.npio2_hw
-                0x08013cfc       0x80 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-e_rem_pio2.o)
+                0x08014324       0x80 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-e_rem_pio2.o)
  .rodata.two_over_pi
-                0x08013d7c      0x108 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-e_rem_pio2.o)
+                0x080143a4      0x108 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-e_rem_pio2.o)
  .rodata.init_jk
-                0x08013e84       0x10 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-k_rem_pio2.o)
- *fill*         0x08013e94        0x4 
- .rodata.PIo2   0x08013e98       0x40 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-k_rem_pio2.o)
+                0x080144ac       0x10 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-k_rem_pio2.o)
+ *fill*         0x080144bc        0x4 
+ .rodata.PIo2   0x080144c0       0x40 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-k_rem_pio2.o)
  .rodata.atanlo
-                0x08013ed8       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-s_atan.o)
+                0x08014500       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-s_atan.o)
  .rodata.atanhi
-                0x08013ef8       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-s_atan.o)
-                0x08013f18                . = ALIGN (0x4)
+                0x08014520       0x20 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/fpv5-sp-d16\libm.a(lib_a-s_atan.o)
+                0x08014540                . = ALIGN (0x4)
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
 
-.ARM            0x08013f18        0x8
-                0x08013f18                __exidx_start = .
+.ARM            0x08014540        0x8
+                0x08014540                __exidx_start = .
  *(.ARM.exidx*)
- .ARM.exidx     0x08013f18        0x8 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16\libgcc.a(_udivmoddi4.o)
-                0x08013f20                __exidx_end = .
+ .ARM.exidx     0x08014540        0x8 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16\libgcc.a(_udivmoddi4.o)
+                0x08014548                __exidx_end = .
 
-.rel.dyn        0x08013f20        0x0
- .rel.iplt      0x08013f20        0x0 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16/crtbegin.o
+.rel.dyn        0x08014548        0x0
+ .rel.iplt      0x08014548        0x0 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16/crtbegin.o
 
-.preinit_array  0x08013f20        0x0
-                0x08013f20                PROVIDE (__preinit_array_start, .)
+.preinit_array  0x08014548        0x0
+                0x08014548                PROVIDE (__preinit_array_start, .)
  *(.preinit_array*)
-                0x08013f20                PROVIDE (__preinit_array_end, .)
+                0x08014548                PROVIDE (__preinit_array_end, .)
 
-.init_array     0x08013f20        0x4
-                0x08013f20                PROVIDE (__init_array_start, .)
+.init_array     0x08014548        0x4
+                0x08014548                PROVIDE (__init_array_start, .)
  *(SORT(.init_array.*))
  *(.init_array*)
- .init_array    0x08013f20        0x4 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16/crtbegin.o
-                0x08013f24                PROVIDE (__init_array_end, .)
+ .init_array    0x08014548        0x4 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16/crtbegin.o
+                0x0801454c                PROVIDE (__init_array_end, .)
 
-.fini_array     0x08013f24        0x4
+.fini_array     0x0801454c        0x4
                 [!provide]                PROVIDE (__fini_array_start, .)
  *(SORT(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x08013f24        0x4 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16/crtbegin.o
+ .fini_array    0x0801454c        0x4 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16/crtbegin.o
                 [!provide]                PROVIDE (__fini_array_end, .)
-                0x08013f28                _sidata = LOADADDR (.data)
+                0x08014550                _sidata = LOADADDR (.data)
 
-.data           0x20010000      0x574 load address 0x08013f28
+.data           0x20010000      0x574 load address 0x08014550
                 0x20010000                . = ALIGN (0x4)
                 0x20010000                _sdata = .
  *(.data)
@@ -5605,21 +5604,21 @@ LOAD c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib
                 0x20010574                . = ALIGN (0x4)
  *fill*         0x20010571        0x3 
                 0x20010574                _edata = .
-                0x0801449c                _sidtcmram = LOADADDR (.dtcmram)
+                0x08014ac4                _sidtcmram = LOADADDR (.dtcmram)
 
-.igot.plt       0x20010574        0x0 load address 0x0801449c
+.igot.plt       0x20010574        0x0 load address 0x08014ac4
  .igot.plt      0x20010574        0x0 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16/crtbegin.o
 
-.dtcmram        0x20000000        0x0 load address 0x0801449c
+.dtcmram        0x20000000        0x0 load address 0x08014ac4
                 0x20000000                . = ALIGN (0x4)
                 0x20000000                _sdtcmram = .
  *(.dtcmram)
  *(.dtcmram*)
                 0x20000000                . = ALIGN (0x4)
                 0x20000000                _edtcmram = .
-                0x0801449c                _sisram2 = LOADADDR (.sram2)
+                0x08014ac4                _sisram2 = LOADADDR (.sram2)
 
-.sram2          0x2004c000        0x0 load address 0x0801449c
+.sram2          0x2004c000        0x0 load address 0x08014ac4
                 0x2004c000                . = ALIGN (0x4)
                 0x2004c000                _ssram2 = .
  *(.sram2)
@@ -6111,59 +6110,59 @@ LOAD c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib
                 0x00001b0f       0x22 c:/program files (x86)/atollic/truestudio for arm 6.0.0/armtools/bin/../lib/gcc/arm-atollic-eabi/5.3.1/armv7e-m/fpu/fpv5-sp-d16/crtn.o
 OUTPUT(BlueBoard.elf elf32-littlearm)
 
-.debug_info     0x00000000    0x19176
- .debug_info    0x00000000      0xf06 src\Application\Shell\shell_commands.o
- .debug_info    0x00000f06      0x508 src\Application\Shell\shell_variables.o
- .debug_info    0x0000140e      0x9ba src\Application\Shell\shell_variables_list.o
- .debug_info    0x00001dc8      0x1d5 src\Application\freertos_hooks.o
- .debug_info    0x00001f9d      0x69f src\Application\syscalls.o
- .debug_info    0x0000263c      0x3ef src\Application\task_ASV.o
- .debug_info    0x00002a2b      0x281 src\Application\task_DSV.o
- .debug_info    0x00002cac      0x3a6 src\Application\task_avoidance.o
- .debug_info    0x00003052      0x27f src\Application\task_led.o
- .debug_info    0x000032d1     0x1152 src\Application\task_motion.o
- .debug_info    0x00004423      0x270 src\Application\task_shell.o
- .debug_info    0x00004693      0x15b src\Aversive\angle_distance.o
- .debug_info    0x000047ee      0x496 src\Aversive\blocking_detection_manager.o
- .debug_info    0x00004c84      0x5e8 src\Aversive\control_system_manager.o
- .debug_info    0x0000526c      0x55a src\Aversive\filters\pid.o
- .debug_info    0x000057c6      0x302 src\Aversive\filters\quadramp.o
- .debug_info    0x00005ac8      0x330 src\Aversive\math\vect2.o
- .debug_info    0x00005df8      0x62d src\Aversive\position_manager.o
- .debug_info    0x00006425      0x6f8 src\Aversive\robot_system.o
- .debug_info    0x00006b1d     0x112b src\Aversive\trajectory_manager.o
- .debug_info    0x00007c48      0x8cf src\Drivers\SPL\src\misc.o
- .debug_info    0x00008517      0xc1f src\Drivers\SPL\src\stm32f7xx_adc.o
- .debug_info    0x00009136      0x802 src\Drivers\SPL\src\stm32f7xx_flash.o
- .debug_info    0x00009938      0x606 src\Drivers\SPL\src\stm32f7xx_gpio.o
- .debug_info    0x00009f3e      0x81f src\Drivers\SPL\src\stm32f7xx_pwr.o
- .debug_info    0x0000a75d     0x11e2 src\Drivers\SPL\src\stm32f7xx_rcc.o
- .debug_info    0x0000b93f      0xa4f src\Drivers\SPL\src\stm32f7xx_spi.o
- .debug_info    0x0000c38e     0x2115 src\Drivers\SPL\src\stm32f7xx_tim.o
- .debug_info    0x0000e4a3      0xfe6 src\Drivers\SPL\src\stm32f7xx_usart.o
- .debug_info    0x0000f489      0x2cf src\FreeRTOS\list.o
- .debug_info    0x0000f758      0x3f0 src\FreeRTOS\portable\GCC\ARM_CM7\r0p1\port.o
- .debug_info    0x0000fb48      0x33a src\FreeRTOS\portable\MemMang\heap_4.o
- .debug_info    0x0000fe82     0x11ae src\FreeRTOS\queue.o
- .debug_info    0x00011030     0x1aa0 src\FreeRTOS\tasks.o
- .debug_info    0x00012ad0      0xafd src\FreeRTOS\timers.o
- .debug_info    0x000135cd      0x407 src\FreeRTOS-Plus\FreeRTOS-Plus-CLI\FreeRTOS_CLI.o
- .debug_info    0x000139d4      0x288 src\Hardware\hardware.o
- .debug_info    0x00013c5c      0x586 src\Hardware\hw_analog_servo.o
- .debug_info    0x000141e2      0xcec src\Hardware\hw_debug.o
- .debug_info    0x00014ece      0x2e2 src\Hardware\hw_digital_input.o
- .debug_info    0x000151b0      0x4a1 src\Hardware\hw_dsv.o
- .debug_info    0x00015651      0x4fe src\Hardware\hw_encoder.o
- .debug_info    0x00015b4f      0x450 src\Hardware\hw_hmi.o
- .debug_info    0x00015f9f      0x34e src\Hardware\hw_led.o
- .debug_info    0x000162ed      0x54f src\Hardware\hw_monitoring.o
- .debug_info    0x0001683c      0x64c src\Hardware\hw_motor.o
- .debug_info    0x00016e88      0x3c1 src\Hardware\hw_power.o
- .debug_info    0x00017249      0xdff src\Hardware\hw_system.o
- .debug_info    0x00018048       0x80 src\Hardware\startup_stm32f756xx.o
- .debug_info    0x000180c8      0x6ac src\Hardware\system_stm32f7xx.o
- .debug_info    0x00018774       0xd2 src\main.o
- .debug_info    0x00018846      0x930 src\xl_320\src\xl_320.o
+.debug_info     0x00000000    0x19185
+ .debug_info    0x00000000      0xf0b src\Application\Shell\shell_commands.o
+ .debug_info    0x00000f0b      0x50d src\Application\Shell\shell_variables.o
+ .debug_info    0x00001418      0x9bf src\Application\Shell\shell_variables_list.o
+ .debug_info    0x00001dd7      0x1d5 src\Application\freertos_hooks.o
+ .debug_info    0x00001fac      0x69f src\Application\syscalls.o
+ .debug_info    0x0000264b      0x3ef src\Application\task_ASV.o
+ .debug_info    0x00002a3a      0x281 src\Application\task_DSV.o
+ .debug_info    0x00002cbb      0x3a6 src\Application\task_avoidance.o
+ .debug_info    0x00003061      0x27f src\Application\task_led.o
+ .debug_info    0x000032e0     0x1152 src\Application\task_motion.o
+ .debug_info    0x00004432      0x270 src\Application\task_shell.o
+ .debug_info    0x000046a2      0x15b src\Aversive\angle_distance.o
+ .debug_info    0x000047fd      0x496 src\Aversive\blocking_detection_manager.o
+ .debug_info    0x00004c93      0x5e8 src\Aversive\control_system_manager.o
+ .debug_info    0x0000527b      0x55a src\Aversive\filters\pid.o
+ .debug_info    0x000057d5      0x302 src\Aversive\filters\quadramp.o
+ .debug_info    0x00005ad7      0x330 src\Aversive\math\vect2.o
+ .debug_info    0x00005e07      0x62d src\Aversive\position_manager.o
+ .debug_info    0x00006434      0x6f8 src\Aversive\robot_system.o
+ .debug_info    0x00006b2c     0x112b src\Aversive\trajectory_manager.o
+ .debug_info    0x00007c57      0x8cf src\Drivers\SPL\src\misc.o
+ .debug_info    0x00008526      0xc1f src\Drivers\SPL\src\stm32f7xx_adc.o
+ .debug_info    0x00009145      0x802 src\Drivers\SPL\src\stm32f7xx_flash.o
+ .debug_info    0x00009947      0x606 src\Drivers\SPL\src\stm32f7xx_gpio.o
+ .debug_info    0x00009f4d      0x81f src\Drivers\SPL\src\stm32f7xx_pwr.o
+ .debug_info    0x0000a76c     0x11e2 src\Drivers\SPL\src\stm32f7xx_rcc.o
+ .debug_info    0x0000b94e      0xa4f src\Drivers\SPL\src\stm32f7xx_spi.o
+ .debug_info    0x0000c39d     0x2115 src\Drivers\SPL\src\stm32f7xx_tim.o
+ .debug_info    0x0000e4b2      0xfe6 src\Drivers\SPL\src\stm32f7xx_usart.o
+ .debug_info    0x0000f498      0x2cf src\FreeRTOS\list.o
+ .debug_info    0x0000f767      0x3f0 src\FreeRTOS\portable\GCC\ARM_CM7\r0p1\port.o
+ .debug_info    0x0000fb57      0x33a src\FreeRTOS\portable\MemMang\heap_4.o
+ .debug_info    0x0000fe91     0x11ae src\FreeRTOS\queue.o
+ .debug_info    0x0001103f     0x1aa0 src\FreeRTOS\tasks.o
+ .debug_info    0x00012adf      0xafd src\FreeRTOS\timers.o
+ .debug_info    0x000135dc      0x407 src\FreeRTOS-Plus\FreeRTOS-Plus-CLI\FreeRTOS_CLI.o
+ .debug_info    0x000139e3      0x288 src\Hardware\hardware.o
+ .debug_info    0x00013c6b      0x586 src\Hardware\hw_analog_servo.o
+ .debug_info    0x000141f1      0xcec src\Hardware\hw_debug.o
+ .debug_info    0x00014edd      0x2e2 src\Hardware\hw_digital_input.o
+ .debug_info    0x000151bf      0x4a1 src\Hardware\hw_dsv.o
+ .debug_info    0x00015660      0x4fe src\Hardware\hw_encoder.o
+ .debug_info    0x00015b5e      0x450 src\Hardware\hw_hmi.o
+ .debug_info    0x00015fae      0x34e src\Hardware\hw_led.o
+ .debug_info    0x000162fc      0x54f src\Hardware\hw_monitoring.o
+ .debug_info    0x0001684b      0x64c src\Hardware\hw_motor.o
+ .debug_info    0x00016e97      0x3c1 src\Hardware\hw_power.o
+ .debug_info    0x00017258      0xdff src\Hardware\hw_system.o
+ .debug_info    0x00018057       0x80 src\Hardware\startup_stm32f756xx.o
+ .debug_info    0x000180d7      0x6ac src\Hardware\system_stm32f7xx.o
+ .debug_info    0x00018783       0xd2 src\main.o
+ .debug_info    0x00018855      0x930 src\xl_320\src\xl_320.o
 
 .debug_abbrev   0x00000000     0x4a39
  .debug_abbrev  0x00000000      0x1df src\Application\Shell\shell_commands.o

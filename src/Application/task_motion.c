@@ -124,7 +124,7 @@ void AVS_Init(void)
     position_set_physical_params(&robot.cs.pos, PHYS_ROBOT_ENCODERS_TRACK_MM, PHYS_ROBOT_NB_IMP_PER_MM);
     position_set_related_robot_system(&robot.cs.pos, &robot.cs.rs);
     position_use_ext(&robot.cs.pos);
-//    position_set_centrifugal_coef(&robot.cs.pos, PHYS_ROBOT_CENTRIFUGAL_COEF);
+    //position_set_centrifugal_coef(&robot.cs.pos, PHYS_ROBOT_CENTRIFUGAL_COEF);
 
     /* Control System filter in Distance */
     pid_init(&robot.cs.pid_d);

@@ -85,8 +85,8 @@ const char* OS_SHL_GetAccessAsString(const OS_SHL_VarAccessEnum acc)
  */
 BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
 {
-    const char* header = "      ID. Type     Acc.  Name                 Unit    Value"SHELL_EOL
-                         "      --------------------------------------------------------"SHELL_EOL;
+    const char* header = "      ID. Type     Acc.  Name                                     Unit            Value"SHELL_EOL
+                         "      ------------------------------------------------------------------------------------"SHELL_EOL;
 
     /* Local handlers for outputting variables one at a time */
     static const OS_SHL_VarItemTypeDef* var = NULL;
@@ -103,7 +103,7 @@ BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
     }
 
     /* Display the variable */
-    snprintf(ret, retLength, SHELL_VAR_PFX"%3u %-8s %-5s %-20s %-8s",
+    snprintf(ret, retLength, SHELL_VAR_PFX"%3u %-8s %-5s %-40s %-16s",
             id,
             OS_SHL_GetTypeAsString(var->type),
             OS_SHL_GetAccessAsString(var->access),
@@ -264,8 +264,8 @@ BaseType_t OS_SHL_GetVariable(OS_SHL_VarItemTypeDef const* var, char* ret, size_
         case TYPE_INT32:    snprintf(ret, retLength, "%ld",  *((int32_t*) value)); break;
         case TYPE_UINT64:   snprintf(ret, retLength, "%llu", *((uint64_t*) value)); break;
         case TYPE_INT64:    snprintf(ret, retLength, "%lld", *((int64_t*) value)); break;
-        case TYPE_FLOAT:    snprintf(ret, retLength, "%f",   *((float*) value)); break;
-        case TYPE_DOUBLE:   snprintf(ret, retLength, "%lf",  *((double*) value)); break;
+        case TYPE_FLOAT:    snprintf(ret, retLength, "%f",   *((float*) value)); break;     // FIXME
+        case TYPE_DOUBLE:   snprintf(ret, retLength, "%lf",  *((double*) value)); break;    // FIXME
         default:            retValue = pdFALSE; break; // Type Error
     }
 
