@@ -1,0 +1,239 @@
+Partlist exported from C:/Users/Paul/Documents/Work/Igrebot/SVN/trunk/Elec/2016/BlueBoard v1/src/BlueBoard_v1.sch at 01/11/2015 20:36:05
+
+Assembly variant: 
+
+Part         Value                  Device                 Package                Description                                       
+ASV1         CON_3.5_3              CON_3.5_3              CON_3.5_3                                                                
+ASV2         CON_3.5_3              CON_3.5_3              CON_3.5_3                                                                
+ASV3         CON_3.5_3              CON_3.5_3              CON_3.5_3                                                                
+ASV4         CON_3.5_3              CON_3.5_3              CON_3.5_3                                                                
+ASV5         CON_3.5_3              CON_3.5_3              CON_3.5_3                                                                
+ASV6         CON_3.5_3              CON_3.5_3              CON_3.5_3                                                                
+ASV7         CON_3.5_3              CON_3.5_3              CON_3.5_3                                                                
+ASV8         CON_3.5_3              CON_3.5_3              CON_3.5_3                                                                
+BAT1         MC15-GF-3.81-LR_2      MC15-GF-3.81-LR_2      CON_3.81_LR_2                                                            
+BAT2         JST-XH-S_5             JST-XH-S_5             JST-XH-5S                                                                
+C1           100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C2           18 pF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C3           18 pF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C4           100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C5           100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C6           100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C7           100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C8           100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C9           10nF                   C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C10          10nF                   C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C11          1uF                    C-EUC0805              C0805                  CAPACITOR, European symbol                        
+C12          2.2uF                  C-EUC0805              C0805                  CAPACITOR, European symbol                        
+C13          2.2uF                  C-EUC0805              C0805                  CAPACITOR, European symbol                        
+C14          470uF                  CPOL-EUB               PANASONIC_B            POLARIZED CAPACITOR, European symbol              
+C15          22uF                   C-EUC3225              C3225                  CAPACITOR, European symbol                        
+C16          470uF                  CPOL-EUD               PANASONIC_D            POLARIZED CAPACITOR, European symbol              
+C17          1uF                    C-EUC3225              C3225                  CAPACITOR, European symbol                        
+C18          22uF                   C-EUC3225              C3225                  CAPACITOR, European symbol                        
+C19          470uF                  CPOL-EUD               PANASONIC_D            POLARIZED CAPACITOR, European symbol              
+C20          1uF                    C-EUC3225              C3225                  CAPACITOR, European symbol                        
+C21          22uF                   C-EUC3225              C3225                  CAPACITOR, European symbol                        
+C22          470uF                  CPOL-EUD               PANASONIC_D            POLARIZED CAPACITOR, European symbol              
+C23          1uF                    C-EUC3225              C3225                  CAPACITOR, European symbol                        
+C24          22uF                   C-EUC3225              C3225                  CAPACITOR, European symbol                        
+C25          47uF                   C-EUC1210              C1210                  CAPACITOR, European symbol                        
+C26          47uF                   C-EUC1210              C1210                  CAPACITOR, European symbol                        
+C27          47uF                   C-EUC1210              C1210                  CAPACITOR, European symbol                        
+C28          100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C29          100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C30          3.3nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C31          3.3nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C32          100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C33          3.3nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C34          3.3nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C35          100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C36          3.3nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C37          100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C38          3.3nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C39          220nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C40          220nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C41          220nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C42          220nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C43          100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C44          100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+C45          100 nF                 C-EUC0603K             C0603K                 CAPACITOR, European symbol                        
+C46          100nF                  C-EUC0603              C0603                  CAPACITOR, European symbol                        
+CEL1         LT1990                 LT1990                 S8                                                                       
+CEL2         LT1990                 LT1990                 S8                                                                       
+CEL3         LT1990                 LT1990                 S8                                                                       
+CEL4         LT1990                 LT1990                 S8                                                                       
+CX1          XTAL_5X3               XTAL_5X3               CRYSTAL-OSC-SMD-5X3                                                      
+DSV1         CON_2.00_MOLEX-53253_3 CON_2.00_MOLEX-53253_3 CON_2.00_MOLEX-53253_3                                                   
+DSV2         CON_2.00_MOLEX-53253_3 CON_2.00_MOLEX-53253_3 CON_2.00_MOLEX-53253_3                                                   
+DSV3         CON_3.5_3              CON_3.5_3              CON_3.5_3                                                                
+ENC1         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+ENC2         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+END1         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+END2         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+END3         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+END4         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+END5         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+END6         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+END7         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+END8         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+HMI          HE10_V_16              HE10_V_16              CON_2X_2.54_V_16                                                         
+IBAT         INA138                 INA138                 DBV_05                                                                   
+IND1         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IND2         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IND3         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IND4         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IND5         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IND6         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IND7         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IND8         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IND9         CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IND10        CON_1.27_4             CON_1.27_4             CON_1.27_4                                                               
+IP1          INA138                 INA138                 DBV_05                                                                   
+IP2          INA138                 INA138                 DBV_05                                                                   
+IP3          INA138                 INA138                 DBV_05                                                                   
+L1           2.2 uH                 DR1030                 DR1030                 DR1030 Series Low Profile Power Inductors         
+L2           2.2 uH                 DR1030                 DR1030                 DR1030 Series Low Profile Power Inductors         
+L3           2.2 uH                 DR1030                 DR1030                 DR1030 Series Low Profile Power Inductors         
+LED1                                LEDCHIP-LED0805        CHIP-LED0805           LED                                               
+LED2                                LEDCHIP-LED0805        CHIP-LED0805           LED                                               
+LED3                                LEDCHIP-LED0805        CHIP-LED0805           LED                                               
+LED4                                LEDCHIP-LED0805        CHIP-LED0805           LED                                               
+LED5                                LEDCHIP-LED0805        CHIP-LED0805           LED                                               
+LED6                                LEDCHIP-LED0805        CHIP-LED0805           LED                                               
+LED7                                LEDCHIP-LED0805        CHIP-LED0805           LED                                               
+LOGO_IGREBOT LOGO_IGREBOT12X2MM     LOGO_IGREBOT12X2MM     IGREBOT_12X2MM                                                           
+LOGO_LAYERS  LAYERS_CHECK4_LAYERS   LAYERS_CHECK4_LAYERS   LAYERS_CHECK_4                                                           
+MOT1         CON_3.5_2              CON_3.5_2              CON_3.5_2                                                                
+MOT2         CON_3.5_2              CON_3.5_2              CON_3.5_2                                                                
+OPA1         OPA4340U               OPA4340U               SO14                   Operational Amplifiers                            
+OPA2         OPA4340U               OPA4340U               SO14                   Operational Amplifiers                            
+OPTO1        EL3H7-G                EL3H7-G                SSOP_4                                                                   
+OPTO2        EL3H7-G                EL3H7-G                SSOP_4                                                                   
+OPTO3        EL3H7-G                EL3H7-G                SSOP_4                                                                   
+OPTO4        EL3H7-G                EL3H7-G                SSOP_4                                                                   
+OPTO5        EL3H7-G                EL3H7-G                SSOP_4                                                                   
+OPTO6        EL3H7-G                EL3H7-G                SSOP_4                                                                   
+OPTO7        EL3H7-G                EL3H7-G                SSOP_4                                                                   
+OPTO8        EL3H7-G                EL3H7-G                SSOP_4                                                                   
+OPTO9        EL3H4-G                EL3H4-G                SSOP_4                                                                   
+OPTO10       EL3H4-G                EL3H4-G                SSOP_4                                                                   
+OPTO11       EL3H4-G                EL3H4-G                SSOP_4                                                                   
+OPTO12       EL3H4-G                EL3H4-G                SSOP_4                                                                   
+OPTO13       EL3H4-G                EL3H4-G                SSOP_4                                                                   
+OPTO14       EL3H4-G                EL3H4-G                SSOP_4                                                                   
+OPTO15       EL3H4-G                EL3H4-G                SSOP_4                                                                   
+OPTO16       EL3H4-G                EL3H4-G                SSOP_4                                                                   
+OPTO17       EL3H4-G                EL3H4-G                SSOP_4                                                                   
+OPTO18       EL3H4-G                EL3H4-G                SSOP_4                                                                   
+P1           47k                    R-TRIMMT93XB           RTRIMT93XB             Trimm resistor                                    
+Q1           BSS138                 MOSFET-NCHANNELBSS138  SOT23                  Common NMOSFET Parts                              
+Q2           BSS138                 MOSFET-NCHANNELBSS138  SOT23                  Common NMOSFET Parts                              
+Q3           BSS138                 MOSFET-NCHANNELBSS138  SOT23                  Common NMOSFET Parts                              
+R1           270                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R2           270                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R3           270                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R4           50k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R5           R005                   R-EU_R2512             R2512                  RESISTOR, European symbol                         
+R6           R01                    R-EU_R2512             R2512                  RESISTOR, European symbol                         
+R7           300k                   R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R8           21k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R9           500k                   R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R10          R01                    R-EU_R2512             R2512                  RESISTOR, European symbol                         
+R11          7.5k                   R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R12          500k                   R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R13          R01                    R-EU_R2512             R2512                  RESISTOR, European symbol                         
+R14          383k                   R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R15          500k                   R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R16          270                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R17          470                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R18          660                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R19          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R20          50k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R21          500                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R22          500                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R23          50k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R24          500                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R25          500                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R26          50k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R27          500                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R28          10k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R29          50k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R30          33k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R31          500                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R32          10k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R33          33k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R34          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R35          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R36          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R37          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R38          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R39          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R40          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R41          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R42          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R43          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R44          33k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R45          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R46          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R47          22k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R48          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R49          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R50          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R51          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R52          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R53          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R54          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R55          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R56          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R57          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R58          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R59          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R60          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R61          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R62          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R63          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R64          10k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R65          10k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R66          10k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R67          10k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R68          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R69          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R70          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R71          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R72          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R73          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R74          1k                     R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R75          330                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R76          120                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R77          120                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R78          10k                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+R79          120                    R-EU_R0603             R0603                  RESISTOR, European symbol                         
+RS485        JST-SHR-8V             JST-SHR-8V             JST-SHR-08V                                                              
+RTC                                 M03LOCK                1X03_LOCK              Header 3                                          
+SJ1          SOLDERJUMPERNC2        SOLDERJUMPERNC2        SJ_2S-NOTRACE          Solder Jumper                                     
+SJ2          SOLDERJUMPERNC2        SOLDERJUMPERNC2        SJ_2S-NOTRACE          Solder Jumper                                     
+SJ3          SOLDERJUMPERNC2        SOLDERJUMPERNC2        SJ_2S-NOTRACE          Solder Jumper                                     
+SJ4          SOLDERJUMPERNC2        SOLDERJUMPERNC2        SJ_2S-NOTRACE          Solder Jumper                                     
+SJ5          SOLDERJUMPERNC2        SOLDERJUMPERNC2        SJ_2S-NOTRACE          Solder Jumper                                     
+STM32        STM32F746VG            STM32F746VG            LQFP_100                                                                 
+SWD                                 M06LOCK                1X06_LOCK              Header 6                                          
+SWITCHS      MC15-GF-3.81-LR_4      MC15-GF-3.81-LR_4      CON_3.81_LR_4                                                            
+U3V3L        TSR_1-2433             TSR_1-24XX             TSR1                                                                     
+U5VL         TSR_1-2450             TSR_1-24XX             TSR1                                                                     
+U12VL        TSR_1-24120            TSR_1-24XX             TSR1                                                                     
+UART                                M05LOCK                1X05_LOCK              Header 5                                          
+UCAN         SN65HVD230D            MCP2551                SO-08                  High-Speed CAN Transceiver                        
+UMOT         MODULE_DRV8843REV      MODULE_DRV8843REV      MODULE_DRV884X_REV                                                       
+URS1         SN65HVD1476-DGS        SN65HVD1476-DGS        MSOP-10                                                                  
+USB          MINI-USB-32005-201     MINI-USB-32005-201     32005-201              MINI USB-B Conector                               
+UVP1         PTN78060W              PTN78060W              PTN78060                                                                 
+UVP2         PTN78060W              PTN78060W              PTN78060                                                                 
+UVP3         PTN78020H              PTN78060W              PTN78060                                                                 
+VCC1         CON_3.5_2              CON_3.5_2              CON_3.5_2                                                                
+VCC2         CON_3.5_2              CON_3.5_2              CON_3.5_2                                                                
+VCC3         CON_3.5_2              CON_3.5_2              CON_3.5_2                                                                
+VP1          CON_3.5_2              CON_3.5_2              CON_3.5_2                                                                
+VP2          CON_3.5_2              CON_3.5_2              CON_3.5_2                                                                
+VP3          CON_3.5_2              CON_3.5_2              CON_3.5_2                                                                
+VREF         REF3030                MAX6520                SOT23                  1.2V Voltage Reference 50ppm/°C, SOT23, 3-Terminal

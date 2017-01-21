@@ -1,8 +1,60 @@
-# Build directories
-/debug/
-/release/
+##############
+##    DOC   ##
+##############
 
-# Object files
+doc/datasheets/*
+
+##############
+##   ELEC   ##
+##############
+
+# Backup files
+*.s#?
+*.b#?
+*.l#?
+
+eagle.epf
+
+# Autorouter files
+*.pro
+*.job
+
+# CAM files
+*.$$$
+*.cmp
+*.ly2
+*.l15
+*.sol
+*.plc
+*.stc
+*.sts
+*.crc
+*.crs
+
+*.dri
+*.drl
+*.gpi
+*.pls
+
+*.drd
+*.drd.*
+
+*.info
+
+*.eps
+
+# file locks introduced since 7.x
+*.lck
+
+##############
+## FIRMWARE ##
+##############
+
+# Build directories
+firm/debug/
+firm/release/
+
+# Object files / Binaries
 *.o
 *.ko
 *.obj
@@ -12,32 +64,5 @@
 *.elf.map
 *.elf.list
 *.map
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
 *.hex
-
-# Debug files
-*.dSYM/
-*.su
 
