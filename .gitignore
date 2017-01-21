@@ -10,6 +10,7 @@
 *.elf.launch
 *.elf.hex
 *.elf.map
+*.elf.list
 *.map
 
 # Precompiled Headers
@@ -40,4 +41,3 @@
 *.dSYM/
 *.su
 
-/debug/

@@ -38,6 +38,9 @@ OS_SHL_ConfigTypeDef OS_SHL_Config;
 
 void OS_SHL_Start( void )
 {
+    /* Reference to the support function for float printf */
+    asm (".global _printf_float");
+
 	/* Create the semaphore used to access the UART Tx. */
 	xTxMutex = xSemaphoreCreateMutex();
 	configASSERT( xTxMutex );
