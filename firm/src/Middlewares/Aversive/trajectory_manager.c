@@ -36,7 +36,8 @@
 #include <quadramp.h>
 
 #include <trajectory_manager.h>
-#include "blueboard.h"
+
+#include "main.h" // FIXME
 
 #define M_2PI (2*M_PI)
 

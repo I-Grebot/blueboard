@@ -20,8 +20,7 @@
  */
 
 /* Inclusion */
-#include "blueboard.h"
-#include "xl_320.h"
+#include "main.h"
 
 /* Definition */
 #define MAX_DSV_IN_QUEUE	5

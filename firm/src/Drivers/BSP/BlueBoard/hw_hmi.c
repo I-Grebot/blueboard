@@ -8,14 +8,10 @@
  * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
- *   <DESCRIPTION HERE>
+ *   This module handles the communication with the Human Machine Interface
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:: 1444                                                                 $
- * $LastChangedBy:: paul.m                                                     $
- * $LastChangedDate:: 2016-02-28 22:16:18 +0100 (dim., 28 févr. 2016)         $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 

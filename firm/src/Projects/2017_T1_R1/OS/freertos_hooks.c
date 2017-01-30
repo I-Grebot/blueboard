@@ -1,6 +1,6 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
  * @file       freertos_hooks.c
  * @author     Paul
@@ -12,15 +12,11 @@
  *   final application.
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:: 1444                                                                 $
- * $LastChangedBy:: paul.m                                                     $
- * $LastChangedDate:: 2016-02-28 22:16:18 +0100 (dim., 28 févr. 2016)         $
+ * Repository: https://github.com/I-Grebot/firm_blueboard.git
  * -----------------------------------------------------------------------------
  */
 
-#include "blueboard.h"
+#include "main.h"
 
 void vApplicationMallocFailedHook( void )
 {

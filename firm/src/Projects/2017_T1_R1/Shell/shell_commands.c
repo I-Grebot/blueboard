@@ -16,7 +16,7 @@
  */
 
 /* Inclusion */
-#include "blueboard.h"
+#include "main.h"
 
 /* -----------------------------------------------------------------------------
  * Prototypes of shell commands (local and private functions)

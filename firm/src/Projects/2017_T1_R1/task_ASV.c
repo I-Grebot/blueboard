@@ -20,7 +20,7 @@
  */
 
 /* Inclusion */
-#include "blueboard.h"
+#include "main.h"
 
 /* Definition */
 #define MAX_ASV_IN_QUEUE	5

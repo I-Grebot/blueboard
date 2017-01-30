@@ -14,7 +14,7 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "blueboard.h"
+#include "main.h"
 
 /* Variables definition list holder */
 extern const OS_SHL_VarItemTypeDef OS_SHL_varList[];

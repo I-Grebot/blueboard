@@ -20,7 +20,7 @@
  */
 
 /* Inclusion */
-#include "blueboard.h"
+#include "main.h"
 
 /* Local Variable Mutex */
 av_t av;	// Avoidance handler

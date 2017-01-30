@@ -2,7 +2,7 @@
  * BlueBoard
  * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       hw_debug.c
+ * @file       bb_dbg.c
  * @author     Paul
  * @date       Jan 3, 2016
  * -----------------------------------------------------------------------------
@@ -16,16 +16,12 @@
 
 #include "blueboard.h"
 
-/* Queues used to hold received characters, and characters waiting to be transmitted. */
-static QueueHandle_t DBG_RxQueue;
-static QueueHandle_t DBG_TxQueue;
-
 /**
   * @brief  Initialize the Debug UART
   * @param  None
   * @retval None
   */
-void HW_DBG_Init(USART_InitTypeDef * USART_InitStruct)
+void bb_dbg_init(USART_InitTypeDef * USART_InitStruct)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     USART_ClockInitTypeDef USART_ClockInitStruct;
@@ -71,131 +67,27 @@ void HW_DBG_Init(USART_InitTypeDef * USART_InitStruct)
     USART_ClockStructInit(&USART_ClockInitStruct);
     USART_ClockInit(DBG_COM, &USART_ClockInitStruct);
 
-    /* Create USART Queues */
-    DBG_RxQueue = xQueueCreate(DBG_RX_QUEUE_LEN, sizeof(char));
-    DBG_TxQueue = xQueueCreate(DBG_TX_QUEUE_LEN, sizeof(char));
 
+}
+
+void bb_dbg_enable(uint32_t nvic_priority)
+{
     /* Enable USART Interrupts */
     USART_ITConfig(DBG_COM, USART_IT_RXNE, ENABLE);
-    NVIC_SetPriority(DBG_IRQn, OS_ISR_PRIORITY_SER);
+    NVIC_SetPriority(DBG_IRQn, nvic_priority);
     NVIC_EnableIRQ(DBG_IRQn);
 
     /* Enable USART */
     USART_Cmd(DBG_COM, ENABLE);
-
 }
 
-/**
-  * @brief  Add a byte to send through Serial Interface.
-  *         Might be started right away or stored in the TX Queue.
-  * @param  ch: character to send
-  * @retval pdPASS if the character was sent or added to the TX Queue
-  *         pdFAIL if the TX Queue is full
-  */
-
-BaseType_t HW_DBG_Put(char ch)
+void bb_dbg_disable(void)
 {
+    /* Disable IRQs */
+    USART_ITConfig(DBG_COM, USART_IT_RXNE, DISABLE);
+    NVIC_DisableIRQ(DBG_IRQn);
 
-    /* If the queue is empty and no message is being transmitted,
-     * the line is idle so we can initiate directly the transmission.
-     */
-    if((uxQueueMessagesWaiting(DBG_TxQueue) == 0) &&
-       (USART_GetFlagStatus(DBG_COM, USART_FLAG_TXE) == SET)) {
-
-        USART_ITConfig(DBG_COM, USART_IT_TC, ENABLE);
-        USART_SendData(DBG_COM, (uint16_t) ch);
-
-        return pdPASS;
-
-    /* Otherwise, at least 1 transmission is pending,
-     * so we add it the the transmit queue.
-     */
-    } else {
-
-        if(xQueueSend(DBG_TxQueue, &ch, DBG_TX_TIMEOUT) == pdPASS)
-        {
-            USART_ITConfig(DBG_COM, USART_IT_TC, ENABLE);
-            return pdPASS;
-        } else {
-            return pdFAIL;
-        }
-    }
+    /* Stop UART */
+    USART_Cmd(DBG_COM, DISABLE);
 
 }
-
-
-/**
-  * @brief  Send a string through Serial Interface
-  * @param  str: string to send
-  * @retval Pass/Fail status
-  */
-BaseType_t HW_DBG_Puts(const char *str)
-{
-    while (*str)
-    {
-    	if((HW_DBG_Put(*str)) == pdPASS) {
-    	    str++;
-    	} else {
-    	    return pdFAIL;
-    	}
-    }
-
-    return pdPASS;
-}
-
-/**
-  * @brief  Receive a byte from debug UART
-  * @param  Const pointer to read value
-  * @retval Pass/Fail status
-  */
-BaseType_t HW_DBG_Get(const char* str)
-{
-    return(xQueueReceive(DBG_RxQueue, str, DBG_RX_TIMEOUT));
-}
-
-
-/*
- * Serial Interface ISR
- */
-void DBG_ISR (void)
-{
-    char rxChar;
-    char txChar;
-
-    // We have not woken a task at the start of the ISR.
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-    // Hand RX Interrupt
-    if(USART_GetITStatus(DBG_COM, USART_IT_RXNE) != RESET)
-    {
-        // RXNE Flag cleared with the USAR_ReceiveData() call
-        rxChar = USART_ReceiveData(DBG_COM);
-
-        // Put the received char into the Rx Queue
-        xQueueSendFromISR(DBG_RxQueue, &rxChar, &xHigherPriorityTaskWoken);
-
-    }
-
-    // Handle TX Interrupt
-    else if(USART_GetITStatus(DBG_COM, USART_IT_TC) != RESET)
-    {
-        // Clear IT
-        USART_ClearITPendingBit(DBG_COM, USART_IT_TC);
-
-        /* Check to see if there is more data to send.
-         * The TC interrupt will be re-generated at the end of the transmission.
-         * Therefore, this will auto-reload until the queue is empty.
-         */
-        if((xQueueReceiveFromISR(DBG_TxQueue, &txChar, &xHigherPriorityTaskWoken)) == pdPASS)
-        {
-            USART_SendData(DBG_COM, (uint16_t) txChar);
-        }
-        else
-        {
-            // Nothing to send! Disable back the ISR
-            USART_ITConfig(DBG_COM, USART_IT_TC, DISABLE);
-        }
-
-    }
-}
-

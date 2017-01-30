@@ -16,7 +16,7 @@
  */
 
 /* Inclusions */
-#include "blueboard.h"
+#include "main.h"
 
 /* Private functions and variables */
 static void OS_SHL_Task( void *pvParameters );
@@ -81,21 +81,21 @@ static void OS_SHL_Task( void *pvParameters )
 	pcOutputString = FreeRTOS_CLIGetOutputBuffer();
 
 	/* Send the welcome message. */
-	HW_DBG_Puts(pcWelcomeMessage);
+	serial_puts(pcWelcomeMessage);
 
 	for( ;; )
 	{
 		/* Wait for the next character.  The while loop is used in case
 		INCLUDE_vTaskSuspend is not set to 1 - in which case the RX Timeout will
 		be a genuine block time rather than an infinite block time. */
-		while( HW_DBG_Get(&cRxedChar) != pdPASS );
+		while( serial_get(&cRxedChar) != pdPASS );
 
 		/* Ensure exclusive access to the UART Tx. */
 		if( xSemaphoreTake( xTxMutex, SHELL_MAX_MUTEX_WAIT ) == pdPASS )
 		{
 			/* Echo the character back. */
 			//if(OS_SHL_Config.echo) {
-			    HW_DBG_Put(cRxedChar);
+			    serial_put(cRxedChar);
 			//}
 
 			/* Was it the end of the line? */
@@ -103,7 +103,7 @@ static void OS_SHL_Task( void *pvParameters )
 			{
 				/* Just to space the output from the input. */
 			    //if(OS_SHL_Config.echo) {
-			        HW_DBG_Puts(pcNewLine);
+			        serial_puts(pcNewLine);
 			    //}
 
 				/* See if the command is empty, indicating that the last command
@@ -124,7 +124,7 @@ static void OS_SHL_Task( void *pvParameters )
 					xReturned = FreeRTOS_CLIProcessCommand( cInputString, pcOutputString, configCOMMAND_INT_MAX_OUTPUT_SIZE );
 
 					/* Write the generated string to the UART. */
-					HW_DBG_Puts(pcOutputString);
+					serial_puts(pcOutputString);
 
 				} while( xReturned != pdFALSE );
 
@@ -137,7 +137,7 @@ static void OS_SHL_Task( void *pvParameters )
 				memset( cInputString, 0x00, SHELL_MAX_INPUT_SIZE );
 
 				//if(OS_SHL_Config.echo) {
-				    HW_DBG_Puts(pcEndOfOutputMessage);
+				serial_puts(pcEndOfOutputMessage);
 				//}
 			}
 			else
@@ -187,7 +187,7 @@ void OS_SHL_OutputString( const char * const pcMessage )
 {
 	if( xSemaphoreTake( xTxMutex, SHELL_MAX_MUTEX_WAIT ) == pdPASS )
 	{
-		HW_DBG_Puts(pcMessage);
+	    serial_puts(pcMessage);
 		xSemaphoreGive( xTxMutex );
 	}
 }

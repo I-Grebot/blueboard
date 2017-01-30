@@ -20,7 +20,7 @@
  */
 
 /* Inclusion */
-#include "blueboard.h"
+#include "main.h"
 
 /* Local Variable Mutex */
 static xSemaphoreHandle xLedColorMutex;

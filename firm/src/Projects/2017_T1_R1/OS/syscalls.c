@@ -11,16 +11,12 @@
  *   System call stub to route them to debug interface
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:: 1444                                                                 $
- * $LastChangedBy:: paul.m                                                     $
- * $LastChangedDate:: 2016-02-28 22:16:18 +0100 (dim., 28 févr. 2016)         $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
 /* Includes */
-#include "blueboard.h"
+#include "main.h"
 
 
 /* Variables */
@@ -63,9 +59,7 @@ int _read (int file, char *ptr, int len)
 
     for (DataIdx = 0; DataIdx < len; DataIdx++)
     {
-        //*ptr++ = __io_getchar();
-        //*ptr++ = HW_DBG_Get();
-        HW_DBG_Get((ptr++));
+        serial_get((ptr++));
     }
 
 return len;
@@ -77,8 +71,7 @@ int _write(int file, char *ptr, int len)
 
     for (DataIdx = 0; DataIdx < len; DataIdx++)
     {
-        //__io_putchar(*ptr++);
-        HW_DBG_Put((*ptr++));
+        serial_put((*ptr++));
     }
     return len;
 }

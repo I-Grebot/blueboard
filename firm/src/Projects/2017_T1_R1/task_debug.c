@@ -20,8 +20,7 @@
  */
 
 /* Inclusion */
-#include "blueboard.h"
-#include "string.h"
+#include "main.h"
 
 /* Definition */
 #define MAX_MSG_LENGTH		50
@@ -57,7 +56,7 @@ static void OS_DebugTask(void *pvParameters)
     	xQueueReceive(xDebugMsgQueue, pcString, portMAX_DELAY);
 
     	/* Print out the string received */
-    	HW_DBG_Puts(pcString);
+    	serial_puts(pcString);
     }
 }
 

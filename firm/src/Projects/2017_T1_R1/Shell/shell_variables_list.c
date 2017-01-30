@@ -14,7 +14,7 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "blueboard.h"
+#include "main.h"
 
 /* External variables; for setting and probing */
 extern OS_SHL_ConfigTypeDef OS_SHL_Config;

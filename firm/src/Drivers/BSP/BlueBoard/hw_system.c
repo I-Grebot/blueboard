@@ -11,11 +11,7 @@
  *   Contains top-level system functions implementation
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:: 1431                                                                 $
- * $LastChangedBy:: paul.m                                                     $
- * $LastChangedDate:: 2016-01-19 22:06:16 +0100 (mar., 19 janv. 2016)          $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -99,7 +95,7 @@ void HW_CPU_CACHE_Enable(void)
   SCB_EnableDCache();
 }
 
-void HW_SYS_TimerRunTime_Config(void)
+void HW_SYS_TimerRunTime_Config()
 {
     TIM_TimeBaseInitTypeDef TIM_BaseStruct;
 
@@ -115,7 +111,7 @@ void HW_SYS_TimerRunTime_Config(void)
 
     /* Configure interrupt */
     TIM_ITConfig(SYS_RUNSTATS_TIM, TIM_IT_Update, ENABLE);
-    NVIC_SetPriority(SYS_RUNSTATS_IRQn, OS_ISR_PRIORITY_SYS_RUNSTATS);
+    NVIC_SetPriority(SYS_RUNSTATS_IRQn, BB_PRIORITY_SYS_RUNSTATS);
     NVIC_EnableIRQ(SYS_RUNSTATS_IRQn);
 
     /* Clear and start timer */
@@ -144,89 +140,3 @@ void SYS_RUNSTATS_ISR (void)
     sysTimerCnt++;
 }
 
-/* This example demonstrates how a human readable table of run time stats
-information is generated from raw data provided by uxTaskGetSystemState().
-The human readable table is written to pcWriteBuffer.  (see the vTaskList()
-API function which actually does just this). */
-void HW_SYS_GetRunTimeStats(char *pcWriteBuffer)
-{
-    const char * const pcHeader =
-                    SHELL_SYS_PFX"Task                  Abs. Time    % Time"SHELL_EOL;
-    const char * const pcLineSeparator =
-                    SHELL_SYS_PFX"-----------------------------------------"SHELL_EOL;
-
-    TaskStatus_t *pxTaskStatusArray;
-    volatile UBaseType_t uxArraySize, x;
-    uint32_t ulTotalRunTime;
-    uint32_t ulStatsAsPercentage;
-
-   /* Make sure the write buffer does not contain a string. */
-   *pcWriteBuffer = 0x00;
-
-   /* Take a snapshot of the number of tasks in case it changes while this
-   function is executing. */
-   uxArraySize = uxTaskGetNumberOfTasks();
-
-   /* Allocate a TaskStatus_t structure for each task.  An array could be
-   allocated statically at compile time. */
-   pxTaskStatusArray = pvPortMalloc( uxArraySize * sizeof( TaskStatus_t ) );
-
-   if( pxTaskStatusArray != NULL )
-   {
-      /* Generate raw status information about each task. */
-      uxArraySize = uxTaskGetSystemState( pxTaskStatusArray,
-                                 uxArraySize,
-                                 &ulTotalRunTime );
-
-      /* For percentage calculations. */
-      ulTotalRunTime /= 100UL;
-
-      /* Avoid divide by zero errors. */
-      if( ulTotalRunTime > 0 )
-      {
-          /* Header */
-          sprintf( pcWriteBuffer, pcHeader );
-          pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
-          sprintf( pcWriteBuffer, pcLineSeparator );
-          pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
-
-          /* For each populated position in the pxTaskStatusArray array,
-          format the raw data as human readable ASCII data. */
-         for( x = 0; x < uxArraySize; x++ )
-         {
-            /* What percentage of the total run time has the task used?
-            This will always be rounded down to the nearest integer.
-            ulTotalRunTimeDiv100 has already been divided by 100. */
-            ulStatsAsPercentage =
-                  pxTaskStatusArray[ x ].ulRunTimeCounter / ulTotalRunTime;
-
-            if( ulStatsAsPercentage > 0UL )
-            {
-               sprintf( pcWriteBuffer, SHELL_SYS_PFX"%-20s %10lu   %3lu%%"SHELL_EOL,
-                                 pxTaskStatusArray[ x ].pcTaskName,
-                                 pxTaskStatusArray[ x ].ulRunTimeCounter,
-                                 ulStatsAsPercentage );
-            }
-            else
-            {
-               /* If the percentage is zero here then the task has
-               consumed less than 1% of the total run time. */
-               sprintf( pcWriteBuffer, SHELL_SYS_PFX"%-20s %10lu    <1%%"SHELL_EOL,
-                                 pxTaskStatusArray[ x ].pcTaskName,
-                                 pxTaskStatusArray[ x ].ulRunTimeCounter );
-            }
-
-            pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
-         }
-
-         /* Footer */
-         sprintf( pcWriteBuffer, pcLineSeparator );
-         pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
-         sprintf( pcWriteBuffer,SHELL_SYS_PFX"%-20s %10lu   %3lu%%"SHELL_EOL, "TOTAL", 100*ulTotalRunTime, 100UL);
-         pcWriteBuffer += strlen( ( char * ) pcWriteBuffer );
-      }
-
-      /* The array is no longer needed, free the memory it consumes. */
-      vPortFree( pxTaskStatusArray );
-   }
-}

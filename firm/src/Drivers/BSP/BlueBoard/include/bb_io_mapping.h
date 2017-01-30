@@ -1,6 +1,6 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
  * @file       bb_io_mapping.h
  * @author     Paul
@@ -8,14 +8,10 @@
  * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
- *   This header describes the I/O mapping of the BlueBoard project.
+ *   This header describes the I/O mapping of the BlueBoard BSP.
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev: 1468 $
- * $LastChangedBy: Pierrick_Boissard $
- * $LastChangedDate: 2016-05-05 03:29:08 +0200 (jeu., 05 mai 2016) $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 

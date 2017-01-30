@@ -1,26 +1,22 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot 2017
  * -----------------------------------------------------------------------------
  * @file       main.c
  * @author     Paul
- * @date       Jan 2, 2016
+ * @date       Jan 23, 2017
  * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
- *   Main module of BlueBoard project
+ *   Main module of IgreBot's 2017 Robot #1 Firmware
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev: 1469 $
- * $LastChangedBy: Pierrick_Boissard $
- * $LastChangedDate: 2016-05-05 09:40:31 +0200 (jeu., 05 mai 2016) $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
 /* General Header */
-#include "blueboard.h"
+#include "main.h"
 
 /**
 ********************************************************************************
@@ -42,8 +38,9 @@
 
 int main( void )
 {
-    /* Configure the hardware */
+    /* Modules initialization */
     HW_InitAll();
+    serial_init();
 
     /* Apply the Power-Up sequence*/
     HW_PowerUp();
@@ -61,8 +58,6 @@ int main( void )
     /*OS_CreateStrategyTask();
 
     */
-
-
 
     /* Start FreeRTOS Scheduler */
     vTaskStartScheduler();

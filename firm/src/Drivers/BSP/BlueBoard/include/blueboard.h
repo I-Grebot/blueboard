@@ -1,17 +1,17 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
  * @file    blueboard.h
- * @author  Paul M. - IGREBOT
- * @date    02-January-2016
- * @version V1.0.0
+ * @author  Paul
+ * @date    2017/01/23
+ * @version V2.0
  * -----------------------------------------------------------------------------
  * @brief
- *    This file contains definitions for the BlueBoard hardware.
+ *    This file is the main header of the blueboard BSP
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: https://github.com/I-Grebot/firm_blueboard.git
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -22,19 +22,6 @@
  extern "C" {
 #endif
 
- /**
- ********************************************************************************
- **
- **  Firmware identification
- **
- ********************************************************************************
- */
-
-#define YEAR_STR          "2017"
-#define ROBOT_NAME_STR    "R1"
-#define BUILD_VERSION_STR __DATE__" @ "__TIME__
-
-
 /**
 ********************************************************************************
 **
@@ -42,20 +29,6 @@
 **
 ********************************************************************************
 */
-
-/* Standard libraries */
-#include <sys/stat.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <errno.h>
-#include <stdio.h>
-#include <signal.h>
-#include <time.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <string.h>
 
 /* Main Configuration file for STM32F7xx devices
  * This will also include the stm32f7xx_hal_conf file which defines
@@ -65,95 +38,26 @@
 /* Defines the HW mapping of the board and some useful macros */
 #include "bb_io_mapping.h"
 
- /* Hardware (electrical & connectivity) constants */
-#include "hardware_const.h"
+/* External configuration of the BlueBoard */
+#include "bb_config.h"
+
+/* Components libraries */
 #include "xl_320.h"
 
- /* Physical constants */
-#include "physics_const.h"
-
-/* Scheduler include files */
-#include "FreeRTOS.h"
-#include "FreeRTOS_CLI.h"
-#include "task.h"
-#include "semphr.h"
-
-/* Aversive files */
-#include "aversive.h"
-
-#include "pid.h"
-#include "biquad.h"
-#include "quadramp.h"
-#include "quadramp_derivate.h"
-#include "ramp.h"
-#include "angle_distance.h"
-
-#include "blocking_detection_manager.h"
-#include "control_system_manager.h"
-#include "position_manager.h"
-#include "robot_system.h"
-#include "trajectory_manager.h"
-
-/* User application files */
-#include "../../../../Projects/2017_T1_R1/include/motion.h"
-#include "../../../../Projects/2017_T1_R1/include/strategy.h"
-#include "../../../../Projects/2017_T1_R1/include/shell.h"
-
-
-/**
-********************************************************************************
-**
-**  Applicative & High-Level Configuration
-**
-********************************************************************************
-*/
-
-/* OS Tasks Priorities. Higher value means higher priority */
-#define OS_TASK_PRIORITY_SHELL     ( tskIDLE_PRIORITY + 1  )
-#define OS_TASK_PRIORITY_LED       ( tskIDLE_PRIORITY + 2  )
-#define OS_TASK_PRIORITY_ASV       ( tskIDLE_PRIORITY + 2  )
-#define OS_TASK_PRIORITY_DSV       ( tskIDLE_PRIORITY + 2  )
-#define OS_TASK_PRIORITY_TRAJ      ( tskIDLE_PRIORITY + 3  )
-#define OS_TASK_PRIORITY_STRATEGY  ( tskIDLE_PRIORITY + 3  )
-#define OS_TASK_PRIORITY_MOTION    ( tskIDLE_PRIORITY + 3  )
-#define OS_TASK_PRIORITY_AVOIDANCE ( tskIDLE_PRIORITY + 4  )
-#define OS_TASK_PRIORITY_AVERSIVE  ( tskIDLE_PRIORITY + 4  )
-
- /* NVIC Priorities. Lower value means higher priority.
-  * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY
-  * and higher than configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY when using
-  * ISR Save FreeRTOS API Routines!
-  */
-#define OS_ISR_PRIORITY_SER             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 )
-#define OS_ISR_PRIORITY_SYS_RUNSTATS    ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY )
-
- /* Events periodicity */
-#define MOTION_CONTROL_PERIOD_MS      50
-#define AVERSIVE_PERIOD_MS            50
-
-
-/**
-********************************************************************************
-**
-**  Run-time Statistics
-**
-********************************************************************************
-*/
-
-/* Timer to be used for run-time statistics */
-#define SYS_RUNSTATS_TIM                    TIM6
-#define SYS_RUNSTATS_TIM_CLK_ENABLE()       RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
-#define SYS_RUNSTATS_TIM_CLK_DISABLE()      RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, DISABLE)
-#define SYS_RUNSTATS_IRQn                   TIM6_DAC_IRQn
-#define SYS_RUNSTATS_ISR                    TIM6_DAC_IRQHandler
-
-/* Clock-divider and prescaler config to adjust the run-time timer frequency
- * APB1 Timers Running at   96000 kHz
- * System ticks running at      1 kHz
+ /**
+ ********************************************************************************
+ **
+ **  Static Peripherals Definitions
+ **
+ ********************************************************************************
  */
-#define SYS_RUNSTATS_CKDIV          TIM_CKD_DIV4
-#define SYS_RUNSTATS_PRESCALER      (1199) // 20 kHz
 
+ /* Timer to be used for run-time statistics */
+ #define SYS_RUNSTATS_TIM                    TIM6
+ #define SYS_RUNSTATS_TIM_CLK_ENABLE()       RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
+ #define SYS_RUNSTATS_TIM_CLK_DISABLE()      RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, DISABLE)
+ #define SYS_RUNSTATS_IRQn                   TIM6_DAC_IRQn
+ #define SYS_RUNSTATS_ISR                    TIM6_DAC_IRQHandler
 
 /**
 ********************************************************************************
@@ -235,6 +139,12 @@ typedef enum {
     HW_LED_BLINK_FAST   = 2
 } HW_LED_ModeTypeDef;
 
+/* List of HMI frame states */
+/* SPI CSn is Active Low when actively transmitting a frame */
+typedef enum {
+    HMI_FRAME_IDLE   = (Bit_SET),
+    HMI_FRAME_ACTIVE = (Bit_RESET)
+} BB_HMI_FrameTypeDef;
 
 /**
 ********************************************************************************
@@ -252,9 +162,8 @@ void HW_PowerDown(void);
 /* System */
 void HW_SystemClock_Config(void);
 void HW_CPU_CACHE_Enable(void);
-void HW_SYS_TimerRunTime_Config(void);
+void HW_SYS_TimerRunTime_Config();
 uint32_t HW_SYS_GetRunTimeTicks(void);
-void HW_SYS_GetRunTimeStats(char *pcWriteBuffer);
 
 /* Power modules */
 void HW_PWR_Init(void);
@@ -295,24 +204,14 @@ uint32_t HW_MON_ConvertRawValueToMv(const uint16_t rawValue);
 int32_t HW_MON_ConvertTempValueToDegree(const uint32_t vsense);
 
 /* Debug */
-void HW_DBG_Init(USART_InitTypeDef * USART_InitStruct);
-BaseType_t HW_DBG_Put(char ch);
-BaseType_t HW_DBG_Puts(const char *str);
-BaseType_t HW_DBG_Get(const char* str);
-void OS_DebugTaskPrint( char ppcMessageToSend[] );
+void bb_dbg_Init(USART_InitTypeDef * USART_InitStruct);
+void bb_dbg_enable(uint32_t nvic_priority);
+void bb_dbg_disable(void);
 
 void OS_SHL_RegisterCommands( void );
 void OS_SHL_Start( void );
 void OS_SHL_OutputString( const char * const pcMessage );
 
-const char* OS_SHL_GetTypeAsString(const OS_SHL_VarTypeEnum type);
-size_t OS_SHL_GetTypeSize(const OS_SHL_VarTypeEnum type);
-const char* OS_SHL_GetAccessAsString(const OS_SHL_VarAccessEnum acc);
-BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength);
-BaseType_t OS_SHL_FindVariableByName(char* name, const OS_SHL_VarItemTypeDef** var);
-BaseType_t OS_SHL_FindVariableById(size_t id, const OS_SHL_VarItemTypeDef** var);
-BaseType_t OS_SHL_SetVariable(OS_SHL_VarItemTypeDef const* var, char* value);
-BaseType_t OS_SHL_GetVariable(OS_SHL_VarItemTypeDef const* var, char* ret, size_t retLength);
 
 /* Digital Servo */
 void HW_DSV_Init(USART_InitTypeDef * USART_InitStruct);
@@ -327,59 +226,6 @@ uint16_t HW_HMI_TxRx(uint16_t value);
 /* Digital Inputs */
 void HW_Digital_Input_Init(void);
 
-/* FreeRTOS prototypes for the standard FreeRTOS callback/hook functions */
-void vApplicationMallocFailedHook( void );
-void vApplicationIdleHook( void );
-void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName );
-void vApplicationTickHook( void );
-
-/* Aversive */
-bool Os_MotionTrajectoryNear(void);
-bool Os_MotionTrajectoryFinished(void);
-void OS_MotionSetWindow(double window_d, double window_a, double a_start);
-void OS_MotionSetNearWindow(double window_d, double window_a);
-void OS_MotionSetSpeed(int16_t speed_d, int16_t speed_a);
-void OS_MotionTrajectoryHardStop(void);
-void OS_MotionTrajectoryStop(void);
-void OS_MotionSetX(int16_t pos_x);
-void OS_MotionSetY(int16_t pos_y);
-void OS_MotionSetA(int16_t pos_a);
-int16_t OS_MotionGetX(void);
-int16_t OS_MotionGetY(void);
-int16_t OS_MotionGetA(void);
-void OS_MotionPowerEnable(void);
-void OS_MotionPowerDisable(void);
-void OS_MotionMoveRelative(double d_mm, double a_deg_rel);
-void OS_MotionGoToAuto(double pos_x, double pos_y);
-void OS_MotionGoToFwd(double pos_x, double pos_y);
-void OS_MotionGoToBwd(double pos_x, double pos_y);
-void OS_MotionTurnToFront(double pos_x, double pos_y);
-void OS_MotionTurnToBehind(double pos_x, double pos_y);
-void motion_send_wp(wp_t *waypoint);
-void motion_clear(void);
-
-/* Mutex Handle*/
-void vLockEncoderAngle(void);
-void vLockEncoderDistance(void);
-void vLockAngleConsign(void);
-void vLockDistanceConsign(void);
-void vLockRobotPosition(void);
-void vUnlockEncoderAngle(void);
-void vUnlockEncoderDistance(void);
-void vUnlockAngleConsign(void);
-void vUnlockDistanceConsign(void);
-void vUnlockRobotPosition(void);
-
-/* Main Application Tasks */
-void OS_CreateDebugTask(void);
-void OS_CreateLedTask(void);
-void OS_CreateMotionTask(void);
-void OS_CreateStrategyTask(void);
-void OS_CreateAvoidanceTask(void);
-void OS_CreateASVTask(void);
-void OS_CreateDSVTask(void);
-
-bool av_detection_is_valid(void);
 
 #ifdef __cplusplus
 }

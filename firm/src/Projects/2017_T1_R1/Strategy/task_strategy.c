@@ -20,7 +20,7 @@
  */
 
 /* Inclusion */
-#include "blueboard.h"
+#include "main.h"
 
 #define UP 2950
 #define DOWN 2000

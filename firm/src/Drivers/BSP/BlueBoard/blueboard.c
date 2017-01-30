@@ -14,6 +14,7 @@
  *      o TIM1                  for [MOT] Main Motors DIR and PWM channels 1 to 4
  *      o TIM3 / TIM4           for [QUA] Quadrature Encoders channels A (1) and B (2)
  *      o TIM5 / TIM8           for [ASV] Analog Servos PWM channels 1 to 8
+ *      o TIM6                  for [SYS] Run-Time statistics
  *      o SPI4                  for [HMI] Human Machine Interface
  *      o CAN1                  for [CAN] CAN bus Interface
  *      o USART1                for [DBG] Debug USART
@@ -21,18 +22,16 @@
  *      o USART3                for [DSV] Digital Servo bus Interface
  *      o ADC1 / TIM2 / DMA2    for [MON] Analog monitoring (Scan-mode with DMA, auto)
  *      o USB_OTG               for [USB] USB OTG High-Speed 2.0 Interface
- *      o TIM6                  for [SYS] Run-Time statistics
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: https://github.com/I-Grebot/firm_blueboard.git
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
 /* Inclusions */
 #include "blueboard.h"
 
-/* Local private hardware configuration handlers */
-static USART_InitTypeDef Debug_Config, Dsv_Config;
+static USART_InitTypeDef Dsv_Config;
 
 /**
   * @brief  Configure all hardware peripheral structures that could be
@@ -44,18 +43,6 @@ static USART_InitTypeDef Debug_Config, Dsv_Config;
   */
 static void HW_ConfigAll(void)
 {
-   /*
-    * Configure the Debug UART init structure:
-    *   8 bits length + 1 stop bit, no parity
-    *   Baudrate 115200 kbps
-    */
-    Debug_Config.USART_Mode                = USART_Mode_Rx | USART_Mode_Tx;
-    Debug_Config.USART_BaudRate            = 115200;
-    Debug_Config.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    Debug_Config.USART_Parity              = USART_Parity_Even;
-    Debug_Config.USART_StopBits            = USART_StopBits_1;
-    Debug_Config.USART_WordLength          = USART_WordLength_9b;
-
 
     /*
      * Configure the Digital Servo UART init structure:
@@ -95,7 +82,6 @@ void HW_InitAll(void)
     HW_HMI_Init();
     HW_Digital_Input_Init();
 
-    HW_DBG_Init(&Debug_Config);
     HW_DSV_Init(&Dsv_Config);
 
     /* Set Interrupt group priority */
