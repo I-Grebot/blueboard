@@ -5,10 +5,13 @@
  * @file       blueboard.c
  * @author     Paul
  * @date       Jan 4, 2016
- * @version    V2.0
  * -----------------------------------------------------------------------------
  * @brief
  *   This is the top-level module of the Board Support Package (BSP) functions.
+ *
+ *   Hardware informations:
+ *      o External Oscillator Clock :   8 MHz
+ *      o Internal System Clock     : 192 MHz
  *
  *   Hardware peripherals resources usage:
  *      o TIM1                  for [MOT] Main Motors DIR and PWM channels 1 to 4
@@ -31,58 +34,26 @@
 /* Inclusions */
 #include "blueboard.h"
 
-static USART_InitTypeDef Dsv_Config;
-
 /**
-  * @brief  Configure all hardware peripheral structures that could be
-  *         changed depending on application or usage.
-  *         This function is private so it can only be called from this
-  *         module.
+  * @brief  Main initializations for the blueboard modules.
   * @param  None
   * @retval None
   */
-static void HW_ConfigAll(void)
-{
-
-    /*
-     * Configure the Digital Servo UART init structure:
-     *   8 bits length + 1 stop bit, no parity
-     *   Baudrate 57600 kbps
-     */
-     Dsv_Config.USART_Mode                = USART_Mode_Tx;
-     Dsv_Config.USART_BaudRate            = 57600;
-     Dsv_Config.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-     Dsv_Config.USART_Parity              = USART_Parity_No;
-     Dsv_Config.USART_StopBits            = USART_StopBits_1;
-     Dsv_Config.USART_WordLength          = USART_WordLength_8b;
-}
-
-/**
-  * @brief  Initialize all hardware modules, also call the main
-  *         HW_ConfigAll() function.
-  * @param  None
-  * @retval None
-  */
-void HW_InitAll(void)
+void bb_init(void)
 {
     /* System Config */
-    HW_CPU_CACHE_Enable();
-    HW_SystemClock_Config();
+    bb_sys_cpu_cache_enable();
+    bb_system_clock_config();
 
-    /* HW Modules Configurations */
-    HW_ConfigAll();
-
-    /* HW Modules Initializations */
-    HW_PWR_Init();
-    HW_LED_Init();
-    HW_ENC_Init();
-    HW_MOT_Init();
-    HW_ASV_Init();
-    HW_MON_Init();
-    HW_HMI_Init();
-    HW_Digital_Input_Init();
-
-    HW_DSV_Init(&Dsv_Config);
+    /* Modules without custom-configuration */
+    bb_pwr_init();
+    bb_led_init();
+    bb_enc_init();
+    bb_mot_init();
+    bb_asv_init();
+    bb_mon_init();
+    bb_hmi_init();
+    bb_dio_init();
 
     /* Set Interrupt group priority */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
@@ -93,16 +64,16 @@ void HW_InitAll(void)
   * @param  None
   * @retval None
   */
-void HW_PowerUp(void)
+void bb_power_up(void)
 {
 
     //MOT_SLEEP_WRITE(MOT_SLEEP_OFF);
     //MOT_RESET_WRITE(MOT_RESET_ON);
 
     /* Enable powers */
-    HW_PWR_Enable(HW_PWR_VP1);
-    HW_PWR_Enable(HW_PWR_VP2);
-    HW_PWR_Enable(HW_PWR_VP3);
+    bb_pwr_enable(BB_PWR_VP1);
+    bb_pwr_enable(BB_PWR_VP2);
+    bb_pwr_enable(BB_PWR_VP3);
 
     /* Enable H-bridges power */
   //  MOT_RESET_WRITE(MOT_RESET_OFF);
@@ -114,15 +85,15 @@ void HW_PowerUp(void)
   * @param  None
   * @retval None
   */
-void HW_PowerDown(void)
+void bb_power_down(void)
 {
     /* Disable H-bridges */
     MOT_SLEEP_WRITE(MOT_SLEEP_ON);
     MOT_RESET_WRITE(MOT_RESET_ON);
 
     /* Disable Power */
-    HW_PWR_Disable(HW_PWR_VP1);
-    HW_PWR_Disable(HW_PWR_VP2);
-    HW_PWR_Disable(HW_PWR_VP3);
+    bb_pwr_disable(BB_PWR_VP1);
+    bb_pwr_disable(BB_PWR_VP2);
+    bb_pwr_disable(BB_PWR_VP3);
 }
 

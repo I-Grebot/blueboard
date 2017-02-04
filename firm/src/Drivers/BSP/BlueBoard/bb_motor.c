@@ -1,28 +1,23 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       hw_motor.c
+ * @file       bb_motor.c
  * @author     Paul
  * @date       Jan 5, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   This module handles main motors hardware
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev: 1458 $
- * $LastChangedBy: Pierrick_Boissard $
- * $LastChangedDate: 2016-04-29 11:29:31 +0200 (ven., 29 avr. 2016) $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
 #include "blueboard.h"
 
 
-void HW_MOT_Init(void)
+void bb_mot_init(void)
 {
     GPIO_InitTypeDef  GPIO_InitStructure;
     TIM_TimeBaseInitTypeDef TIM_BaseStruct;
@@ -90,7 +85,7 @@ void HW_MOT_Init(void)
     /* Enable Timers Clocks from RCC */
     MOT_TIM_CLK_ENABLE();
 
-    /* Setup ASV Timers */
+    /* Setup Motors Timers */
     TIM_BaseStruct.TIM_CounterMode          = TIM_CounterMode_Up;
     TIM_BaseStruct.TIM_ClockDivision        = TIM_CKD_DIV1;
     TIM_BaseStruct.TIM_Prescaler            = MOT_TIMER_PRESCALER;
@@ -126,29 +121,29 @@ void HW_MOT_Init(void)
     //    MOT_RESET_WRITE(MOT_RESET_ON);
 
     /* Setup default bridge current */
-    //    HW_MOT_SetBridgeCurrent(HW_MOT_CURRENT_100);
+    //    BB_MOT_SetBridgeCurrent(BB_MOT_CURRENT_100);
 }
 
-void HW_MOT_SetBridgeCurrent(HW_MOT_CurrentTypeDef current)
+void bb_mot_set_bridge_current(BB_MOT_CurrentTypeDef current)
 {
     switch(current) {
-        case HW_MOT_CURRENT_100:
+        case BB_MOT_CURRENT_100:
             MOT_I1_WRITE(Bit_RESET);
             MOT_I0_WRITE(Bit_RESET);
             break;
 
-        case HW_MOT_CURRENT_71:
+        case BB_MOT_CURRENT_71:
             MOT_I1_WRITE(Bit_RESET);
             MOT_I0_WRITE(Bit_SET);
             break;
 
-        case HW_MOT_CURRENT_38:
+        case BB_MOT_CURRENT_38:
             MOT_I1_WRITE(Bit_SET);
             MOT_I0_WRITE(Bit_RESET);
             break;
 
         default:
-        case HW_MOT_CURRENT_0:
+        case BB_MOT_CURRENT_0:
             MOT_I1_WRITE(Bit_SET);
             MOT_I0_WRITE(Bit_SET);
             break;
@@ -170,7 +165,7 @@ void HW_MOT_SetBridgeCurrent(HW_MOT_CurrentTypeDef current)
   * @param  fastDecay: If this param is enabled, fast decay mode is applied.
   * @retval None
   */
-void HW_MOT_SetMotorSpeed(HW_MOT_ChannelTypeDef channel, int16_t speed, FunctionalState fastDecay)
+void bb_mot_set_motor_speed(BB_MOT_ChannelTypeDef channel, int16_t speed, FunctionalState fastDecay)
 {
     uint16_t xIN1_PWM;
     uint16_t xIN2_PWM;
@@ -206,13 +201,13 @@ void HW_MOT_SetMotorSpeed(HW_MOT_ChannelTypeDef channel, int16_t speed, Function
 
     /* Setup new PWM Compare value for the selected channel */
     switch(channel) {
-        case HW_MOT_CHANNEL1:
+        case BB_MOT_CHANNEL1:
             MOT1_IN1_SET_PULSE(xIN1_PWM);
             //MOT1_IN2_SET_PULSE(xIN2_PWM);
             GPIO_WriteBit(MOT1_IN2_GPIO_PORT, MOT1_IN2_PIN, xIN2_PWM);
             break;
 
-        case HW_MOT_CHANNEL2:
+        case BB_MOT_CHANNEL2:
             MOT2_IN1_SET_PULSE(xIN1_PWM);
             //MOT2_IN2_SET_PULSE(xIN2_PWM);
             GPIO_WriteBit(MOT2_IN2_GPIO_PORT, MOT2_IN2_PIN, xIN2_PWM);
@@ -226,7 +221,7 @@ void HW_MOT_SetMotorSpeed(HW_MOT_ChannelTypeDef channel, int16_t speed, Function
 }
 
 /* Shorthand for fast-decay PWM */
-void HW_MOT_SetMotorSpeedFastDecay(HW_MOT_ChannelTypeDef channel, int32_t speed)
+void bb_mot_set_motor_speed_fast_decay(BB_MOT_ChannelTypeDef channel, int32_t speed)
 {
-    HW_MOT_SetMotorSpeed(channel, (int16_t) speed, ENABLE);
+    bb_mot_set_motor_speed(channel, (int16_t) speed, ENABLE);
 }

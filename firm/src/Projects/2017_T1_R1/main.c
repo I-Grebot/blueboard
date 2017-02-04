@@ -38,12 +38,15 @@
 
 int main( void )
 {
-    /* Modules initialization */
-    HW_InitAll();
+    /* BlueBoard Initializations */
+    bb_init();
+
+    /* Application modules Initialization */
     serial_init();
+    dsv_init();
 
     /* Apply the Power-Up sequence*/
-    HW_PowerUp();
+    bb_power_up();
 
     /* Start software tasks */
 

@@ -18,6 +18,10 @@
 #ifndef __MAIN_H
 #define __MAIN_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
  /**
  ********************************************************************************
  **
@@ -179,7 +183,24 @@ void OS_CreateAvoidanceTask(void);
 void OS_CreateASVTask(void);
 void OS_CreateDSVTask(void);
 
+/* Analog Servos */
+void ASV_DeployLeftArm(void);
+void ASV_DeployRightArm(void);
+void ASV_IdleLeftArm(void);
+void ASV_IdleRightArm(void);
+void ASV_MoveIndex(uint16_t position);
+void ASV_DeployParasol(uint16_t position);
+
+/* Digital Servos */
+void dsv_init(void);
+void DSV_SetServo1(uint16_t position);
+void DSV_SetServo2(uint16_t position);
+
 bool av_detection_is_valid(void);
+
+/* LEDs */
+//void LedSetMode(BB_LED_ModeTypeDef mode);
+//void LedSetColor(BB_LED_ColorTypeDef color);
 
 /* Serial Interface */
 BaseType_t serial_init(void);
@@ -190,6 +211,11 @@ BaseType_t serial_get(const char* str);
 void OS_DebugTaskPrint( char ppcMessageToSend[] );
 
 /* Shell */
+
+void OS_SHL_RegisterCommands( void );
+void OS_SHL_Start( void );
+void OS_SHL_OutputString( const char * const pcMessage );
+
 const char* OS_SHL_GetTypeAsString(const OS_SHL_VarTypeEnum type);
 size_t OS_SHL_GetTypeSize(const OS_SHL_VarTypeEnum type);
 const char* OS_SHL_GetAccessAsString(const OS_SHL_VarAccessEnum acc);
@@ -198,5 +224,9 @@ BaseType_t OS_SHL_FindVariableByName(char* name, const OS_SHL_VarItemTypeDef** v
 BaseType_t OS_SHL_FindVariableById(size_t id, const OS_SHL_VarItemTypeDef** var);
 BaseType_t OS_SHL_SetVariable(OS_SHL_VarItemTypeDef const* var, char* value);
 BaseType_t OS_SHL_GetVariable(OS_SHL_VarItemTypeDef const* var, char* ret, size_t retLength);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MAIN_H */

@@ -25,8 +25,8 @@
 /* Local Variable Mutex */
 static xSemaphoreHandle xLedColorMutex;
 static xSemaphoreHandle xLedModeMutex;
-static HW_LED_ColorTypeDef LedColor=HW_LED_OFF;
-static HW_LED_ModeTypeDef LedMode=HW_LED_STATIC;
+static BB_LED_ColorTypeDef LedColor=BB_LED_OFF;
+static BB_LED_ModeTypeDef LedMode=BB_LED_STATIC;
 
 /* Local, Private functions */
 static void OS_LedTask(void *pvParameters);
@@ -56,16 +56,16 @@ static void OS_LedTask( void *pvParameters )
     {
         switch(LedMode)
         {
-            case HW_LED_BLINK_SLOW:
+            case BB_LED_BLINK_SLOW:
                 blinkPeriod = LED_BLINK_SLOW;
                 break;
 
-            case HW_LED_BLINK_FAST:
+            case BB_LED_BLINK_FAST:
                 blinkPeriod = LED_BLINK_FAST;
                 break;
 
             default:
-            case HW_LED_STATIC:
+            case BB_LED_STATIC:
                         break;
         }
 
@@ -73,14 +73,14 @@ static void OS_LedTask( void *pvParameters )
         if(blinkCounter++ > blinkPeriod)
             blinkCounter = 0;
 
-        if((blinkCounter > blinkPeriod / 2) || LedMode == HW_LED_STATIC) {
+        if((blinkCounter > blinkPeriod / 2) || LedMode == BB_LED_STATIC) {
 
             /* Duration ON */
-            HW_LED_SetColor(LedColor);
+            bb_led_set_color(LedColor);
             vTaskDelayUntil( &xNextWakeTime, LED_PWM_DUTY_TICK);
 
             /* Duration OFF */
-            HW_LED_SetColor(HW_LED_OFF);
+            bb_led_set_color(BB_LED_OFF);
             vTaskDelayUntil( &xNextWakeTime, LED_PWM_PERIOD_TICK-LED_PWM_DUTY_TICK);
 
         } else {
@@ -89,14 +89,14 @@ static void OS_LedTask( void *pvParameters )
     }
 }
 
-void LedSetColor(HW_LED_ColorTypeDef color)
+void LedSetColor(BB_LED_ColorTypeDef color)
 {
 	xSemaphoreTake(xLedColorMutex, 10);
 	LedColor = color;
 	xSemaphoreGive(xLedColorMutex);
 }
 
-void LedSetMode(HW_LED_ModeTypeDef mode)
+void LedSetMode(BB_LED_ModeTypeDef mode)
 {
 	xSemaphoreTake(xLedModeMutex, 10);
 	LedMode = mode;

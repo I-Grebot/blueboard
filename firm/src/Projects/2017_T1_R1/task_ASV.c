@@ -31,7 +31,7 @@
 
 /* Local structures */
 typedef struct {
-	HW_ASV_ChannelTypeDef channel;
+	BB_ASV_ChannelTypeDef channel;
 	uint16_t current_Position;
 	uint16_t min_Position;
 	uint16_t max_Position;
@@ -43,7 +43,7 @@ static ASV_ControlTypeDef leftArm, rightArm, centralIndex, parasol;
 
 /* Local, Private functions */
 static void OS_ASVTask(void *pvParameters);
-void ASV_Create(ASV_ControlTypeDef* ASV, HW_ASV_ChannelTypeDef channel, uint16_t min_Position, uint16_t max_Position);
+void ASV_Create(ASV_ControlTypeDef* ASV, BB_ASV_ChannelTypeDef channel, uint16_t min_Position, uint16_t max_Position);
 
 
 void OS_CreateASVTask(void)
@@ -54,10 +54,10 @@ void OS_CreateASVTask(void)
     	printf("insufficient heap RAM available for ASVMsgQueue\r\n");
     	while(1);
     }
-    ASV_Create(&parasol, HW_ASV_CHANNEL1, 1400, 2300);
-    ASV_Create(&centralIndex, HW_ASV_CHANNEL2, MIN_INDEX, MAX_INDEX);
-    ASV_Create(&leftArm, HW_ASV_CHANNEL4, 2000, 4000);
-    ASV_Create(&rightArm, HW_ASV_CHANNEL2, 2000, 4000);
+    ASV_Create(&parasol, BB_ASV_CHANNEL1, 1400, 2300);
+    ASV_Create(&centralIndex, BB_ASV_CHANNEL2, MIN_INDEX, MAX_INDEX);
+    ASV_Create(&leftArm, BB_ASV_CHANNEL4, 2000, 4000);
+    ASV_Create(&rightArm, BB_ASV_CHANNEL2, 2000, 4000);
 
 
 
@@ -80,11 +80,11 @@ static void OS_ASVTask( void *pvParameters )
     	if (ASV_To_Manage.current_Position < ASV_To_Manage.min_Position)
     		ASV_To_Manage.current_Position = ASV_To_Manage.min_Position;
 
-    	HW_ASV_SetPwmPulseLength(ASV_To_Manage.channel,ASV_To_Manage.current_Position);
+    	bb_asv_set_pwm_pulse_length(ASV_To_Manage.channel,ASV_To_Manage.current_Position);
     }
 }
 
-void ASV_Create(ASV_ControlTypeDef* ASV, HW_ASV_ChannelTypeDef channel, uint16_t min_Position, uint16_t max_Position)
+void ASV_Create(ASV_ControlTypeDef* ASV, BB_ASV_ChannelTypeDef channel, uint16_t min_Position, uint16_t max_Position)
 {
 	ASV->channel = channel;
 	ASV->max_Position = max_Position;

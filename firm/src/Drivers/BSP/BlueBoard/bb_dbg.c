@@ -67,8 +67,8 @@ void bb_dbg_init(USART_InitTypeDef * USART_InitStruct)
     USART_ClockStructInit(&USART_ClockInitStruct);
     USART_ClockInit(DBG_COM, &USART_ClockInitStruct);
 
-
 }
+
 
 void bb_dbg_enable(uint32_t nvic_priority)
 {
@@ -89,5 +89,5 @@ void bb_dbg_disable(void)
 
     /* Stop UART */
     USART_Cmd(DBG_COM, DISABLE);
-
 }
+

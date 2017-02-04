@@ -1,21 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
  * @file       hw_encoder.c
  * @author     Paul
  * @date       Jan 5, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
- *   <DESCRIPTION HERE>
+ *   This module implements required hardware for the quadrature encoders
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev: 1464 $
- * $LastChangedBy: Pierrick_Boissard $
- * $LastChangedDate: 2016-05-02 15:38:42 +0200 (lun., 02 mai 2016) $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -24,7 +19,7 @@
 static int32_t encoder1_Value, encoder2_Value;
 static int16_t encoder1_Old, encoder2_Old;
 
-void HW_ENC_Init(void)
+void bb_enc_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
 
@@ -74,7 +69,7 @@ void HW_ENC_Init(void)
     TIM_SetAutoreload(ENC2_TIM, 0xFFFFFFFF);
 
     /* Cleanup timers */
-    HW_ENC_ResetChannels();
+    bb_enc_reset_channels();
 
     /* Enable Quadrature Encoders */
     TIM_Cmd(ENC1_TIM, ENABLE);
@@ -82,12 +77,12 @@ void HW_ENC_Init(void)
 
 }
 
-int32_t HW_ENC_GetChannel(HW_ENC_ChannelTypeDef channel)
+int32_t bb_enc_get_channel(BB_ENC_ChannelTypeDef channel)
 {
 	int16_t encoder, delta;
     switch(channel)
     {
-    case HW_ENC_CHANNEL1:
+    case BB_ENC_CHANNEL1:
     	encoder = (int16_t)ENC1_TIM->CNT;
     	delta = encoder - encoder1_Old;
     	encoder1_Old = encoder;
@@ -95,7 +90,7 @@ int32_t HW_ENC_GetChannel(HW_ENC_ChannelTypeDef channel)
         return  encoder1_Value;
         break;
 
-    case HW_ENC_CHANNEL2:
+    case BB_ENC_CHANNEL2:
     	encoder = (int16_t)ENC2_TIM->CNT;
     	delta = encoder - encoder2_Old;
     	encoder2_Old = encoder;
@@ -111,7 +106,7 @@ int32_t HW_ENC_GetChannel(HW_ENC_ChannelTypeDef channel)
 
 }
 
-void HW_ENC_ResetChannels(void)
+void bb_enc_reset_channels(void)
 {
     ENC1_TIM->CNT = 0x00000000 ;
     ENC2_TIM->CNT = 0x00000000 ;

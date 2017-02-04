@@ -1,11 +1,10 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       hw_hmi.c
+ * @file       bb_hmi.c
  * @author     Paul
  * @date       Jan 31, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   This module handles the communication with the Human Machine Interface
@@ -17,7 +16,7 @@
 
 #include "blueboard.h"
 
-void HW_HMI_Init(void)
+void bb_hmi_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     SPI_InitTypeDef SPI_InitStruct;
@@ -95,15 +94,15 @@ void HW_HMI_Init(void)
     SPI_SSOutputCmd(HMI_COM, ENABLE);
 
     /* Enable SPI module */
-    HMI_CSN_WRITE(HMI_FRAME_IDLE);
+    HMI_CSN_WRITE(BB_HMI_FRAME_IDLE);
     SPI_Cmd(HMI_COM, ENABLE);
 
 }
 
-uint16_t HW_HMI_TxRx(uint16_t value)
+uint16_t bb_hmi_tx_rx(uint16_t value)
 {
     /* Send a new 16 bits word */
-    HMI_CSN_WRITE(HMI_FRAME_ACTIVE);
+    HMI_CSN_WRITE(BB_HMI_FRAME_ACTIVE);
     SPI_I2S_SendData16(HMI_COM, value);
 
     /* Wait until transmit complete */
@@ -115,7 +114,7 @@ uint16_t HW_HMI_TxRx(uint16_t value)
     /* Wait until SPI is not busy anymore */
     while(SPI_I2S_GetFlagStatus(HMI_COM, SPI_I2S_FLAG_BSY) == SET);
 
-    HMI_CSN_WRITE(HMI_FRAME_IDLE);
+    HMI_CSN_WRITE(BB_HMI_FRAME_IDLE);
 
     /* Return 16 bit received word */
     return SPI_I2S_ReceiveData16(HMI_COM);

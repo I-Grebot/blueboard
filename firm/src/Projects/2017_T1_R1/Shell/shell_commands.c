@@ -496,7 +496,7 @@ static BaseType_t OS_SHL_PowCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     BaseType_t xParameter1StringLength;
     BaseType_t xParameter2StringLength;
     uint8_t allSupplies = 0;
-    HW_PWR_TypeDef powerSupply;
+    BB_PWR_TypeDef powerSupply;
 
     /* Get parameters */
     pcParameter1 = (char*) FreeRTOS_CLIGetParameter(pcCommandString, 1, &xParameter1StringLength);
@@ -508,11 +508,11 @@ static BaseType_t OS_SHL_PowCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     /* Decode <no> argument */
     if(!strcasecmp(pcParameter1, "1")) {
-        powerSupply = HW_PWR_VP1;
+        powerSupply = BB_PWR_VP1;
     } else if(!strcasecmp(pcParameter1, "2")) {
-        powerSupply = HW_PWR_VP2;
+        powerSupply = BB_PWR_VP2;
     } else if(!strcasecmp(pcParameter1, "3")) {
-        powerSupply = HW_PWR_VP3;
+        powerSupply = BB_PWR_VP3;
     } else if(!strcasecmp(pcParameter1, "ALL")) {
         allSupplies = 1;
     } else {
@@ -523,19 +523,19 @@ static BaseType_t OS_SHL_PowCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     /* Decode <state> argument */
     if(!strcasecmp(pcParameter2, "OFF")) {
         if(!allSupplies) {
-            HW_PWR_Disable(powerSupply);
+            bb_pwr_disable(powerSupply);
         } else {
-            HW_PWR_Disable(HW_PWR_VP1);
-            HW_PWR_Disable(HW_PWR_VP2);
-            HW_PWR_Disable(HW_PWR_VP3);
+            bb_pwr_disable(BB_PWR_VP1);
+            bb_pwr_disable(BB_PWR_VP2);
+            bb_pwr_disable(BB_PWR_VP3);
         }
     } else if(!strcasecmp(pcParameter2, "ON")) {
         if(!allSupplies) {
-            HW_PWR_Enable(powerSupply);
+            bb_pwr_enable(powerSupply);
         } else {
-            HW_PWR_Enable(HW_PWR_VP1);
-            HW_PWR_Enable(HW_PWR_VP2);
-            HW_PWR_Enable(HW_PWR_VP3);
+            bb_pwr_enable(BB_PWR_VP1);
+            bb_pwr_enable(BB_PWR_VP2);
+            bb_pwr_enable(BB_PWR_VP3);
         }
     } else {
         snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not define power-supply state to %s"SHELL_EOL, pcParameter2);
@@ -660,11 +660,11 @@ static BaseType_t OS_SHL_LedCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     /* Decode <mode> argument */
     if(!strcasecmp(pcParameter1, "STATIC")) {
-        LedSetMode(HW_LED_STATIC);
+        LedSetMode(BB_LED_STATIC);
     } else if(!strcasecmp(pcParameter1, "BLINK_SLOW")) {
-        LedSetMode(HW_LED_BLINK_SLOW);
+        LedSetMode(BB_LED_BLINK_SLOW);
     } else if(!strcasecmp(pcParameter1, "BLINK_FAST")) {
-        LedSetMode(HW_LED_BLINK_FAST);
+        LedSetMode(BB_LED_BLINK_FAST);
     } else {
         snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not set LED mode to %s"SHELL_EOL, pcParameter1);
         return pdFALSE;
@@ -672,21 +672,21 @@ static BaseType_t OS_SHL_LedCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     /* Decode <color> argument */
     if(!strcasecmp(pcParameter2, "OFF")) {
-        LedSetColor(HW_LED_OFF);
+        LedSetColor(BB_LED_OFF);
     } else if(!strcasecmp(pcParameter2, "WHITE")) {
-        LedSetColor(HW_LED_WHITE);
+        LedSetColor(BB_LED_WHITE);
     } else if(!strcasecmp(pcParameter2, "RED")) {
-        LedSetColor(HW_LED_RED);
+        LedSetColor(BB_LED_RED);
     } else if(!strcasecmp(pcParameter2, "GREEN")) {
-        LedSetColor(HW_LED_GREEN);
+        LedSetColor(BB_LED_GREEN);
     } else if(!strcasecmp(pcParameter2, "BLUE")) {
-        LedSetColor(HW_LED_BLUE);
+        LedSetColor(BB_LED_BLUE);
     } else if(!strcasecmp(pcParameter2, "CYAN")) {
-        LedSetColor(HW_LED_CYAN);
+        LedSetColor(BB_LED_CYAN);
     } else if(!strcasecmp(pcParameter2, "MAGENTA")) {
-        LedSetColor(HW_LED_MAGENTA);
+        LedSetColor(BB_LED_MAGENTA);
     } else if(!strcasecmp(pcParameter2, "YELLOW")) {
-        LedSetColor(HW_LED_YELLOW);
+        LedSetColor(BB_LED_YELLOW);
     } else {
         snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not set LED color to %s"SHELL_EOL, pcParameter2);
         return pdFALSE;

@@ -66,7 +66,7 @@ static void OS_StrategyTask( void *pvParameters )
     /* Initialise xNextWakeTime - this only needs to be done once. */
     xNextWakeTime = xTaskGetTickCount();
 
-    LedSetColor(HW_LED_BLUE);
+    LedSetColor(BB_LED_BLUE);
     //OS_DebugTaskPrint("Starting!\n");
 
     // TEMP
@@ -97,7 +97,7 @@ static void OS_StrategyTask( void *pvParameters )
         // --------------------
         case MATCH_STATE_READY:
         // --------------------
-    	    LedSetColor(HW_LED_WHITE);
+    	    LedSetColor(BB_LED_WHITE);
         	// Awaits for user input to start the INIT procedure
             if(START_JACK==PRESENT)
             {
@@ -139,19 +139,19 @@ static void OS_StrategyTask( void *pvParameters )
             	if(match.timer_msec>=START_DEBOUNCING_DELAY_MSEC/portTICK_RATE_MS)
                 {
             		match.state = MATCH_STATE_RUN;
-            		LedSetMode(HW_LED_BLINK_SLOW);
+            		LedSetMode(BB_LED_BLINK_SLOW);
                     match.timer_msec = 0;
                     match.scored_points = 0;
 
                     // Sample the color
                     if(COLOR==MATCH_COLOR_PURPLE)
                     {
-                    	LedSetColor(HW_LED_MAGENTA);
+                    	LedSetColor(BB_LED_MAGENTA);
                         match.color = MATCH_COLOR_PURPLE;
                     }
                     else
                     {
-                    	LedSetColor(HW_LED_GREEN);
+                    	LedSetColor(BB_LED_GREEN);
                         match.color = MATCH_COLOR_GREEN;
                     }
                     // Update all variables that depends on the color choice
@@ -197,12 +197,12 @@ static void OS_StrategyTask( void *pvParameters )
                 // Sample the color
                 if(COLOR==MATCH_COLOR_PURPLE)
                 {
-                	LedSetColor(HW_LED_MAGENTA);
+                	LedSetColor(BB_LED_MAGENTA);
                     match.color = MATCH_COLOR_PURPLE;
                 }
                 else
                 {
-                	LedSetColor(HW_LED_GREEN);
+                	LedSetColor(BB_LED_GREEN);
                     match.color = MATCH_COLOR_GREEN;
                 }
             	match.timer_msec = 0;
@@ -218,8 +218,8 @@ static void OS_StrategyTask( void *pvParameters )
         		OS_MotionPowerDisable();
      //       motion_clear();
         		match.state = MATCH_STATE_STOPPED;
-        		LedSetColor(HW_LED_RED);
-        		LedSetMode(HW_LED_STATIC);
+        		LedSetColor(BB_LED_RED);
+        		LedSetMode(BB_LED_STATIC);
         	}
         	else
         	{

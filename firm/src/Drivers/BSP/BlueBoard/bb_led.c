@@ -1,21 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       hw_led.c
+ * @file       bb_led.c
  * @author     Paul
  * @date       Jan 3, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   This module handles the RGB LED
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:: 1431                                                                 $
- * $LastChangedBy:: paul.m                                                     $
- * $LastChangedDate:: 2016-01-19 22:06:16 +0100 (mar., 19 janv. 2016)          $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -26,7 +21,7 @@
   * @param  None
   * @retval None
   */
-void HW_LED_Init(void)
+void bb_led_init(void)
 {
     GPIO_InitTypeDef  GPIO_InitStructure;
 
@@ -60,48 +55,48 @@ void HW_LED_Init(void)
   * @param  color: Color to setup
   * @retval None
   */
-void HW_LED_SetColor(HW_LED_ColorTypeDef color)
+void bb_led_set_color(BB_LED_ColorTypeDef color)
 {
     switch(color)
     {
-    case HW_LED_RED:
+    case BB_LED_RED:
         LEDR_WRITE(LEDx_ON);
         LEDG_WRITE(LEDx_OFF);
         LEDB_WRITE(LEDx_OFF);
         break;
-    case HW_LED_GREEN:
+    case BB_LED_GREEN:
         LEDR_WRITE(LEDx_OFF);
         LEDG_WRITE(LEDx_ON);
         LEDB_WRITE(LEDx_OFF);
         break;
-    case HW_LED_BLUE:
+    case BB_LED_BLUE:
         LEDR_WRITE(LEDx_OFF);
         LEDG_WRITE(LEDx_OFF);
         LEDB_WRITE(LEDx_ON);
         break;
-    case HW_LED_CYAN:
+    case BB_LED_CYAN:
         LEDR_WRITE(LEDx_OFF);
         LEDG_WRITE(LEDx_ON);
         LEDB_WRITE(LEDx_ON);
         break;
-    case HW_LED_YELLOW:
+    case BB_LED_YELLOW:
         LEDR_WRITE(LEDx_ON);
         LEDG_WRITE(LEDx_ON);
         LEDB_WRITE(LEDx_OFF);
         break;
-    case HW_LED_MAGENTA:
+    case BB_LED_MAGENTA:
         LEDR_WRITE(LEDx_ON);
         LEDG_WRITE(LEDx_OFF);
         LEDB_WRITE(LEDx_ON);
         break;
-    case HW_LED_WHITE:
+    case BB_LED_WHITE:
         LEDR_WRITE(LEDx_ON);
         LEDG_WRITE(LEDx_ON);
         LEDB_WRITE(LEDx_ON);
         break;
 
     default:
-    case HW_LED_OFF:
+    case BB_LED_OFF:
         LEDR_WRITE(LEDx_OFF);
         LEDG_WRITE(LEDx_OFF);
         LEDB_WRITE(LEDx_OFF);

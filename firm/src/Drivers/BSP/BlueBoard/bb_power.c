@@ -1,11 +1,10 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       hw_power.c
+ * @file       bb_power.c
  * @author     Paul
  * @date       Jan 3, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   This module handles the PTN78060 power enables
@@ -13,21 +12,17 @@
  * Versionning informations
  * Repository: http://svn2.assembla.com/svn/paranoid_android/
  * -----------------------------------------------------------------------------
- * $Rev:: 1431                                                                 $
- * $LastChangedBy:: paul.m                                                     $
- * $LastChangedDate:: 2016-01-19 22:06:16 +0100 (mar., 19 janv. 2016)          $
- * -----------------------------------------------------------------------------
  */
 
 /* Inclusions */
 #include "blueboard.h"
 
 /* Private variables */
-static const GPIO_TypeDef* HW_PWR_PORT[PWRn] = {VP1_EN_GPIO_PORT,
+static const GPIO_TypeDef* BB_PWR_PORT[PWRn] = {VP1_EN_GPIO_PORT,
                                                 VP2_EN_GPIO_PORT,
                                                 VP3_EN_GPIO_PORT};
 
-static const uint16_t HW_PWR_PIN[PWRn] = {VP1_EN_PIN,
+static const uint16_t BB_PWR_PIN[PWRn] = {VP1_EN_PIN,
                                           VP2_EN_PIN,
                                           VP3_EN_PIN};
 
@@ -36,7 +31,7 @@ static const uint16_t HW_PWR_PIN[PWRn] = {VP1_EN_PIN,
   * @param  None
   * @retval None
   */
-void HW_PWR_Init(void)
+void bb_pwr_init(void)
 {
     GPIO_InitTypeDef  GPIO_InitStructure;
 
@@ -60,9 +55,9 @@ void HW_PWR_Init(void)
     GPIO_Init(VP3_EN_GPIO_PORT, &GPIO_InitStructure);
 
     /* Default state: Modules OFF */
-    HW_PWR_Disable(HW_PWR_VP1);
-    HW_PWR_Disable(HW_PWR_VP2);
-    HW_PWR_Disable(HW_PWR_VP3);
+    bb_pwr_disable(BB_PWR_VP1);
+    bb_pwr_disable(BB_PWR_VP2);
+    bb_pwr_disable(BB_PWR_VP3);
 
 }
 
@@ -71,9 +66,9 @@ void HW_PWR_Init(void)
   * @param  power VPx channel to enable
   * @retval None
   */
-void HW_PWR_Enable(HW_PWR_TypeDef power)
+void bb_pwr_enable(BB_PWR_TypeDef power)
 {
-    GPIO_WriteBit((GPIO_TypeDef*) HW_PWR_PORT[power], HW_PWR_PIN[power], PWRx_ON);
+    GPIO_WriteBit((GPIO_TypeDef*) BB_PWR_PORT[power], BB_PWR_PIN[power], PWRx_ON);
 }
 
 /**
@@ -81,7 +76,7 @@ void HW_PWR_Enable(HW_PWR_TypeDef power)
   * @param  power VPx channel to disable
   * @retval None
   */
-void HW_PWR_Disable(HW_PWR_TypeDef power)
+void bb_pwr_disable(BB_PWR_TypeDef power)
 {
-    GPIO_WriteBit((GPIO_TypeDef*) HW_PWR_PORT[power], HW_PWR_PIN[power], PWRx_OFF);
+    GPIO_WriteBit((GPIO_TypeDef*) BB_PWR_PORT[power], BB_PWR_PIN[power], PWRx_OFF);
 }

@@ -111,12 +111,12 @@ void AVS_Init(void)
 {
     /* Robot System */
     rs_init(&robot.cs.rs);
-    rs_set_left_pwm(&robot.cs.rs,  (void*) HW_MOT_SetMotorSpeedFastDecay, (void*) MOT_CHANNEL_LEFT);
-    rs_set_right_pwm(&robot.cs.rs, (void*) HW_MOT_SetMotorSpeedFastDecay, (void*) MOT_CHANNEL_RIGHT);
+    rs_set_left_pwm(&robot.cs.rs,  (void*) bb_mot_set_motor_speed_fast_decay, (void*) MOT_CHANNEL_LEFT);
+    rs_set_right_pwm(&robot.cs.rs, (void*) bb_mot_set_motor_speed_fast_decay, (void*) MOT_CHANNEL_RIGHT);
 
     /* External Encoders */
-    rs_set_left_ext_encoder(&robot.cs.rs,  (void*) HW_ENC_GetChannel, (void*) ENC_CHANNEL_LEFT,  PHYS_ROBOT_ENCODER_LEFT_GAIN);
-    rs_set_right_ext_encoder(&robot.cs.rs, (void*) HW_ENC_GetChannel, (void*) ENC_CHANNEL_RIGHT, PHYS_ROBOT_ENCODER_RIGHT_GAIN);
+    rs_set_left_ext_encoder(&robot.cs.rs,  (void*) bb_enc_get_channel, (void*) ENC_CHANNEL_LEFT,  PHYS_ROBOT_ENCODER_LEFT_GAIN);
+    rs_set_right_ext_encoder(&robot.cs.rs, (void*) bb_enc_get_channel, (void*) ENC_CHANNEL_RIGHT, PHYS_ROBOT_ENCODER_RIGHT_GAIN);
     rs_set_flags(&robot.cs.rs, RS_USE_EXT);
 
     /* Position Manager */
@@ -236,8 +236,8 @@ void AVS_CsTask(void *pvParameters)
 		}
 		else
 		{
-			HW_MOT_SetMotorSpeedFastDecay(MOT_CHANNEL_LEFT, 0);
-			HW_MOT_SetMotorSpeedFastDecay(MOT_CHANNEL_RIGHT,0);
+			bb_mot_set_motor_speed_fast_decay(MOT_CHANNEL_LEFT, 0);
+			bb_mot_set_motor_speed_fast_decay(MOT_CHANNEL_RIGHT,0);
 		}
 
 		if(robot.cs.cs_events & DO_POS)

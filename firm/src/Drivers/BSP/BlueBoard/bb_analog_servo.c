@@ -1,28 +1,22 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       hw_analog_servo.c
+ * @file       bb_analog_servo.c
  * @author     Paul
  * @date       Jan 4, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
- *   <DESCRIPTION HERE>
+ *   This module implements hardware functions of the analog servos.
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:: 1469                                                                 $
- * $LastChangedBy:: Pierrick_Boissard                                          $
- * $LastChangedDate:: 2016-05-05 09:40:31 +0200 (jeu., 05 mai 2016)            $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
-
 #include "blueboard.h"
 
-void HW_ASV_Init(void)
+void bb_asv_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
     TIM_TimeBaseInitTypeDef TIM_BaseStruct;
@@ -125,20 +119,20 @@ void HW_ASV_Init(void)
 
 }
 
-void HW_ASV_SetPwmPulseLength(HW_ASV_ChannelTypeDef ASV_Channel, uint16_t pulseLength)
+void bb_asv_set_pwm_pulse_length(BB_ASV_ChannelTypeDef ASV_Channel, uint16_t pulseLength)
 {
 
     /* Configure the correct OC depending on channel selection */
     switch(ASV_Channel)
     {
-        case HW_ASV_CHANNEL1: ASV1_PWM_SET_PULSE(pulseLength); break;
-        case HW_ASV_CHANNEL2: ASV2_PWM_SET_PULSE(pulseLength); break;
-        case HW_ASV_CHANNEL3: ASV3_PWM_SET_PULSE(pulseLength); break;
-        case HW_ASV_CHANNEL4: ASV4_PWM_SET_PULSE(pulseLength); break;
-        case HW_ASV_CHANNEL5: ASV5_PWM_SET_PULSE(pulseLength); break;
-        case HW_ASV_CHANNEL6: ASV6_PWM_SET_PULSE(pulseLength); break;
-        case HW_ASV_CHANNEL7: ASV7_PWM_SET_PULSE(pulseLength); break;
-        case HW_ASV_CHANNEL8: ASV8_PWM_SET_PULSE(pulseLength); break;
+        case BB_ASV_CHANNEL1: ASV1_PWM_SET_PULSE(pulseLength); break;
+        case BB_ASV_CHANNEL2: ASV2_PWM_SET_PULSE(pulseLength); break;
+        case BB_ASV_CHANNEL3: ASV3_PWM_SET_PULSE(pulseLength); break;
+        case BB_ASV_CHANNEL4: ASV4_PWM_SET_PULSE(pulseLength); break;
+        case BB_ASV_CHANNEL5: ASV5_PWM_SET_PULSE(pulseLength); break;
+        case BB_ASV_CHANNEL6: ASV6_PWM_SET_PULSE(pulseLength); break;
+        case BB_ASV_CHANNEL7: ASV7_PWM_SET_PULSE(pulseLength); break;
+        case BB_ASV_CHANNEL8: ASV8_PWM_SET_PULSE(pulseLength); break;
 
         default:
             /* Incorrect, Do nothing */

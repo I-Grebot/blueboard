@@ -45,23 +45,23 @@ struct quadramp_derivate_filter
 
 /** Initialization of the filter
     as this filter has always an infinite gain, it is initilized with an integrative infinite gain limited by 1 */
-extern inline void quadramp_derivate_init(struct quadramp_derivate_filter * r);
+void quadramp_derivate_init(struct quadramp_derivate_filter * r);
 
 /** set the anticipation value. This gain is a fixed point value that will be divided by 256.
     set this gain to have enough anticipation, so the goal is not atteined with too much speed.
     too much, and the goal will be overlooked, and the system will oscillate.
     Too less, and the goal will be atteined with speed, and the goal window will eventually cutoff brutally
     */
-extern inline void quadramp_derivate_set_gain_anticipation(struct quadramp_derivate_filter * q, uint16_t gain_anticipation);
+void quadramp_derivate_set_gain_anticipation(struct quadramp_derivate_filter * q, uint16_t gain_anticipation);
 
 /** goal window is a shutdown of the integration when the goal is atteined.
     this aims to get rid of the very little oscillations when immobile */
-extern inline void quadramp_derivate_set_goal_window(struct quadramp_derivate_filter * q, uint32_t goal_window);
+void quadramp_derivate_set_goal_window(struct quadramp_derivate_filter * q, uint32_t goal_window);
 
 /** as in the quadramp, we can set here the maximum speed (1st order) and maximum acceleration (2nd order)
     and this in both directions, positive, and negative.  */
-extern inline void quadramp_derivate_set_2nd_order_vars(struct quadramp_derivate_filter * q, uint32_t var_2nd_ord_pos, uint32_t var_2nd_ord_neg);
-extern inline void quadramp_derivate_set_1st_order_vars(struct quadramp_derivate_filter * q, uint32_t var_1st_ord_pos, uint32_t var_1st_ord_neg);
+void quadramp_derivate_set_2nd_order_vars(struct quadramp_derivate_filter * q, uint32_t var_2nd_ord_pos, uint32_t var_2nd_ord_neg);
+void quadramp_derivate_set_1st_order_vars(struct quadramp_derivate_filter * q, uint32_t var_1st_ord_pos, uint32_t var_1st_ord_neg);
 
 /** this sets a divisor. (executing only 1 time of n) 
     this permits to make a bigger resolution on the speed and acceleration consign.
@@ -72,7 +72,7 @@ extern inline void quadramp_derivate_set_1st_order_vars(struct quadramp_derivate
     
     The drawback is that the speed will have the forma of a stair, so do not abuse of it !
     */
-extern inline void quadramp_derivate_set_divisor(struct quadramp_derivate_filter * q, uint8_t divisor);
+void quadramp_derivate_set_divisor(struct quadramp_derivate_filter * q, uint8_t divisor);
 
 
 /**

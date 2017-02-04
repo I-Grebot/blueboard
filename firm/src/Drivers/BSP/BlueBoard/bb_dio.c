@@ -1,21 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       hw_digital_input.c
+ * @file       bb_dio.c
  * @author     Pierrick
  * @date       Apr 28, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
- *   This module implements the digital input hardware functions
+ *   This module implements the GPIOs hardware functions
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:$
- * $LastChangedBy:$
- * $LastChangedDate:$
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -26,7 +21,7 @@
   * @param  None
   * @retval None
   */
-void HW_Digital_Input_Init(void)
+void bb_dio_init(void)
 {
     GPIO_InitTypeDef  GPIO_InitStructure;
 

@@ -1,27 +1,22 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       hw_monitoring.c
+ * @file       bb_monitoring.c
  * @author     Paul
  * @date       Jan 3, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   Implementation of analog monitoring features
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:: 1431                                                                 $
- * $LastChangedBy:: paul.m                                                     $
- * $LastChangedDate:: 2016-01-19 22:06:16 +0100 (mar., 19 janv. 2016)          $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
 #include "blueboard.h"
 
-void HW_MON_Init(void)
+void bb_mon_init(void)
 {
 
     GPIO_InitTypeDef  GPIO_InitStructure;
@@ -102,7 +97,7 @@ void HW_MON_Init(void)
 
 }
 
-uint16_t HW_MON_ReadChannel(uint8_t channel)
+uint16_t bb_mon_read_channel(uint8_t channel)
 {
     /* Configure channel to acquire */
     ADC_RegularChannelConfig(MON_ADC, channel, 1, ADC_SampleTime_480Cycles);
@@ -115,12 +110,12 @@ uint16_t HW_MON_ReadChannel(uint8_t channel)
     return ADC_GetConversionValue(MON_ADC);
 }
 
-uint32_t HW_MON_ConvertRawValueToMv(const uint16_t rawValue)
+uint32_t bb_mon_convert_raw_value_to_mv(const uint16_t rawValue)
 {
     return (((uint32_t) rawValue) * 1000) / ADC_STEPS_PER_VOLT;
 }
 
-int32_t HW_MON_ConvertTempValueToDegree(const uint32_t vsense)
+int32_t bb_mon_convert_temp_value_to_degree(const uint32_t vsense)
 {
     return (((int32_t) vsense) - ADC_TEMPERATURE_V25) / 25 + 25;
 }

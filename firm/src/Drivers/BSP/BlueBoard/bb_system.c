@@ -1,11 +1,10 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       hw_system.c
+ * @file       bb_system.c
  * @author     Paul
  * @date       Jan 2, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   Contains top-level system functions implementation
@@ -40,7 +39,7 @@ static uint16_t sysTimerCnt;
   * @param  None
   * @retval None
   */
-void HW_SystemClock_Config(void)
+void bb_system_clock_config(void)
 {
   RCC_HSEConfig(RCC_HSE_ON);
 
@@ -82,7 +81,7 @@ void HW_SystemClock_Config(void)
   * @param  None
   * @retval None
   */
-void HW_CPU_CACHE_Enable(void)
+void bb_sys_cpu_cache_enable(void)
 {
   /* Enable branch prediction */
   SCB->CCR |= (1 <<18);
@@ -95,7 +94,7 @@ void HW_CPU_CACHE_Enable(void)
   SCB_EnableDCache();
 }
 
-void HW_SYS_TimerRunTime_Config()
+void bb_sys_timer_run_time_config(void)
 {
     TIM_TimeBaseInitTypeDef TIM_BaseStruct;
 
@@ -121,7 +120,7 @@ void HW_SYS_TimerRunTime_Config()
 
 }
 
-uint32_t HW_SYS_GetRunTimeTicks(void)
+uint32_t bb_sys_timer_get_run_time_ticks(void)
 {
     uint32_t ret;
     ret = (((uint32_t) sysTimerCnt) << 16UL) + TIM_GetCounter(SYS_RUNSTATS_TIM);

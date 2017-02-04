@@ -22,6 +22,9 @@
 /* Inclusion */
 #include "main.h"
 
+
+static USART_InitTypeDef Dsv_Config;
+
 /* Definition */
 #define MAX_DSV_IN_QUEUE	5
 
@@ -41,9 +44,31 @@ static DSV_ControlTypeDef servo1, servo2; // TODO : define a comprehensive name
 static void OS_DSVTask(void *pvParameters);
 void DSV_Create(DSV_ControlTypeDef* DSV, uint8_t id, uint16_t min_Position, uint16_t max_Position);
 
+void dsv_init(void)
+{
+    /*
+     * Configure the Digital Servo UART init structure:
+     *   8 bits length + 1 stop bit, no parity
+     *   Baudrate 57600 kbps
+     */
+     Dsv_Config.USART_Mode                = USART_Mode_Tx;
+     Dsv_Config.USART_BaudRate            = 57600;
+     Dsv_Config.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+     Dsv_Config.USART_Parity              = USART_Parity_No;
+     Dsv_Config.USART_StopBits            = USART_StopBits_1;
+     Dsv_Config.USART_WordLength          = USART_WordLength_8b;
+
+     /* Initialize DSV Hardware */
+     bb_dsv_init(&Dsv_Config);
+
+     /* Initialize XL-320 Library */
+     xl_320_init(XL_320_TX_ONLY);
+     xl_320_set_hw_send(bb_dsv_put);
+}
 
 void OS_CreateDSVTask(void)
 {
+
 	xDSVMsgQueue = xQueueCreate( MAX_DSV_IN_QUEUE, sizeof(DSV_ControlTypeDef));
     if(xDSVMsgQueue==NULL)
     {
