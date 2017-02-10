@@ -1,16 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2017
+ * I-Grebot
  * -----------------------------------------------------------------------------
  * @file       shell_variables_list.c
- * @author     Bebop35 [Paul M]
+ * @author     Bebop35
  * @date       Jan 6, 2017
  * -----------------------------------------------------------------------------
  * @brief
  *   Details the variables that are accessible through the shell
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: https://github.com/I-Grebot/firm_blueboard.git
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -49,10 +49,10 @@ const OS_SHL_VarItemTypeDef OS_SHL_varList[] = {
          ,{"robot.cs.pid_d.max_out"     , TYPE_INT32,  ACC_WR, &robot.cs.pid_d.max_out,                  "NA"}
          ,{"robot.cs.pid_d.out_shift"   , TYPE_UINT8,  ACC_WR, &robot.cs.pid_d.out_shift,                "NA"}
          ,{"robot.cs.pid_d.drv_filter"  , TYPE_UINT8,  ACC_WR, &robot.cs.pid_d.derivate_nb_samples,      "NA"}
-         ,{"robot.cs.qr_d.pos_speed"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_d.var_1st_ord_pos,           "mm/imp"}
-         ,{"robot.cs.qr_d.neg_speed"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_d.var_1st_ord_neg,           "mm/imp"}
-         ,{"robot.cs.qr_d.pos_accel"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_d.var_2nd_ord_pos,           "mm/imp2"}
-         ,{"robot.cs.qr_d.neg_accel"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_d.var_2nd_ord_neg,           "mm/imp2"}
+         ,{"robot.cs.qr_d.pos_speed"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_d.var_1st_ord_pos,           "mm/s"}
+         ,{"robot.cs.qr_d.neg_speed"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_d.var_1st_ord_neg,           "mm/s"}
+         ,{"robot.cs.qr_d.pos_accel"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_d.var_2nd_ord_pos,           "mm/s2"}
+         ,{"robot.cs.qr_d.neg_accel"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_d.var_2nd_ord_neg,           "mm/s2"}
 
          // Motion configuration for A filter
          ,{"robot.cs.pid_a.kp"          , TYPE_INT16,  ACC_WR, &robot.cs.pid_a.gain_P,                   "NA"}
@@ -63,19 +63,19 @@ const OS_SHL_VarItemTypeDef OS_SHL_varList[] = {
          ,{"robot.cs.pid_a.max_out"     , TYPE_INT32,  ACC_WR, &robot.cs.pid_a.max_out,                  "NA"}
          ,{"robot.cs.pid_a.out_shift"   , TYPE_UINT8,  ACC_WR, &robot.cs.pid_a.out_shift,                "NA"}
          ,{"robot.cs.pid_a.drv_filter"  , TYPE_UINT8,  ACC_WR, &robot.cs.pid_a.derivate_nb_samples,      "NA"}
-         ,{"robot.cs.qr_a.pos_speed"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_a.var_1st_ord_pos,           "deg/imp"}
-         ,{"robot.cs.qr_a.neg_speed"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_a.var_1st_ord_neg,           "deg/imp"}
-         ,{"robot.cs.qr_a.pos_accel"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_a.var_2nd_ord_pos,           "deg/imp2"}
-         ,{"robot.cs.qr_a.neg_accel"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_a.var_2nd_ord_neg,           "deg/imp2"}
+         ,{"robot.cs.qr_a.pos_speed"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_a.var_1st_ord_pos,           "deg/s"}
+         ,{"robot.cs.qr_a.neg_speed"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_a.var_1st_ord_neg,           "deg/s"}
+         ,{"robot.cs.qr_a.pos_accel"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_a.var_2nd_ord_pos,           "deg/s2"}
+         ,{"robot.cs.qr_a.neg_accel"    , TYPE_UINT32, ACC_WR, &robot.cs.qr_a.var_2nd_ord_neg,           "deg/s2"}
 
          // Motion feedbacks
          ,{"robot.cs.pos.x"           , TYPE_INT16, ACC_RD, &robot.cs.pos.pos_s16.x,          "mm"}
          ,{"robot.cs.pos.y"           , TYPE_INT16, ACC_RD, &robot.cs.pos.pos_s16.y,          "mm"}
          ,{"robot.cs.pos.a"           , TYPE_INT16, ACC_RD, &robot.cs.pos.pos_s16.a,          "deg"}
-         ,{"robot.cs.speed.d"         , TYPE_INT16, ACC_RD, &robot.cs.speed_d,                "mm/imp"}
-         ,{"robot.cs.speed.a"         , TYPE_INT16, ACC_RD, &robot.cs.speed_a,                "deg/imp"}
-         ,{"robot.cs.accel.d"         , TYPE_INT16, ACC_RD, &robot.cs.acceleration_d,         "deg/imp2"}
-         ,{"robot.cs.accel.a"         , TYPE_INT16, ACC_RD, &robot.cs.acceleration_a,         "mm/imp2"}
+         ,{"robot.cs.speed.d"         , TYPE_INT16, ACC_RD, &robot.cs.speed_d,                "mm/s"}
+         ,{"robot.cs.speed.a"         , TYPE_INT16, ACC_RD, &robot.cs.speed_a,                "deg/s"}
+         ,{"robot.cs.accel.d"         , TYPE_INT16, ACC_RD, &robot.cs.acceleration_d,         "mm/s2"}
+         ,{"robot.cs.accel.a"         , TYPE_INT16, ACC_RD, &robot.cs.acceleration_a,         "deg/s2"}
          ,{"robot.cs.cs_d.consign"    , TYPE_INT32, ACC_RD, &robot.cs.cs_d.consign_value,     "mm"}
          ,{"robot.cs.cs_d.output"     , TYPE_INT32, ACC_RD, &robot.cs.cs_d.out_value,         "mm"}
          ,{"robot.cs.cs_d.error"      , TYPE_INT32, ACC_RD, &robot.cs.cs_d.error_value,       "mm"}

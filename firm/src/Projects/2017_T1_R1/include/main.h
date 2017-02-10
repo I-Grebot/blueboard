@@ -113,7 +113,6 @@
   * ISR Save FreeRTOS API Routines!
   */
 #define OS_ISR_PRIORITY_SER             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 )
-#define OS_ISR_PRIORITY_SYS_RUNSTATS    ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY )
 
  /* Events periodicity */
 #define MOTION_CONTROL_PERIOD_MS      50
@@ -128,6 +127,12 @@
 ********************************************************************************
 */
 
+/*
+ * -----------------------------------------------------------------------------
+ * Core & Middlewares
+ * -----------------------------------------------------------------------------
+ */
+
 /* FreeRTOS prototypes for the standard FreeRTOS callback/hook functions */
 void vApplicationMallocFailedHook( void );
 void vApplicationIdleHook( void );
@@ -135,24 +140,59 @@ void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName );
 void vApplicationTickHook( void );
 
 /* OS handlers */
-void HW_SYS_GetRunTimeStats(char *pcWriteBuffer);
+void sys_get_run_time_stats(char *pcWriteBuffer);
 
-/* Aversive */
-bool Os_MotionTrajectoryNear(void);
-bool Os_MotionTrajectoryFinished(void);
-void OS_MotionSetWindow(double window_d, double window_a, double a_start);
-void OS_MotionSetNearWindow(double window_d, double window_a);
-void OS_MotionSetSpeed(int16_t speed_d, int16_t speed_a);
-void OS_MotionTrajectoryHardStop(void);
-void OS_MotionTrajectoryStop(void);
-void OS_MotionSetX(int16_t pos_x);
-void OS_MotionSetY(int16_t pos_y);
-void OS_MotionSetA(int16_t pos_a);
-int16_t OS_MotionGetX(void);
-int16_t OS_MotionGetY(void);
-int16_t OS_MotionGetA(void);
-void OS_MotionPowerEnable(void);
-void OS_MotionPowerDisable(void);
+/*
+ * -----------------------------------------------------------------------------
+ * Hardware Management
+ * -----------------------------------------------------------------------------
+ */
+
+/* Analog Servos */
+BaseType_t asv_start(void);
+
+/* Digital Servos */
+void dsv_init(void);
+BaseType_t dsv_start(void);
+
+/* RGB LED */
+BaseType_t led_start(void);
+void led_set_mode(BB_LED_ModeTypeDef mode);
+void led_set_color(BB_LED_ColorTypeDef color);
+
+/* Serial Interface */
+BaseType_t serial_init(void);
+BaseType_t serial_put(char ch);
+BaseType_t serial_puts(const char* str);
+BaseType_t serial_get(const char* str);
+
+/* Avoidance */
+void avoidance_start(void);
+bool avoidance_detection_is_valid(void);
+
+/*
+ * -----------------------------------------------------------------------------
+ * Sub-Systems
+ * -----------------------------------------------------------------------------
+ */
+
+/* Motion */
+BaseType_t motion_start(void);
+bool motion_is_traj_near(void);
+bool motion_is_traj_finished(void);
+void motion_set_window(double window_d, double window_a, double a_start);
+void motion_set_near_window(double window_d, double window_a);
+void motion_set_speed(int16_t speed_d, int16_t speed_a);
+void motion_traj_hard_stop(void);
+void motion_traj_stop(void);
+void motion_set_x(int16_t pos_x);
+void motion_set_y(int16_t pos_y);
+void motion_set_a(int16_t pos_a);
+int16_t motion_get_x(void);
+int16_t motion_get_y(void);
+int16_t motion_get_a(void);
+void motion_power_enable(void);
+void motion_power_disable(void);
 void OS_MotionMoveRelative(double d_mm, double a_deg_rel);
 void OS_MotionGoToAuto(double pos_x, double pos_y);
 void OS_MotionGoToFwd(double pos_x, double pos_y);
@@ -162,7 +202,6 @@ void OS_MotionTurnToBehind(double pos_x, double pos_y);
 void motion_send_wp(wp_t *waypoint);
 void motion_clear(void);
 
-/* Mutex Handle*/
 void vLockEncoderAngle(void);
 void vLockEncoderDistance(void);
 void vLockAngleConsign(void);
@@ -174,56 +213,20 @@ void vUnlockAngleConsign(void);
 void vUnlockDistanceConsign(void);
 void vUnlockRobotPosition(void);
 
-/* Main Application Tasks */
-void OS_CreateDebugTask(void);
-void OS_CreateLedTask(void);
-void OS_CreateMotionTask(void);
-void OS_CreateStrategyTask(void);
-void OS_CreateAvoidanceTask(void);
-void OS_CreateASVTask(void);
-void OS_CreateDSVTask(void);
-
-/* Analog Servos */
-void ASV_DeployLeftArm(void);
-void ASV_DeployRightArm(void);
-void ASV_IdleLeftArm(void);
-void ASV_IdleRightArm(void);
-void ASV_MoveIndex(uint16_t position);
-void ASV_DeployParasol(uint16_t position);
-
-/* Digital Servos */
-void dsv_init(void);
-void DSV_SetServo1(uint16_t position);
-void DSV_SetServo2(uint16_t position);
-
-bool av_detection_is_valid(void);
-
-/* LEDs */
-//void LedSetMode(BB_LED_ModeTypeDef mode);
-//void LedSetColor(BB_LED_ColorTypeDef color);
-
-/* Serial Interface */
-BaseType_t serial_init(void);
-BaseType_t serial_put(char ch);
-BaseType_t serial_puts(const char* str);
-BaseType_t serial_get(const char* str);
-
-void OS_DebugTaskPrint( char ppcMessageToSend[] );
+/* Strategy */
+BaseType_t strategy_start(void);
 
 /* Shell */
-
-void OS_SHL_RegisterCommands( void );
-void OS_SHL_Start( void );
-void OS_SHL_OutputString( const char * const pcMessage );
-
-const char* OS_SHL_GetTypeAsString(const OS_SHL_VarTypeEnum type);
-size_t OS_SHL_GetTypeSize(const OS_SHL_VarTypeEnum type);
-const char* OS_SHL_GetAccessAsString(const OS_SHL_VarAccessEnum acc);
-BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength);
-BaseType_t OS_SHL_FindVariableByName(char* name, const OS_SHL_VarItemTypeDef** var);
-BaseType_t OS_SHL_FindVariableById(size_t id, const OS_SHL_VarItemTypeDef** var);
-BaseType_t OS_SHL_SetVariable(OS_SHL_VarItemTypeDef const* var, char* value);
-BaseType_t OS_SHL_GetVariable(OS_SHL_VarItemTypeDef const* var, char* ret, size_t retLength);
+void shell_register_commands(void);
+BaseType_t shell_start(void);
+const char* shell_get_type_as_string(const OS_SHL_VarTypeEnum type);
+size_t shell_get_type_size(const OS_SHL_VarTypeEnum type);
+const char* shell_get_access_as_string(const OS_SHL_VarAccessEnum acc);
+BaseType_t shell_get_variables_list(char* ret, size_t retLength);
+BaseType_t shell_find_variable_by_name(const char* name, const OS_SHL_VarItemTypeDef** var);
+BaseType_t shell_find_variable_by_id(size_t id, const OS_SHL_VarItemTypeDef** var);
+BaseType_t shell_set_variable(OS_SHL_VarItemTypeDef const* var, char* value);
+BaseType_t shell_get_variable(OS_SHL_VarItemTypeDef const* var, char* ret, size_t retLength);
 
 #ifdef __cplusplus
 }

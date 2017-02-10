@@ -50,15 +50,16 @@ int main( void )
 
     /* Start software tasks */
 
-    //OS_CreateDebugTask();
-    OS_SHL_Start();
-    //OS_CreateLedTask();
-    OS_CreateMotionTask();
-    OS_CreateAvoidanceTask();
-    OS_CreateASVTask();
-    OS_CreateDSVTask();
+    shell_start();
 
-    /*OS_CreateStrategyTask();
+    motion_start();
+    avoidance_start();
+    asv_start();
+    dsv_start();
+
+    led_start();
+
+    /*strategy_start();
 
     */
 

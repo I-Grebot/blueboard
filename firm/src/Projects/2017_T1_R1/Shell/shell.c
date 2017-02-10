@@ -1,11 +1,10 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2017
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       task_shell.c
- * @author     Bebop35 [Paul M]
+ * @file       shell.c
+ * @author     Bebop35
  * @date       Dec 04, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   FreeRTOS CLI Shell task
@@ -19,7 +18,7 @@
 #include "main.h"
 
 /* Private functions and variables */
-static void OS_SHL_Task( void *pvParameters );
+static void shell_task (void *pvParameters);
 
 static const char * const pcWelcomeMessage 		= SHELL_WELCOME_MESSAGE;
 static const char * const pcEndOfOutputMessage 	= SHELL_END_OF_OUTPUT_STR;
@@ -36,7 +35,7 @@ OS_SHL_ConfigTypeDef OS_SHL_Config;
  * -----------------------------------------------------------------------------
  */
 
-void OS_SHL_Start( void )
+BaseType_t shell_start(void)
 {
     /* Reference to the support function for float printf */
     asm (".global _printf_float");
@@ -46,18 +45,20 @@ void OS_SHL_Start( void )
 	configASSERT( xTxMutex );
 
 	/* Register Shell Commands */
-	OS_SHL_RegisterCommands();
+	shell_register_commands();
 
 	/* Initialize configuration with default settings */
 	OS_SHL_Config.echo = true;
 
 	/* Create that task that handles the console itself. */
-	xTaskCreate( 	OS_SHL_Task,				/* The task that implements the command console. */
+	xTaskCreate( 	shell_task,				/* The task that implements the command console. */
 					"SHELL",	    			/* Text name assigned to the task.  This is just to assist debugging.  The kernel does not use this name itself. */
 					500,						/* The size of the stack allocated to the task. */
 					NULL,						/* The parameter is not used, so NULL is passed. */
 					OS_TASK_PRIORITY_SHELL,		/* The priority allocated to the task. */
 					NULL );						/* A handle is not required, so just pass NULL. */
+
+	return pdPASS;
 }
 
 /* -----------------------------------------------------------------------------
@@ -65,7 +66,7 @@ void OS_SHL_Start( void )
  * -----------------------------------------------------------------------------
  */
 
-static void OS_SHL_Task( void *pvParameters )
+static void shell_task(void *pvParameters)
 {
 	char cRxedChar;
 	uint8_t ucInputIndex = 0;
@@ -182,7 +183,7 @@ static void OS_SHL_Task( void *pvParameters )
  * Helpers and other public functions
  * -----------------------------------------------------------------------------
  */
-
+/*
 void OS_SHL_OutputString( const char * const pcMessage )
 {
 	if( xSemaphoreTake( xTxMutex, SHELL_MAX_MUTEX_WAIT ) == pdPASS )
@@ -190,6 +191,7 @@ void OS_SHL_OutputString( const char * const pcMessage )
 	    serial_puts(pcMessage);
 		xSemaphoreGive( xTxMutex );
 	}
-}
+}*/
+
 /*-----------------------------------------------------------*/
 

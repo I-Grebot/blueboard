@@ -1,21 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       task_avoidance.c
+ * @file       avoidance.c
  * @author     Pierrick
  * @date       Apr 29, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   This task read industrial sensor and manage robot avoidance
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:$
- * $LastChangedBy:$
- * $LastChangedDate:$
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -34,7 +29,7 @@ static void av_mask_sensor_from_wall(int16_t a, int16_t wall_a);
 //void do_avoidance(void);
 
 
-void OS_CreateAvoidanceTask(void)
+void avoidance_start(void)
 {
 
     xTaskCreate(OS_AvoidanceTask, "AVOIDANCE", 250, NULL, OS_TASK_PRIORITY_AVOIDANCE, NULL );
@@ -93,7 +88,7 @@ static void av_init(void) {
 // and the table dimension and shape decide if an opponent detection
 // should occur. Each sensor value is masked depending on these condition.
 // Finally if a detection is valid (and we should stop!) returns true.
-bool av_detection_is_valid(void) {
+bool avoidance_detection_is_valid(void) {
 
   int16_t x;
   int16_t y;

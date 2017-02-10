@@ -1,21 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       task_strategy.c
+ * @file       strategy.c
  * @author     Pierrick
  * @date       Apr 29, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   This task handle the whole strategy
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev$
- * $LastChangedBy$
- * $LastChangedDate$
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -43,9 +38,9 @@ wp_t checkpoints[20];
 static void OS_StrategyTask(void *pvParameters);
 
 
-void OS_CreateStrategyTask(void)
+BaseType_t strategy_start(void)
 {
-    xTaskCreate(OS_StrategyTask, "Strategy", 250, NULL, OS_TASK_PRIORITY_STRATEGY, NULL );
+    return xTaskCreate(OS_StrategyTask, "Strategy", 250, NULL, OS_TASK_PRIORITY_STRATEGY, NULL );
 }
 
 static void OS_StrategyTask( void *pvParameters )
@@ -54,7 +49,6 @@ static void OS_StrategyTask( void *pvParameters )
     poi_t reset_pos;
     uint16_t parasol_pos = 1500;
    // path_init();
-    ASV_DeployParasol(parasol_pos);
     strategy_init();
 
     uint32_t tick_cnt = 0;
@@ -66,13 +60,13 @@ static void OS_StrategyTask( void *pvParameters )
     /* Initialise xNextWakeTime - this only needs to be done once. */
     xNextWakeTime = xTaskGetTickCount();
 
-    LedSetColor(BB_LED_BLUE);
+    led_set_color(BB_LED_BLUE);
     //OS_DebugTaskPrint("Starting!\n");
 
     // TEMP
     while(1) {
     	sprintf(str, "Tick %lu\n", tick_cnt++);
-    	OS_DebugTaskPrint(str);
+    	serial_puts(str);
     	vTaskDelayUntil( &xNextWakeTime, 1000);
     }
 
@@ -85,7 +79,7 @@ static void OS_StrategyTask( void *pvParameters )
     	case MATCH_STATE_RESET:
         // --------------------
     		parasol_pos += 10;
-    		ASV_DeployParasol(parasol_pos);
+    		//ASV_DeployParasol(parasol_pos);
     		if(parasol_pos>=2200)
     		{
         		vTaskDelay(READY_DELAY_MSEC/portTICK_RATE_MS);

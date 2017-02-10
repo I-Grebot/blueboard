@@ -18,8 +18,6 @@
 #ifndef __BB_CONFIG_H
 #define __BB_CONFIG_H
 
-#include "main.h"
-
 /**
  ********************************************************************************
  **
@@ -96,7 +94,7 @@
 #define SYS_RUNSTATS_PRESCALER      (1199) // 20 kHz
 
 /* NVIC priority of the system runstats timer */
-#define BB_PRIORITY_SYS_RUNSTATS    OS_ISR_PRIORITY_SYS_RUNSTATS
+#define BB_PRIORITY_SYS_RUNSTATS    (15) // configLIBRARY_LOWEST_INTERRUPT_PRIORITY
 
 
 

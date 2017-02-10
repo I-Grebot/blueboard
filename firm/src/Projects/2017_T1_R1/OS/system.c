@@ -22,7 +22,7 @@
 information is generated from raw data provided by uxTaskGetSystemState().
 The human readable table is written to pcWriteBuffer.  (see the vTaskList()
 API function which actually does just this). */
-void HW_SYS_GetRunTimeStats(char *pcWriteBuffer)
+void sys_get_run_time_stats(char *pcWriteBuffer)
 {
     const char * const pcHeader =
                     SHELL_SYS_PFX"Task                  Abs. Time    % Time"SHELL_EOL;

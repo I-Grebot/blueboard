@@ -1,17 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2017
+ * I-Grebot
  * -----------------------------------------------------------------------------
  * @file       shell_commands.c
- * @author     Bebop35 [Paul M]
+ * @author     Bebop35
  * @date       Dec 04, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   Implements CLI commands.
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: https://github.com/I-Grebot/firm_blueboard.git
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -273,7 +272,7 @@ static const CLI_Command_Definition_t xStr =
  */
 
 
-void OS_SHL_RegisterCommands( void )
+void shell_register_commands(void)
 {
     FreeRTOS_CLIRegisterCommand( &xSys );
     FreeRTOS_CLIRegisterCommand( &xVar );
@@ -348,7 +347,7 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     /* 'TASKS-STATS' Sub-command: display tasks statistics */
     } else if(!strcasecmp(pcParameter1, "tasks-stats")) {
-        HW_SYS_GetRunTimeStats( pcWriteBuffer );
+        sys_get_run_time_stats( pcWriteBuffer );
         return pdFALSE;
 
     /* Error case */
@@ -361,7 +360,7 @@ static BaseType_t OS_SHL_SysCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 static BaseType_t OS_SHL_VarCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
-    return OS_SHL_GetVariablesList(pcWriteBuffer, xWriteBufferLen);
+    return shell_get_variables_list(pcWriteBuffer, xWriteBufferLen);
 
 }
 
@@ -382,9 +381,9 @@ static BaseType_t OS_SHL_SetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     pcParameter2[ xParameter2StringLength ] = 0x00;
 
     /* Find the variable by its name */
-        if(OS_SHL_FindVariableByName(pcParameter1, &var) == pdTRUE)
+        if(shell_find_variable_by_name(pcParameter1, &var) == pdTRUE)
         {
-            if(OS_SHL_SetVariable(var, pcParameter2) == pdTRUE)
+            if(shell_set_variable(var, pcParameter2) == pdTRUE)
             {
                 snprintf(pcWriteBuffer, xWriteBufferLen, "");
 
@@ -418,9 +417,9 @@ static BaseType_t OS_SHL_GetCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     pcParameter1[ xParameter1StringLength ] = 0x00;
 
     /* Find the variable by its name */
-    if(OS_SHL_FindVariableByName(pcParameter1, &var) == pdTRUE)
+    if(shell_find_variable_by_name(pcParameter1, &var) == pdTRUE)
     {
-        if(OS_SHL_GetVariable(var, valueStr, valueStrLen) == pdTRUE)
+        if(shell_get_variable(var, valueStr, valueStrLen) == pdTRUE)
         {
             snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_GET_PFX"%s=%s"SHELL_EOL, var->name, valueStr);
         } else {
@@ -458,9 +457,9 @@ static BaseType_t OS_SHL_PrbCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
        // Convert ID string to int
        id = strtoul(pcParameter, NULL, 10);
 
-       if(OS_SHL_FindVariableById(id, &var) == pdTRUE)
+       if(shell_find_variable_by_id(id, &var) == pdTRUE)
        {
-           if(OS_SHL_GetVariable(var, valueStr, valueStrLen) == pdTRUE)
+           if(shell_get_variable(var, valueStr, valueStrLen) == pdTRUE)
            {
                snprintf(pcWriteBuffer, xWriteBufferLen, "%s ", valueStr);
            } else {
@@ -660,11 +659,11 @@ static BaseType_t OS_SHL_LedCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     /* Decode <mode> argument */
     if(!strcasecmp(pcParameter1, "STATIC")) {
-        LedSetMode(BB_LED_STATIC);
+        led_set_mode(BB_LED_STATIC);
     } else if(!strcasecmp(pcParameter1, "BLINK_SLOW")) {
-        LedSetMode(BB_LED_BLINK_SLOW);
+        led_set_mode(BB_LED_BLINK_SLOW);
     } else if(!strcasecmp(pcParameter1, "BLINK_FAST")) {
-        LedSetMode(BB_LED_BLINK_FAST);
+        led_set_mode(BB_LED_BLINK_FAST);
     } else {
         snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not set LED mode to %s"SHELL_EOL, pcParameter1);
         return pdFALSE;
@@ -672,21 +671,21 @@ static BaseType_t OS_SHL_LedCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     /* Decode <color> argument */
     if(!strcasecmp(pcParameter2, "OFF")) {
-        LedSetColor(BB_LED_OFF);
+        led_set_color(BB_LED_OFF);
     } else if(!strcasecmp(pcParameter2, "WHITE")) {
-        LedSetColor(BB_LED_WHITE);
+        led_set_color(BB_LED_WHITE);
     } else if(!strcasecmp(pcParameter2, "RED")) {
-        LedSetColor(BB_LED_RED);
+        led_set_color(BB_LED_RED);
     } else if(!strcasecmp(pcParameter2, "GREEN")) {
-        LedSetColor(BB_LED_GREEN);
+        led_set_color(BB_LED_GREEN);
     } else if(!strcasecmp(pcParameter2, "BLUE")) {
-        LedSetColor(BB_LED_BLUE);
+        led_set_color(BB_LED_BLUE);
     } else if(!strcasecmp(pcParameter2, "CYAN")) {
-        LedSetColor(BB_LED_CYAN);
+        led_set_color(BB_LED_CYAN);
     } else if(!strcasecmp(pcParameter2, "MAGENTA")) {
-        LedSetColor(BB_LED_MAGENTA);
+        led_set_color(BB_LED_MAGENTA);
     } else if(!strcasecmp(pcParameter2, "YELLOW")) {
-        LedSetColor(BB_LED_YELLOW);
+        led_set_color(BB_LED_YELLOW);
     } else {
         snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Could not set LED color to %s"SHELL_EOL, pcParameter2);
         return pdFALSE;

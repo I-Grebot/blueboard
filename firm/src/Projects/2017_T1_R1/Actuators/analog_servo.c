@@ -1,21 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       task_ASV.c
+ * @file       analog_servo.c
  * @author     Pierrick
  * @date       Apr 26, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
- *   This module handles the annalog servos
+ *   This module handles the analog servos
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev$
- * $LastChangedBy$
- * $LastChangedDate$
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -46,22 +41,20 @@ static void OS_ASVTask(void *pvParameters);
 void ASV_Create(ASV_ControlTypeDef* ASV, BB_ASV_ChannelTypeDef channel, uint16_t min_Position, uint16_t max_Position);
 
 
-void OS_CreateASVTask(void)
+BaseType_t asv_start(void)
 {
 	xASVMsgQueue = xQueueCreate( MAX_ASV_IN_QUEUE, sizeof(ASV_ControlTypeDef));
     if(xASVMsgQueue==NULL)
     {
-    	printf("insufficient heap RAM available for ASVMsgQueue\r\n");
-    	while(1);
+    	serial_puts("Error: Insufficient heap RAM available for ASVMsgQueue"SHELL_EOL);
+    	return pdFAIL;
     }
     ASV_Create(&parasol, BB_ASV_CHANNEL1, 1400, 2300);
     ASV_Create(&centralIndex, BB_ASV_CHANNEL2, MIN_INDEX, MAX_INDEX);
     ASV_Create(&leftArm, BB_ASV_CHANNEL4, 2000, 4000);
     ASV_Create(&rightArm, BB_ASV_CHANNEL2, 2000, 4000);
 
-
-
-	xTaskCreate(OS_ASVTask, "ANALOG SERVO", 350, NULL, OS_TASK_PRIORITY_ASV, NULL );
+	return xTaskCreate(OS_ASVTask, "ANALOG SERVO", 350, NULL, OS_TASK_PRIORITY_ASV, NULL );
 }
 
 static void OS_ASVTask( void *pvParameters )
@@ -91,34 +84,9 @@ void ASV_Create(ASV_ControlTypeDef* ASV, BB_ASV_ChannelTypeDef channel, uint16_t
 	ASV->min_Position = min_Position;
 }
 
+/* EXAMPLE
 void ASV_DeployLeftArm(void)
 {
 	GPIO_WriteBit((GPIO_TypeDef*) END6_GPIO_PORT, END6_PIN, Bit_RESET);
-}
+}*/
 
-void ASV_DeployRightArm(void)
-{
-	GPIO_WriteBit((GPIO_TypeDef*) END7_GPIO_PORT, END7_PIN, Bit_RESET);
-}
-
-void ASV_IdleLeftArm(void)
-{
-	GPIO_WriteBit((GPIO_TypeDef*) END6_GPIO_PORT, END6_PIN, Bit_SET);
-}
-
-void ASV_IdleRightArm(void)
-{
-	GPIO_WriteBit((GPIO_TypeDef*) END7_GPIO_PORT, END7_PIN, Bit_SET);
-}
-
-void ASV_MoveIndex(uint16_t position)
-{
-	centralIndex.current_Position = position;
-	xQueueSend( xASVMsgQueue, &centralIndex, (TickType_t)0 );
-}
-
-void ASV_DeployParasol(uint16_t position)
-{
-	parasol.current_Position = position;
-	xQueueSend( xASVMsgQueue, &parasol, (TickType_t)0 );
-}

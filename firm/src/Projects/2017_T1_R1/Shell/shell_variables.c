@@ -1,16 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2017
+ * I-Grebot
  * -----------------------------------------------------------------------------
  * @file       shell_variables.c
- * @author     Bebop35 [Paul M]
+ * @author     Bebop35
  * @date       Dec 25, 2016
  * -----------------------------------------------------------------------------
  * @brief
  *   Shell variables manipulation functions
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: https://github.com/I-Grebot/firm_blueboard.git
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -23,7 +23,7 @@ extern const size_t OS_SHL_varListLength;
 /*
  * Converts a type into a printable string
  */
-const char* OS_SHL_GetTypeAsString(const OS_SHL_VarTypeEnum type)
+const char* shell_get_type_as_string(const OS_SHL_VarTypeEnum type)
 {
     switch(type)
     {
@@ -46,7 +46,7 @@ const char* OS_SHL_GetTypeAsString(const OS_SHL_VarTypeEnum type)
 /*
  * Returns the size of a type. 0 if the type is not known
  */
-size_t OS_SHL_GetTypeSize(const OS_SHL_VarTypeEnum type)
+size_t shell_get_type_size(const OS_SHL_VarTypeEnum type)
 {
     switch(type)
     {
@@ -69,7 +69,7 @@ size_t OS_SHL_GetTypeSize(const OS_SHL_VarTypeEnum type)
 /*
  * Converts an access type into a printable string
  */
-const char* OS_SHL_GetAccessAsString(const OS_SHL_VarAccessEnum acc)
+const char* shell_get_access_as_string(const OS_SHL_VarAccessEnum acc)
 {
     switch(acc)
     {
@@ -83,7 +83,7 @@ const char* OS_SHL_GetAccessAsString(const OS_SHL_VarAccessEnum acc)
 /*
  * Print in the buffer string the list of every variable that are accessible
  */
-BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
+BaseType_t shell_get_variables_list(char* ret, size_t retLength)
 {
     const char* header = "      ID. Type     Acc.  Name                                     Unit            Value"SHELL_EOL
                          "      ------------------------------------------------------------------------------------"SHELL_EOL;
@@ -105,12 +105,12 @@ BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
     /* Display the variable */
     snprintf(ret, retLength, SHELL_VAR_PFX"%3u %-8s %-5s %-40s %-16s",
             id,
-            OS_SHL_GetTypeAsString(var->type),
-            OS_SHL_GetAccessAsString(var->access),
+            shell_get_type_as_string(var->type),
+            shell_get_access_as_string(var->access),
             var->name,
             var->unit);
     ret += strlen(ret);
-    OS_SHL_GetVariable(var, ret, retLength);
+    shell_get_variable(var, ret, retLength);
     ret += strlen(ret);
     snprintf(ret, retLength, SHELL_EOL);
 
@@ -135,7 +135,7 @@ BaseType_t OS_SHL_GetVariablesList(char* ret, size_t retLength)
  * Returns pdFALSE if not found.
  * pdTRUE is returned otherwise and var is set to the found variable structure address.
  */
-BaseType_t OS_SHL_FindVariableByName(char* name, const OS_SHL_VarItemTypeDef** var)
+BaseType_t shell_find_variable_by_name(const char* name, const OS_SHL_VarItemTypeDef** var)
 {
     OS_SHL_VarItemTypeDef* lookup = OS_SHL_varList;
     size_t id = 0;
@@ -160,7 +160,7 @@ BaseType_t OS_SHL_FindVariableByName(char* name, const OS_SHL_VarItemTypeDef** v
 /*
  * Fast lookup of a variable by its index
  */
-BaseType_t OS_SHL_FindVariableById(size_t id, const OS_SHL_VarItemTypeDef** var)
+BaseType_t shell_find_variable_by_id(size_t id, const OS_SHL_VarItemTypeDef** var)
 {
     if(id < OS_SHL_varListLength)
     {
@@ -174,7 +174,7 @@ BaseType_t OS_SHL_FindVariableById(size_t id, const OS_SHL_VarItemTypeDef** var)
 /*
  * Set a variable value based on the input string
  */
-BaseType_t OS_SHL_SetVariable(OS_SHL_VarItemTypeDef const* var, char* value)
+BaseType_t shell_set_variable(OS_SHL_VarItemTypeDef const* var, char* value)
 {
     size_t size;
     int32_t valueTmpInt;
@@ -183,7 +183,7 @@ BaseType_t OS_SHL_SetVariable(OS_SHL_VarItemTypeDef const* var, char* value)
     double valueTmpDouble;
     void* valueTmp;
 
-    if((size = OS_SHL_GetTypeSize(var->type)) == 0)
+    if((size = shell_get_type_size(var->type)) == 0)
         return pdFALSE; // Size Error
 
     if(var->access == ACC_RD)
@@ -236,14 +236,14 @@ BaseType_t OS_SHL_SetVariable(OS_SHL_VarItemTypeDef const* var, char* value)
  * Decode a variable path/name and write its current value
  * into the result string.
  */
-BaseType_t OS_SHL_GetVariable(OS_SHL_VarItemTypeDef const* var, char* ret, size_t retLength)
+BaseType_t shell_get_variable(OS_SHL_VarItemTypeDef const* var, char* ret, size_t retLength)
 {
     BaseType_t retValue = pdTRUE;
     size_t size;
     void* value;
 
 
-    if((size = OS_SHL_GetTypeSize(var->type)) == 0)
+    if((size = shell_get_type_size(var->type)) == 0)
         return pdFALSE; // Size Error
 
     if((value = malloc(size)) == NULL){} // FIXME: Apparently always returns NULL...

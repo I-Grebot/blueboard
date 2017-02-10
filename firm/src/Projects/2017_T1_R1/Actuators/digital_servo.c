@@ -1,8 +1,8 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       task_DSV.c
+ * @file       digital_servo.c
  * @author     Pierrick
  * @date       Apr 27, 2016
  * @version    V1.0
@@ -11,11 +11,7 @@
  *   This module handles the digital servos
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:$
- * $LastChangedBy:$
- * $LastChangedDate:$
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -66,19 +62,20 @@ void dsv_init(void)
      xl_320_set_hw_send(bb_dsv_put);
 }
 
-void OS_CreateDSVTask(void)
+BaseType_t dsv_start(void)
 {
 
 	xDSVMsgQueue = xQueueCreate( MAX_DSV_IN_QUEUE, sizeof(DSV_ControlTypeDef));
     if(xDSVMsgQueue==NULL)
     {
-    	printf("insufficient heap RAM available for DSVMsgQueue\r\n");
-    	while(1);
+    	serial_puts("Error: Insufficient heap RAM available for DSVMsgQueue"SHELL_EOL);
+    	return pdFAIL;
     }
-	xTaskCreate(OS_DSVTask, "DIGITAL SERVO", 350, NULL, OS_TASK_PRIORITY_DSV, NULL );
 
     DSV_Create(&servo1, 23, 0, 1023);
     DSV_Create(&servo2, 42, 0, 1023);
+
+    return xTaskCreate(OS_DSVTask, "DIGITAL SERVO", 350, NULL, OS_TASK_PRIORITY_DSV, NULL );
 }
 
 static void OS_DSVTask( void *pvParameters )
@@ -111,14 +108,9 @@ void DSV_Create(DSV_ControlTypeDef* DSV, uint8_t id, uint16_t min_Position, uint
 	xl_320_set_control_mode(DSV->id, XL_320_JOIN_MODE);
 }
 
+/* EXAMPLE
 void DSV_SetServo1(uint16_t position)
 {
 	servo1.current_Position = position;
 	xQueueSend( xDSVMsgQueue, &servo1, (TickType_t)0 );
-}
-
-void DSV_SetServo2(uint16_t position)
-{
-	servo2.current_Position = position;
-	xQueueSend( xDSVMsgQueue, &servo2, (TickType_t)0 );
-}
+}*/

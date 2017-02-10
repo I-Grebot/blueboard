@@ -1,27 +1,20 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       task_motion.c
- * @author     Paul
+ * @file       motion.c
+ * @author     Bebop35
  * @date       Jan 5, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   This task handles the motion control
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev: 1470 $
- * $LastChangedBy: Pierrick_Boissard $
- * $LastChangedDate: 2016-05-06 00:47:14 +0200 (ven., 06 mai 2016) $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
 #include "main.h"
-
-
 
 
 /* Main robot structure containing all operational variables */
@@ -45,13 +38,13 @@ static xSemaphoreHandle xRobotPositionMutex;
 static xQueueHandle 	xWaypointQueue;
 
 /* Local, Private functions */
-static void OS_MotionTask(void *pvParameters);
+static void motion_task(void *pvParameters);
 static void vCreateAllMutex(void);
 static void AVS_Init(void);
 static void AVS_CsTask(void *pvParameters);
 static bool motion_is_traj_done(wp_t *waypoint);
 
-void OS_CreateMotionTask(void)
+BaseType_t motion_start(void)
 {
     /* Initialize global variables */
     memset(&robot, 0, sizeof(RobotTypeDef));
@@ -65,11 +58,12 @@ void OS_CreateMotionTask(void)
     	printf("insufficient heap RAM available for xELTQueue\r\n");
     	while(1);
     }
-	xTaskCreate(OS_MotionTask, "MOTION", 500, NULL, OS_TASK_PRIORITY_MOTION, NULL );
+
+	return xTaskCreate(motion_task, "MOTION", 500, NULL, OS_TASK_PRIORITY_MOTION, NULL );
 
 }
 
-static void OS_MotionTask( void *pvParameters )
+static void motion_task( void *pvParameters )
 {
     static wp_t current_waypoint;
     //    char cBuffer[50];
@@ -256,77 +250,77 @@ void AVS_CsTask(void *pvParameters)
     }
 }
 
-bool Os_MotionTrajectoryNear(void)
+bool motion_is_traj_near(void)
 {
 	return (bool)trajectory_in_window(&robot.cs.traj, traj_near_window_d, traj_near_window_a);
 }
 
-bool Os_MotionTrajectoryFinished(void)
+bool motion_is_traj_finished(void)
 {
 	return (bool)(trajectory_finished(&robot.cs.traj)&&(robot.cs.traj.scheduler_task==NULL));
 }
 
-void OS_MotionSetWindow(double window_d, double window_a, double a_start)
+void motion_set_window(double window_d, double window_a, double a_start)
 {
 	trajectory_set_windows(&robot.cs.traj, window_d, window_a, a_start);
 }
 
-void OS_MotionSetNearWindow(double window_d, double window_a)
+void motion_set_near_window(double window_d, double window_a)
 {
 	traj_near_window_d = (double) window_d;
     traj_near_window_a  = (double) window_a;
 }
 
-void OS_MotionSetSpeed(int16_t speed_d, int16_t speed_a)
+void motion_set_speed(int16_t speed_d, int16_t speed_a)
 {
 	trajectory_set_speed(&robot.cs.traj, speed_d, speed_a);
 }
-void OS_MotionTrajectoryHardStop(void)
+void motion_traj_hard_stop(void)
 {
 	trajectory_hardstop(&robot.cs.traj);
 }
-void OS_MotionTrajectoryStop(void)
+void motion_traj_stop(void)
 {
 	trajectory_stop(&robot.cs.traj);
 }
-void OS_MotionSetX(int16_t pos_x)
+void motion_set_x(int16_t pos_x)
 {
 	int16_t pos_y = position_get_y_s16(&robot.cs.pos);
 	int16_t pos_a = position_get_a_deg_s16(&robot.cs.pos);
 	position_set(&robot.cs.pos, pos_x, pos_y, pos_a);
 }
-void OS_MotionSetY(int16_t pos_y)
+void motion_set_y(int16_t pos_y)
 {
 	int16_t pos_x = position_get_x_s16(&robot.cs.pos);
 	int16_t pos_a = position_get_a_deg_s16(&robot.cs.pos);
 	position_set(&robot.cs.pos, pos_x, pos_y, pos_a);
 }
-void OS_MotionSetA(int16_t pos_a)
+void motion_set_a(int16_t pos_a)
 {
 	int16_t pos_x = position_get_x_s16(&robot.cs.pos);
 	int16_t pos_y = position_get_y_s16(&robot.cs.pos);
 	position_set(&robot.cs.pos, pos_x, pos_y, pos_a);
 }
 
-int16_t OS_MotionGetX(void)
+int16_t motion_get_x(void)
 {
 	return position_get_x_s16(&robot.cs.pos);
 }
-int16_t OS_MotionGetY(void)
+int16_t motion_get_y(void)
 {
 	return position_get_y_s16(&robot.cs.pos);
 }
-int16_t OS_MotionGetA(void)
+int16_t motion_get_a(void)
 {
 	return position_get_a_deg_s16(&robot.cs.pos);
 }
 
-void OS_MotionPowerEnable(void)
+void motion_power_enable(void)
 {
 	robot.cs.cs_events |=   DO_POWER;
 	robot.cs.cs_events |=   DO_CS;
 }
-void OS_MotionPowerDisable(void)
+void motion_power_disable(void)
 {
 	robot.cs.cs_events &= ~ DO_POWER;
 	robot.cs.cs_events &= ~ DO_CS;
@@ -421,9 +415,9 @@ void motion_set_wp(wp_t *waypoint) {
 
 bool motion_is_traj_done(wp_t *waypoint) {
 	if(waypoint->trajectory_must_finish)
-		return Os_MotionTrajectoryFinished();
+		return motion_is_traj_finished();
 	else
-		return Os_MotionTrajectoryNear();
+		return motion_is_traj_near();
 }
 void motion_clear(void){
 	wp_t lost;
@@ -442,17 +436,17 @@ void motion_send_wp(wp_t *waypoint) {
     // Pop a waypoint and send the speed and position it
     switch(waypoint->speed) {
     	case WP_SPEED_FAST:
-    		OS_MotionSetSpeed(SPEED_FAST_D, SPEED_FAST_A);
+    		motion_set_speed(SPEED_FAST_D, SPEED_FAST_A);
     		break;
     	case WP_SPEED_NORMAL:
-    		OS_MotionSetSpeed(SPEED_NORMAL_D, SPEED_NORMAL_A);
+    	    motion_set_speed(SPEED_NORMAL_D, SPEED_NORMAL_A);
     		break;
     	case WP_SPEED_SLOW:
-    		OS_MotionSetSpeed(SPEED_SLOW_D, SPEED_SLOW_A);
+    	    motion_set_speed(SPEED_SLOW_D, SPEED_SLOW_A);
     		break;
     	case WP_SPEED_VERY_SLOW:
     	default: // this is quite an error
-    		OS_MotionSetSpeed(SPEED_VERY_SLOW_D, SPEED_VERY_SLOW_A);
+    	    motion_set_speed(SPEED_VERY_SLOW_D, SPEED_VERY_SLOW_A);
     		break;
     }
 

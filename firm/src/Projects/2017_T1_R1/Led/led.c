@@ -1,21 +1,16 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2016
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       task_led.c
+ * @file       led.c
  * @author     Paul
  * @date       Jan 5, 2016
- * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *   This module handles the RGB Led
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev: 1458 $
- * $LastChangedBy: Pierrick_Boissard $
- * $LastChangedDate: 2016-04-29 11:29:31 +0200 (ven., 29 avr. 2016) $
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -32,11 +27,12 @@ static BB_LED_ModeTypeDef LedMode=BB_LED_STATIC;
 static void OS_LedTask(void *pvParameters);
 
 
-void OS_CreateLedTask(void)
+BaseType_t led_start(void)
 {
 	xLedColorMutex = xSemaphoreCreateMutex();
 	xLedModeMutex = xSemaphoreCreateMutex();
-    xTaskCreate(OS_LedTask, "LED", configMINIMAL_STACK_SIZE, NULL, OS_TASK_PRIORITY_LED, NULL );
+
+    return xTaskCreate(OS_LedTask, "LED", configMINIMAL_STACK_SIZE, NULL, OS_TASK_PRIORITY_LED, NULL );
 }
 
 static void OS_LedTask( void *pvParameters )
@@ -89,14 +85,14 @@ static void OS_LedTask( void *pvParameters )
     }
 }
 
-void LedSetColor(BB_LED_ColorTypeDef color)
+void led_set_color(BB_LED_ColorTypeDef color)
 {
 	xSemaphoreTake(xLedColorMutex, 10);
 	LedColor = color;
 	xSemaphoreGive(xLedColorMutex);
 }
 
-void LedSetMode(BB_LED_ModeTypeDef mode)
+void led_set_mode(BB_LED_ModeTypeDef mode)
 {
 	xSemaphoreTake(xLedModeMutex, 10);
 	LedMode = mode;

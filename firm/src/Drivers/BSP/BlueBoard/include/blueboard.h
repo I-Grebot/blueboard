@@ -139,6 +139,7 @@ typedef enum {
     BB_LED_BLINK_FAST   = 2
 } BB_LED_ModeTypeDef;
 
+
 /* List of HMI frame states */
 /* SPI CSn is Active Low when actively transmitting a frame */
 typedef enum {
@@ -198,8 +199,8 @@ int32_t bb_mon_convert_temp_value_to_degree(const uint32_t vsense);
 /* RGB LED */
 void bb_led_init(void);
 void bb_led_set_color(BB_LED_ColorTypeDef color);
-void LedSetMode(BB_LED_ModeTypeDef mode);
-void LedSetColor(BB_LED_ColorTypeDef color);
+/*void LedSetMode(BB_LED_ModeTypeDef mode);
+void LedSetColor(BB_LED_ColorTypeDef color);*/
 
 /* Digital I/Os */
 void bb_dio_init(void);
