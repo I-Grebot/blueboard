@@ -42,6 +42,7 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/CMSIS/Device/ST/STM32F7xx/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/SPL/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/BSP/BlueBoard/include}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/BSP/Components/dynamixel/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/BSP/Components/xl_320/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Middlewares/FreeRTOS/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Middlewares/FreeRTOS/portable/GCC/ARM_CM7/r0p1}"/>
@@ -163,6 +164,7 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/CMSIS/Device/ST/STM32F7xx/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/SPL/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/BSP/BlueBoard/include}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/BSP/Components/dynamixel/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Drivers/BSP/Components/xl_320/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Middlewares/FreeRTOS/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Middlewares/FreeRTOS/portable/GCC/ARM_CM7/r0p1}"/>
@@ -178,7 +180,7 @@
 								<option id="com.atollic.truestudio.gcc.optimization.prep_garbage.2022663533" name="Prepare dead code removal " superClass="com.atollic.truestudio.gcc.optimization.prep_garbage" value="true" valueType="boolean"/>
 								<option id="com.atollic.truestudio.gcc.optimization.prep_data.460531636" name="Prepare dead data removal" superClass="com.atollic.truestudio.gcc.optimization.prep_data" value="true" valueType="boolean"/>
 								<option id="com.atollic.truestudio.common_options.target.interwork.187870766" name="Mix ARM/Thumb" superClass="com.atollic.truestudio.common_options.target.interwork"/>
-								<option id="com.atollic.truestudio.gcc.misc.otherflags.831977559" superClass="com.atollic.truestudio.gcc.misc.otherflags" value="-Wunused-function -Wcomment" valueType="string"/>
+								<option id="com.atollic.truestudio.gcc.misc.otherflags.831977559" name="Other options" superClass="com.atollic.truestudio.gcc.misc.otherflags" value="-Wunused-function -Wcomment" valueType="string"/>
 								<inputType id="com.atollic.truestudio.gcc.input.839259853" superClass="com.atollic.truestudio.gcc.input"/>
 							</tool>
 							<tool id="com.atollic.truestudio.exe.release.toolchain.ld.176531243" name="C Linker" superClass="com.atollic.truestudio.exe.release.toolchain.ld">
