@@ -19,6 +19,7 @@
 /* External variables; for setting and probing */
 extern OS_SHL_ConfigTypeDef OS_SHL_Config;
 extern RobotTypeDef robot;
+extern USART_InitTypeDef Dsv_Config;
 
 /*
  * Variables definition list holder
@@ -39,6 +40,9 @@ const OS_SHL_VarItemTypeDef OS_SHL_varList[] = {
 #ifdef CONFIG_MODULE_COMPENSATE_CENTRIFUGAL_FORCE
          ,{"robot.cs.centrifugal"       , TYPE_DOUBLE,  ACC_WR, &robot.cs.rs.centrifugal_coef,                 "NA"}
 #endif
+
+         // Digital Servos Configuration
+         ,{"dsv.baudrate"               , TYPE_UINT32,  ACC_WR, &Dsv_Config.USART_BaudRate,                   "bps"}
 
          // Motion configuration for D filter
          ,{"robot.cs.pid_d.kp"          , TYPE_INT16,  ACC_WR, &robot.cs.pid_d.gain_P,                   "NA"}

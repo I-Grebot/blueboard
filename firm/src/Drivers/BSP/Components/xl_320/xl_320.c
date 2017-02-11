@@ -13,35 +13,35 @@ static uint8_t xl_320_receive_packet(xl_320_packet_t* packet);
 // -----------------------------------------------------------------------------
 
 void xl_320_init(XL_320_Com_Mode mode){
-	xl_320_cfg.mode = mode;
-	switch(mode)
-	{
-		case XL_320_TX_ONLY:
-		case XL_320_TXRX_ONE_PIN:
-		case XL_320_TXRX_TWO_PINS:
-		default:
-			xl_320_cfg.hw_send_byte = NULL;
-			xl_320_cfg.hw_receive_byte = NULL;
-			xl_320_cfg.hw_flush = NULL;
-			xl_320_cfg.hw_switch = NULL;
-		break;
-	}
+    xl_320_cfg.mode = mode;
+    switch(mode)
+    {
+        case XL_320_TX_ONLY:
+        case XL_320_TXRX_ONE_PIN:
+        case XL_320_TXRX_TWO_PINS:
+        default:
+            xl_320_cfg.hw_send_byte = NULL;
+            xl_320_cfg.hw_receive_byte = NULL;
+            xl_320_cfg.hw_flush = NULL;
+            xl_320_cfg.hw_switch = NULL;
+        break;
+    }
 }
 void xl_320_set_hw_send(void (*hw_send)(uint8_t))
 {
-	xl_320_cfg.hw_send_byte = hw_send;
+    xl_320_cfg.hw_send_byte = hw_send;
 }
 void xl_320_set_hw_receive(uint8_t (*hw_receive)(uint8_t*))
 {
-	xl_320_cfg.hw_receive_byte = hw_receive;
+    xl_320_cfg.hw_receive_byte = hw_receive;
 }
 void xl_320_set_hw_flush(void (*hw_flush)(void))
 {
-	xl_320_cfg.hw_flush = hw_flush;
+    xl_320_cfg.hw_flush = hw_flush;
 }
 void xl_320_set_hw_switch(void (*hw_switch)(uint8_t))
 {
-	xl_320_cfg.hw_switch = hw_switch;
+    xl_320_cfg.hw_switch = hw_switch;
 }
 
 // Write instruction
@@ -151,7 +151,7 @@ void xl_320_send_packet(xl_320_packet_t* packet){
     length = idx_buffer;
 
     if(xl_320_cfg.mode==XL_320_TXRX_ONE_PIN)
-    	xl_320_cfg.hw_switch(XL_320_TX);
+        xl_320_cfg.hw_switch(XL_320_TX);
     for(idx_buffer = 0; idx_buffer<length; idx_buffer++)
     {
         xl_320_cfg.hw_send_byte(buffer[idx_buffer]);
@@ -159,7 +159,7 @@ void xl_320_send_packet(xl_320_packet_t* packet){
     xl_320_cfg.hw_send_byte(crc16 & 0xFF); // CRC_L
     xl_320_cfg.hw_send_byte((crc16>>8)&0xFF); // CRC_H
     if(xl_320_cfg.mode==XL_320_TXRX_ONE_PIN)
-    	xl_320_cfg.hw_switch(XL_320_RX);
+        xl_320_cfg.hw_switch(XL_320_RX);
 }
 
 //// Status check to be added
@@ -219,73 +219,183 @@ uint8_t xl_320_is_received(void){
         return 0;
 }                                              //Tested
 
-void xl_320_set_id(uint8_t id){
-     xl_320_write(XL_320_ID_BROADCAST, Xl_320_ADR_ID, &id, 1, XL_320_INS_WRITE);}                                                //Tested
-void xl_320_set_baudrate(uint8_t id, uint8_t baudrate){
-     xl_320_write(id, Xl_320_ADR_BAUDRATE, &baudrate, 1, XL_320_INS_WRITE);}                        //Tested
-void xl_320_set_return_delay(uint8_t id, uint8_t return_delay){
-     xl_320_write(id, Xl_320_ADR_RET_DELAY, &return_delay, 1, XL_320_INS_WRITE);}
-void xl_320_set_cw_limit(uint8_t id, uint16_t cw_limit){
+/****************/
+/* Instructions */
+/****************/
+
+/**
+  * @brief Set the ID of all XL320, it is recommended to have only one XL320 plugged when calling this method.
+  * @param id: the new ID that will be written on all XL320.
+  */
+void xl_320_set_id(uint8_t id) {
+     xl_320_write(XL_320_ID_BROADCAST, Xl_320_ADR_ID, &id, 1, XL_320_INS_WRITE);
+}                                                //Tested
+
+/**
+  * @brief Set the baud rate of the specified XL320.
+  * @param id: the ID of the targeted XL320.
+  * @param baudrate: the baudrate identifier (0: 9600, 1:57600, 2:115200, 3:1Mbps).
+  */
+void xl_320_set_baudrate(uint8_t id, uint8_t baudrate) {
+     xl_320_write(id, Xl_320_ADR_BAUDRATE, &baudrate, 1, XL_320_INS_WRITE);
+}                        //Tested
+
+/**
+  * @brief Set the delay time per data value that takes from the transmission of Instruction Packet until the return of Status Packet.
+  * @param id: the ID of the targeted XL320.
+  * @param return_delay: the delay multiplier (0 to 254). Calculated delay is 2usec * return_delay.
+  */
+void xl_320_set_return_delay(uint8_t id, uint8_t return_delay) {
+     xl_320_write(id, Xl_320_ADR_RET_DELAY, &return_delay, 1, XL_320_INS_WRITE);
+}
+
+void xl_320_set_cw_limit(uint8_t id, uint16_t cw_limit) {
     uint8_t angle[2];
     angle[0]=(uint8_t)(cw_limit&0xFF);
     angle[1]=(uint8_t)((cw_limit>>8)&0xFF);
-     xl_320_write(id, Xl_320_ADR_CW_LIMIT, angle, 2, XL_320_INS_WRITE);}
-void xl_320_set_ccw_limit(uint8_t id, uint16_t ccw_limit){
+     xl_320_write(id, Xl_320_ADR_CW_LIMIT, angle, 2, XL_320_INS_WRITE);
+}
+void xl_320_set_ccw_limit(uint8_t id, uint16_t ccw_limit) {
     uint8_t angle[2];
     angle[0]=(uint8_t)(ccw_limit&0xFF);
     angle[1]=(uint8_t)((ccw_limit>>8)&0xFF);
-     xl_320_write(id, Xl_320_ADR_CCW_LIMIT, angle, 2, XL_320_INS_WRITE);}
-void xl_320_set_control_mode(uint8_t id, uint8_t mode){
-    xl_320_write(id, Xl_320_ADR_CONTROL_MODE, &mode, 1, XL_320_INS_WRITE);}
-void xl_320_set_temp_limit(uint8_t id, uint8_t temp_limit){
-    xl_320_write(id, Xl_320_ADR_TEMP_LIMIT, &temp_limit, 1, XL_320_INS_WRITE);}
-void xl_320_set_min_voltage(uint8_t id, uint8_t min_voltage){
-    xl_320_write(id, Xl_320_ADR_LOW_VOLTAGE, &min_voltage, 1, XL_320_INS_WRITE);}
-void xl_320_set_max_voltage(uint8_t id, uint8_t max_voltage){
-    xl_320_write(id, Xl_320_ADR_HIGH_VOLTAGE, &max_voltage, 1, XL_320_INS_WRITE);}
-void xl_320_set_torque_limit(uint8_t id, uint16_t torque_limit){
+     xl_320_write(id, Xl_320_ADR_CCW_LIMIT, angle, 2, XL_320_INS_WRITE);
+}
+
+/**
+  * @brief Set control mode of the specified XL320.
+  * @param id: the ID of the targeted XL320.
+  * @param mode: the desired mode (1: Wheel Mode, 2:Join Mode).
+  */
+void xl_320_set_control_mode(uint8_t id, uint8_t mode) {
+    xl_320_write(id, Xl_320_ADR_CONTROL_MODE, &mode, 1, XL_320_INS_WRITE);
+}
+
+//void xl_320_set_temp_limit(uint8_t id, uint8_t temp_limit) {
+//    xl_320_write(id, Xl_320_ADR_TEMP_LIMIT, &temp_limit, 1, XL_320_INS_WRITE);
+//}
+
+
+void xl_320_set_min_voltage(uint8_t id, uint8_t min_voltage) {
+    xl_320_write(id, Xl_320_ADR_LOW_VOLTAGE, &min_voltage, 1, XL_320_INS_WRITE);
+}
+void xl_320_set_max_voltage(uint8_t id, uint8_t max_voltage) {
+    xl_320_write(id, Xl_320_ADR_HIGH_VOLTAGE, &max_voltage, 1, XL_320_INS_WRITE);
+}
+
+/**
+  * @brief Set the torque value of maximum output.
+  * @param id: the ID of the targeted XL320.
+  * @param torque_limit: the desired maximum torque value (0 to 1023). Calculated maximum torque is ~0.1% * torque_limit.
+  */
+void xl_320_set_torque_limit(uint8_t id, uint16_t torque_limit) {
     uint8_t torque[2];
     torque[0]=(uint8_t)(torque_limit&0xFF);
     torque[1]=(uint8_t)((torque_limit>>8)&0xFF);
-     xl_320_write(id, Xl_320_ADR_MAX_TORQUE, torque, 2, XL_320_INS_WRITE);}
-void xl_320_set_return_level(uint8_t id, uint8_t level){
-     xl_320_write(id, Xl_320_ADR_RET_LEVEL, &level, 1, XL_320_INS_WRITE);}                       //Tested
-void xl_320_set_alarm_shutdown(uint8_t id, uint8_t shutdown){
-     xl_320_write(id, Xl_320_ADR_ALARM_SHUTDOWN, &shutdown, 1, XL_320_INS_WRITE);}
-void xl_320_set_torque_en(uint8_t id, uint8_t torque_en){
-     xl_320_write(id, Xl_320_ADR_TORQUE_EN, &torque_en, 1, XL_320_INS_WRITE);}
-void xl_320_set_led(uint8_t id , uint8_t led){
-    xl_320_write(id, XL_320_ADR_LED, &led, 1, XL_320_INS_WRITE);}                                 //Tested
-void xl_320_set_D_gain(uint8_t id, uint8_t D){
-    xl_320_write(id, XL_320_ADR_D_GAIN, &D, 1, XL_320_INS_WRITE);}
-void xl_320_set_I_gain(uint8_t id, uint8_t I){
-    xl_320_write(id, XL_320_ADR_I_GAIN, &I, 1, XL_320_INS_WRITE);}
-void xl_320_set_P_gain(uint8_t id, uint8_t P){
-    xl_320_write(id, XL_320_ADR_P_GAIN, &P, 1, XL_320_INS_WRITE);}
-void xl_320_set_position(uint8_t id, uint16_t position){
+     xl_320_write(id, Xl_320_ADR_MAX_TORQUE, torque, 2, XL_320_INS_WRITE);
+}
+
+/**
+  * @brief Set when return status are send by the specified XL320.
+  * @param id: the ID of the targeted XL320.
+  * @param level: the desired policy (0: never returns status, 1: returns status only for READ commands, 2: returns status for all commands).
+  */
+void xl_320_set_return_level(uint8_t id, uint8_t level) {
+     xl_320_write(id, Xl_320_ADR_RET_LEVEL, &level, 1, XL_320_INS_WRITE);
+}                       //Tested
+
+void xl_320_set_alarm_shutdown(uint8_t id, uint8_t shutdown) {
+     xl_320_write(id, Xl_320_ADR_ALARM_SHUTDOWN, &shutdown, 1, XL_320_INS_WRITE);
+}
+
+/**
+  * @brief Enable or disable torque on the specified XL320.
+  * @param id: the ID of the targeted XL320.
+  * @param torque_en: the Torque Enable value (0: torque disabled, 1: torque enabled).
+  */
+void xl_320_set_torque_en(uint8_t id, uint8_t torque_en) {
+     xl_320_write(id, Xl_320_ADR_TORQUE_EN, &torque_en, 1, XL_320_INS_WRITE);
+}
+
+/**
+  * @brief Set the LED color on the specified XL320.
+  * @param id: the ID of the targeted XL320.
+  * @param led: the LED color (0b111: white, 0b101: pink, 0b110: cyan, 0b011: yellow, 0b100: blue, 0b010: green, 0b001: red).
+  */
+void xl_320_set_led(uint8_t id , uint8_t led) {
+    xl_320_write(id, XL_320_ADR_LED, &led, 1, XL_320_INS_WRITE);
+}                                 //Tested
+
+/**
+  * @brief Set the D gain of the specified XL320's PID.
+  * @param id: the ID of the targeted XL320.
+  * @param D_gain: the D gain (0 to 254). Calculated D value is D Gain / 8.
+  */
+void xl_320_set_D_gain(uint8_t id, uint8_t D_gain) {
+    xl_320_write(id, XL_320_ADR_D_GAIN, &D_gain, 1, XL_320_INS_WRITE);
+}
+
+/**
+  * @brief Set the I gain of the specified XL320's PID.
+  * @param id: the ID of the targeted XL320.
+  * @param I_gain: the I gain (0 to 254). Calculated I value is I Gain * 1000 / 2048.
+  */
+void xl_320_set_I_gain(uint8_t id, uint8_t I_gain) {
+    xl_320_write(id, XL_320_ADR_I_GAIN, &I_gain, 1, XL_320_INS_WRITE);
+}
+
+/**
+  * @brief Set the P gain of the specified XL320's PID.
+  * @param id: the ID of the targeted XL320.
+  * @param P_gain: the P gain (0 to 254). Calculated P value is P Gain * 4 / 1000.
+  */
+void xl_320_set_P_gain(uint8_t id, uint8_t P_gain) {
+    xl_320_write(id, XL_320_ADR_P_GAIN, &P_gain, 1, XL_320_INS_WRITE);
+}
+
+/**
+  * @brief Set the desired position of the specified XL320. In order to use this method, the XL320 mode must be 'Join Mode'
+  * @param id: the ID of the targeted XL320.
+  * @param position: the desired position (0 to 1023). Calculated goal position is position * 0.29deg.
+  */
+void xl_320_set_position(uint8_t id, uint16_t position) {
     uint8_t pos[2];
     pos[0]=(uint8_t)(position&0xFF);
     pos[1]=(uint8_t)((position>>8)&0xFF);
      xl_320_write(id, XL_320_ADR_GOAL_POSITION, pos, 2, XL_320_INS_WRITE);
 }
-void xl_320_set_speed(uint8_t id, uint16_t speed){
+
+/**
+  * @brief Set the desired speed of the specified XL320. In order to use this method, the XL320 mode must be 'Join Mode'
+  * @param id: the ID of the targeted XL320.
+  * @param speed: the desired speed (0 to 1023 for Join Mode, 0 to 2048 for Wheel Mode). Calculated speed is (speed * 0.111rpm) for Join Mode or ((speed - 1023) * 0.1% of the maximum speed) in Wheel mode.
+  */
+void xl_320_set_speed(uint8_t id, uint16_t speed) {
     uint8_t velocity[2];
     velocity[0]=(uint8_t)(speed&0xFF);
     velocity[1]=(uint8_t)((speed>>8)&0xFF);
      xl_320_write(id, XL_320_ADR_GOAL_VELOCITY, velocity, 2, XL_320_INS_WRITE);
 }
-void xl_320_set_goal_torque(uint8_t id, uint16_t goal_torque){
+
+/**
+  * @brief Set the desired torque of the specified XL320.
+  * @param id: the ID of the targeted XL320.
+  * @param goal_torque: the desired goal torque (0 to 1023). Calculated goal torque is (goal_torque * 0.1% of the maximum torque).
+  */
+void xl_320_set_goal_torque(uint8_t id, uint16_t goal_torque) {
     uint8_t torque[2];
     torque[0]=(uint8_t)(goal_torque&0xFF);
     torque[1]=(uint8_t)((goal_torque>>8)&0xFF);
     xl_320_write(id, XL_320_ADR_GOAL_TORQUE, torque, 2, XL_320_INS_WRITE);
 }
+
+
 void xl_320_set_punch(uint8_t id, uint16_t punch) {
     uint8_t min_current[2];
     min_current[0]=(uint8_t)(punch&0xFF);
     min_current[1]=(uint8_t)((punch>>8)&0xFF);
-    xl_320_write(id, Xl_320_ADR_MAX_TORQUE, min_current, 2, XL_320_INS_WRITE);}
-
+    xl_320_write(id, Xl_320_ADR_MAX_TORQUE, min_current, 2, XL_320_INS_WRITE);
+}
 
 
 //// -----------------------------------------------------------------------------
@@ -293,33 +403,33 @@ void xl_320_set_punch(uint8_t id, uint16_t punch) {
 //// -----------------------------------------------------------------------------
 //
 //// Gather all status: from XL-320 but also from the UART layer
-//unsigned int xl_320_get_status(xl_320_packet_t* instruction_packet,
-//                                xl_320_packet_t* status_packet,
-//                                unsigned char expected_param_length){
-//    unsigned int status;
-//
-//    // Retrieve hardware status from XL-320
-//    status = (status_packet->instruction) & 0xFF;
-//
-//    // Check that the status packet id matches the sender
-//    if(status_packet->id != instruction_packet->id)
-//        status |= XL_320_ERROR_APP_ID;
-//
-//    // Check that received parameter length is correct
-//    if(status_packet->packet_length != expected_param_length+2)
-//        status |= XL_320_ERROR_APP_LENGTH;
-//
-//    // Check that checksum is correct, this is not
-//    // revealant if length is incorrect
-//    if(status_packet->checksum != xl_320_compute_checksum(status_packet)) {
-//        status |= XL_320_ERROR_APP_CHECKSUM;
-//        //printf("Checksums : 0x%02X vs 0x%02X\n", status_packet->checksum ,xl_320_compute_checksum(status_packet)  );
-//    }
-//
-//    //xl_320_print_packet(&status_packet);
-//
-//    return status;
-//}
+unsigned int xl_320_get_status(xl_320_packet_t* instruction_packet,
+                                xl_320_packet_t* status_packet,
+                                unsigned char expected_param_length){
+    unsigned int status;
+
+    // Retrieve hardware status from XL-320
+    status = (status_packet->instruction) & 0xFF;
+
+    // Check that the status packet id matches the sender
+    if(status_packet->id != instruction_packet->id)
+        status |= XL_320_ERROR_APP_ID;
+
+    // Check that received parameter length is correct
+    if(status_packet->packet_length != expected_param_length+2)
+        status |= XL_320_ERROR_APP_LENGTH;
+
+    // Check that checksum is correct, this is not
+    // revealant if length is incorrect
+    if (status_packet->checksum != xl_320_compute_checksum(status_packet)) {
+        status |= XL_320_ERROR_APP_CHECKSUM;
+        //printf("Checksums : 0x%02X vs 0x%02X\n", status_packet->checksum ,xl_320_compute_checksum(status_packet)  );
+    }
+
+    //xl_320_print_packet(&status_packet);
+
+    return status;
+}
 //// Ping instruction
 //unsigned int xl_320_ping(unsigned char id){
 //    unsigned int status;

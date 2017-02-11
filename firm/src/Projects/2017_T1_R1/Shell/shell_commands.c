@@ -153,7 +153,12 @@ static const CLI_Command_Definition_t xDsv =
     SHELL_EOL
     "dsv [command] [value1]... [valueN]: Run a digital-servo command."SHELL_EOL
     " List of available commands:"SHELL_EOL
-    "  - [cmd1] [value1] [value2]"SHELL_EOL
+    "  - [set_id] [new id]"SHELL_EOL
+    "  - [set_br] [id] [servo baudrate]"SHELL_EOL
+    "  - [ping] [id]"SHELL_EOL
+    "  - [set_pos] [id] [position]"SHELL_EOL
+    "  - [set_torque] [id] [torque]"SHELL_EOL
+    "  - [set_led] [id] [led value]"SHELL_EOL
     ,OS_SHL_DsvCmd,
     -1 // Variable
 };
@@ -480,9 +485,6 @@ static BaseType_t OS_SHL_PrbCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 }
 
-
-
-
 static BaseType_t OS_SHL_StoCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
     return pdFALSE;
@@ -618,7 +620,123 @@ static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
+    char *pcCommand;
+    char *pcParameter;
+    BaseType_t lCommandStringLength;
+    BaseType_t lParameterStringLength;
+    UBaseType_t lParameterNumber;
+
+    //snprintf(pcWriteBuffer, xWriteBufferLen, SHELL_PRB_PFX);
+    pcWriteBuffer += strlen(pcWriteBuffer);
+
+    uint8_t servoId;
+    uint8_t servoBaudrate;
+    uint16_t servoPosition;
+    uint16_t servoTorque;
+    uint8_t servoLed;
+
+    lParameterNumber = 1;
+
+    // Get [command] parameter
+    if((pcCommand = (char*) FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lCommandStringLength )) != NULL)
+    {
+        lParameterNumber++;
+
+        //second parameter is always the [id]
+        if((pcParameter = FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength )) != NULL) {
+            servoId = strtol(pcParameter, NULL, 10);
+        } else {
+            snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"No id defined"SHELL_EOL);
+            return pdFALSE;
+        }
+
+        lParameterNumber++;
+
+        if(!strncasecmp(pcCommand, "set_id", strlen( "set_id"))) {
+            // [set_id] [new id]
+
+            snprintf( pcWriteBuffer, xWriteBufferLen, "start set_id"SHELL_EOL);
+            pcWriteBuffer += strlen(pcWriteBuffer);
+
+            vTaskDelay(pdMS_TO_TICKS(2000));
+            xl_320_set_led(254, 1);
+
+            xl_320_set_id(servoId);
+
+            vTaskDelay(pdMS_TO_TICKS(2000));
+            xl_320_set_led(servoId, 2);
+
+            snprintf( pcWriteBuffer, xWriteBufferLen, "end set_id"SHELL_EOL);
+            pcWriteBuffer += strlen(pcWriteBuffer);
+        } else if(!strncasecmp(pcCommand, "set_br", strlen( "set_br"))) {
+            //[set_br] [id] [servo baudrate]
+
+            if((pcParameter = FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength )) != NULL) {
+                servoBaudrate = strtol(pcParameter, NULL, 10);
+                xl_320_set_baudrate(servoId, servoBaudrate);
+
+                lParameterNumber++;
+            } else {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"No baudrate defined"SHELL_EOL);
+                return pdFALSE;
+            }
+        } else if(!strncasecmp(pcCommand, "ping", strlen( "ping"))) {
+            // [ping] [id]
+
+            // not implemented yet
+        } else if(!strncasecmp(pcCommand, "set_pos", strlen( "set_pos"))) {
+            // [set_pos] [id] [position]
+
+            if((pcParameter = FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength )) != NULL) {
+                servoPosition = strtol(pcParameter, NULL, 10);
+                xl_320_set_position(servoId, servoPosition);
+
+                lParameterNumber++;
+            } else {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"No position defined"SHELL_EOL);
+                return pdFALSE;
+            }
+        } else if(!strncasecmp(pcCommand, "set_torque", strlen( "set_torque"))) {
+            // [set_torque] [id] [torque]
+
+            if((pcParameter = FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength )) != NULL) {
+                servoTorque = strtol(pcParameter, NULL, 10);
+                xl_320_set_goal_torque(servoId, servoTorque);
+
+                lParameterNumber++;
+            } else {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"No torque defined"SHELL_EOL);
+                return pdFALSE;
+            }
+        } else if(!strncasecmp(pcCommand, "set_led", strlen( "set_led"))) {
+            // [set_led] [id] [led]
+
+            if((pcParameter = FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength )) != NULL) {
+
+                pcParameter[ lParameterStringLength ] = 0x00;
+
+                servoLed = strtol(pcParameter, NULL, 10);
+                xl_320_set_led(servoId, servoLed);
+
+                lParameterNumber++;
+            } else {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"No led value defined"SHELL_EOL);
+                return pdFALSE;
+            }
+        } else {
+            snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unknown system command %s"SHELL_EOL, pcCommand);
+            return pdFALSE;
+        }
+    }
+    else
+    {
+        //error no param
+        snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"This command requires parameters"SHELL_EOL);
+        return pdFALSE;
+    }
+
     return pdFALSE;
+
 }
 
 static BaseType_t OS_SHL_AsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
