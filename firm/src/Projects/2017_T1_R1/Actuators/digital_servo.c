@@ -19,7 +19,7 @@
 #include "main.h"
 
 
-static USART_InitTypeDef Dsv_Config;
+USART_InitTypeDef Dsv_Config;
 
 /* Definition */
 #define MAX_DSV_IN_QUEUE	5
@@ -60,6 +60,23 @@ void dsv_init(void)
      /* Initialize XL-320 Library */
      xl_320_init(XL_320_TX_ONLY);
      xl_320_set_hw_send(bb_dsv_put);
+}
+
+/* TEMPORARY TESTS RX-28 */
+void dsv_set_pos(uint8_t id, uint16_t pos)
+{
+
+    // Clamp
+    if(pos > 1023)
+        pos = 1023;
+
+    /* Instruction packet */
+    bb_dsv_put(0xFF);
+    bb_dsv_put(0xFF);
+    bb_dsv_put(id);
+    bb_dsv_put(2+2); // Nb param = 2
+    bb_dsv_put(0x04); // REG_WRITE
+
 }
 
 BaseType_t dsv_start(void)

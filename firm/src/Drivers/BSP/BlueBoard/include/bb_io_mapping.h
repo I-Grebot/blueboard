@@ -712,6 +712,22 @@
 /* RS485_DE Mapped on PD4 */
 /* RS485_RE Mapped on PD3 */
 
+// TODO
+
+/* Definitions for DSV USART connected on USART3 */
+#define RS485_COM                         USART3
+#define RS485_CLK_ENABLE()                RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE)
+#define RS485_CLK_DISABLE()               RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, DISABLE)
+#define RS485_IRQn                        USART3_IRQn
+
+/* DSV_TXRX Mapped on PB10 */
+#define RS485_TXRX_GPIO_PORT              GPIOB
+#define RS485_TXRX_PIN                    GPIO_Pin_10
+#define RS485_TXRX_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE)
+#define RS485_TXRX_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE)
+#define RS485_TXRX_AF                     GPIO_AF7_USART3
+#define RS485_TXRX_PIN_SOURCE             GPIO_PinSource10
+
 /**
  * @}
  */

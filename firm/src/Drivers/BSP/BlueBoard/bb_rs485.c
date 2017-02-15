@@ -1,27 +1,13 @@
-/* -----------------------------------------------------------------------------
- * BlueBoard
- * I-Grebot
- * -----------------------------------------------------------------------------
- * @file       bb_digital_servo.c
- * @author     Pierrick
- * @date       Mar 19, 2016
- * -----------------------------------------------------------------------------
- * @brief
- *   This module implements the digital servo hardware functions
- * -----------------------------------------------------------------------------
- * Versionning informations
- * Repository: https://github.com/I-Grebot/blueboard.git
- * -----------------------------------------------------------------------------
- */
+
 
 #include "blueboard.h"
 
 /**
-  * @brief  Initialize the Digital Servo UART
+  * @brief  Initialize the Sensor Interface UART
   * @param  None
   * @retval None
   */
-void bb_dsv_init(USART_InitTypeDef * USART_InitStruct)
+void bb_sen_init(USART_InitTypeDef * USART_InitStruct)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     USART_ClockInitTypeDef USART_ClockInitStruct;
@@ -35,7 +21,7 @@ void bb_dsv_init(USART_InitTypeDef * USART_InitStruct)
     /* Configure USART TXRX as alternate function */
     GPIO_InitStructure.GPIO_Pin = DSV_TXRX_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Medium_Speed; /* < 25 MHz */
+    GPIO_InitStructure.GPIO_Speed = GPIO_Low_Speed; /* 2 MHz */
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_Init(DSV_TXRX_GPIO_PORT, &GPIO_InitStructure);
 
@@ -58,8 +44,8 @@ void bb_dsv_init(USART_InitTypeDef * USART_InitStruct)
   * @param  ch: character to send
   * @retval None
   */
-/*void bb_dsv_put(uint8_t ch)
+void bb_dsv_put(uint8_t ch)
 {
       USART_SendData(DSV_COM, (uint8_t) ch);
       while(USART_GetFlagStatus(DSV_COM, USART_FLAG_TC) == RESET);
-}*/
+}

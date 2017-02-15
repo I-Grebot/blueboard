@@ -111,6 +111,10 @@ dxl_register_t dxl_registers_v4[] = {
    ,{DXL_RAM,     0x51,       "Punch"                    , DXL_RW,       2,      32}
 /* ---------------------------------------------------------------------------------------------*/
 };
+/* Control Register Table for Version 5 */
+dxl_register_t dxl_registers_v5[] = {
+        /* TODO */
+};
 
 /* Named version for functions handlers */
 const dxl_register_t* dxl_reg_v1_model_number             = dxl_registers_v1 +  0;
