@@ -42,6 +42,7 @@
 #include "bb_config.h"
 
 /* Components libraries */
+#include "dynamixel.h"
 #include "xl_320.h"
 
  /**
@@ -187,8 +188,9 @@ void bb_asv_init(void);
 void bb_asv_set_pwm_pulse_length(BB_ASV_ChannelTypeDef ASV_Channel, uint16_t pulseLength);
 
 /* Digital Servo */
-void bb_dsv_init(USART_InitTypeDef * USART_InitStruct);
-void bb_dsv_put(uint8_t ch);
+void bb_dsv_init(uint8_t chan_idx, USART_InitTypeDef * USART_InitStruct);
+void bb_dsv_switch(uint8_t chan_idx, dxl_switch_mode_e mode);
+void bb_dsv_put(uint8_t chan_idx, uint8_t ch);
 
 /* Analog Monitoring */
 void bb_mon_init(void);

@@ -645,13 +645,13 @@
 /**
 ********************************************************************************
 **
-**  Digital Servomotors (XL-320)
+**  Digital Servomotors Main channel or channel 1
 **    1x Bi-directionnal UART
 **
 ********************************************************************************
 */
 
-/** @addtogroup BB_LOW_LEVEL_XL320
+/** @addtogroup BB_LOW_LEVEL_DSV_CHAN1
  * @{
  */
 
@@ -660,6 +660,7 @@
 #define DSV_CLK_ENABLE()                RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE)
 #define DSV_CLK_DISABLE()               RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, DISABLE)
 #define DSV_IRQn                        USART3_IRQn
+#define DSV_ISR                         USART3_IRQHandler
 
 /* DSV_TXRX Mapped on PB10 */
 #define DSV_TXRX_GPIO_PORT              GPIOB
@@ -699,6 +700,7 @@
 **  RS485 Interface
 **    2x Digital Communication Signals (RS485_RX / RS485_TX)
 **    2x Digital Outputs for transceiver / receiver enables
+**    Could also be used as a 2nd DSV channel
 **
 ********************************************************************************
 */
@@ -707,26 +709,41 @@
  * @{
  */
 
+/* Definitions for RS485 USART connected on USART2 */
+#define RS485_COM                         USART2
+#define RS485_CLK_ENABLE()                RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE)
+#define RS485_CLK_DISABLE()               RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, DISABLE)
+#define RS485_IRQn                        USART2_IRQn
+#define RS485_ISR                         USART2_IRQHandler
+
 /* RS485_RX Mapped on PD6 */
-/* RS485_TX Mapped on PD5 */
+#define RS485_RX_GPIO_PORT                GPIOD
+#define RS485_RX_PIN                      GPIO_Pin_6
+#define RS485_RX_GPIO_CLK_ENABLE()        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define RS485_RX_GPIO_CLK_DISABLE()       RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+#define RS485_RX_AF                       GPIO_AF7_USART2
+#define RS485_RX_PIN_SOURCE               GPIO_PinSource6
+
+/* RS485_TX Mapped on PD5
+ * Can also serve as TXRX for 2nd digital servo channel */
+#define RS485_TX_GPIO_PORT                GPIOD
+#define RS485_TX_PIN                      GPIO_Pin_5
+#define RS485_TX_GPIO_CLK_ENABLE()        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define RS485_TX_GPIO_CLK_DISABLE()       RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+#define RS485_TX_AF                       GPIO_AF7_USART2
+#define RS485_TX_PIN_SOURCE               GPIO_PinSource5
+
 /* RS485_DE Mapped on PD4 */
+#define RS485_DE_GPIO_PORT                GPIOD
+#define RS485_DE_PIN                      GPIO_Pin_4
+#define RS485_DE_GPIO_CLK_ENABLE()        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define RS485_DE_GPIO_CLK_DISABLE()       RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+
 /* RS485_RE Mapped on PD3 */
-
-// TODO
-
-/* Definitions for DSV USART connected on USART3 */
-#define RS485_COM                         USART3
-#define RS485_CLK_ENABLE()                RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE)
-#define RS485_CLK_DISABLE()               RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, DISABLE)
-#define RS485_IRQn                        USART3_IRQn
-
-/* DSV_TXRX Mapped on PB10 */
-#define RS485_TXRX_GPIO_PORT              GPIOB
-#define RS485_TXRX_PIN                    GPIO_Pin_10
-#define RS485_TXRX_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE)
-#define RS485_TXRX_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE)
-#define RS485_TXRX_AF                     GPIO_AF7_USART3
-#define RS485_TXRX_PIN_SOURCE             GPIO_PinSource10
+#define RS485_RE_GPIO_PORT                GPIOD
+#define RS485_RE_PIN                      GPIO_Pin_3
+#define RS485_RE_GPIO_CLK_ENABLE()        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define RS485_RE_GPIO_CLK_DISABLE()       RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
 
 /**
  * @}

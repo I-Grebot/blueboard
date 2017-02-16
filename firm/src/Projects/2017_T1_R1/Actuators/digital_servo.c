@@ -18,8 +18,13 @@
 /* Inclusion */
 #include "main.h"
 
+/* UART Configuration handlers */
+USART_InitTypeDef dsv_itf1_uart;
+USART_InitTypeDef dsv_itf2_uart;
 
-USART_InitTypeDef Dsv_Config;
+/* Dynamixel Interfaces configuration */
+dxl_interface_t dxl_itf1;
+dxl_interface_t dxl_itf2;
 
 /* Definition */
 #define MAX_DSV_IN_QUEUE	5
@@ -42,42 +47,57 @@ void DSV_Create(DSV_ControlTypeDef* DSV, uint8_t id, uint16_t min_Position, uint
 
 void dsv_init(void)
 {
+    /* Initialize the dynamixel interfaces */
+    dxl_init(&dxl_itf1);
+    dxl_init(&dxl_itf2);
+
     /*
-     * Configure the Digital Servo UART init structure:
+     * Configure the Digital Servo UART Interface 1 structure (XL-320):
      *   8 bits length + 1 stop bit, no parity
      *   Baudrate 57600 kbps
      */
-     Dsv_Config.USART_Mode                = USART_Mode_Tx;
-     Dsv_Config.USART_BaudRate            = 57600;
-     Dsv_Config.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-     Dsv_Config.USART_Parity              = USART_Parity_No;
-     Dsv_Config.USART_StopBits            = USART_StopBits_1;
-     Dsv_Config.USART_WordLength          = USART_WordLength_8b;
+    dsv_itf1_uart.USART_Mode                = USART_Mode_Tx;
+    dsv_itf1_uart.USART_BaudRate            = 57600;
+    dsv_itf1_uart.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    dsv_itf1_uart.USART_Parity              = USART_Parity_No;
+    dsv_itf1_uart.USART_StopBits            = USART_StopBits_1;
+    dsv_itf1_uart.USART_WordLength          = USART_WordLength_8b;
 
-     /* Initialize DSV Hardware */
-     bb_dsv_init(&Dsv_Config);
+    /*
+     * Configure the Digital Servo UART Interface 1 structure (RX-28):
+     *   8 bits length + 1 stop bit, no parity
+     *   Baudrate 1 Mbps
+     */
+    dsv_itf2_uart.USART_Mode                = USART_Mode_Tx;
+    dsv_itf2_uart.USART_BaudRate            = 1000000;
+    dsv_itf2_uart.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    dsv_itf2_uart.USART_Parity              = USART_Parity_No;
+    dsv_itf2_uart.USART_StopBits            = USART_StopBits_1;
+    dsv_itf2_uart.USART_WordLength          = USART_WordLength_8b;
+
+    /* Initialize DSV Hardware */
+    bb_dsv_init(dxl_itf1.itf_idx, &dsv_itf1_uart);
+    bb_dsv_init(dxl_itf2.itf_idx, &dsv_itf2_uart);
+
+    /* Configure XL-320 interface */
+    dxl_itf1.protocol = DXL_V2;
+    dxl_itf1.hw_switch = bb_dsv_switch;
+//    dxl_itf1.hw_send_byte = bb_dsv_put;
+//    dxl_itf1.hw_receive_byte = bb_dsv_receive;
+//    dxl_itf1.hw_flush = bb_dsv_flush;
+
+    /* Configure RX-28 interface */
+    dxl_itf2.protocol = DXL_V1;
+    dxl_itf2.hw_switch = bb_dsv_switch;
+//    dxl_itf2.hw_send_byte = bb_dsv_put;
+//    dxl_itf2.hw_receive_byte = bb_dsv_receive;
+//    dxl_itf2.hw_flush = bb_dsv_flush;
 
      /* Initialize XL-320 Library */
-     xl_320_init(XL_320_TX_ONLY);
-     xl_320_set_hw_send(bb_dsv_put);
+     //xl_320_init(XL_320_TX_ONLY);
+     //xl_320_set_hw_send(bb_dsv_put);
 }
 
-/* TEMPORARY TESTS RX-28 */
-void dsv_set_pos(uint8_t id, uint16_t pos)
-{
-
-    // Clamp
-    if(pos > 1023)
-        pos = 1023;
-
-    /* Instruction packet */
-    bb_dsv_put(0xFF);
-    bb_dsv_put(0xFF);
-    bb_dsv_put(id);
-    bb_dsv_put(2+2); // Nb param = 2
-    bb_dsv_put(0x04); // REG_WRITE
-
-}
 
 BaseType_t dsv_start(void)
 {

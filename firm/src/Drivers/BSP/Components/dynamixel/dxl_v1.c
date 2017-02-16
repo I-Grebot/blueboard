@@ -50,26 +50,26 @@ void dxl_v1_send_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     uint8_t idx_param;
 
     // Set uart2 half duplex to TX mode
-    itf->hw_switch(DXL_TX_MODE);
+    itf->hw_switch(itf->itf_idx, DXL_TX_MODE);
 
-    itf->hw_send_byte(DXL_V1_HEADER);
-    itf->hw_send_byte(DXL_V1_HEADER);
-    itf->hw_send_byte(packet->id);
-    itf->hw_send_byte(packet->length);
-    itf->hw_send_byte(packet->content);
+    itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
+    itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
+    itf->hw_send_byte(itf->itf_idx, packet->id);
+    itf->hw_send_byte(itf->itf_idx, packet->length);
+    itf->hw_send_byte(itf->itf_idx, packet->content);
 
     // Parameters
     if(packet->length > DXL_V1_PACKET_MIN_LENGTH) {
         for(idx_param = 0; idx_param < packet->length-DXL_V1_PACKET_MIN_LENGTH ; idx_param++) {
-            itf->hw_send_byte(packet->parameters[idx_param]);
+            itf->hw_send_byte(itf->itf_idx, packet->parameters[idx_param]);
         }
     }
 
     // Checksum
-    itf->hw_send_byte(packet->checksum);
+    itf->hw_send_byte(itf->itf_idx, packet->checksum);
 
     // Get back to RX mode
-    itf->hw_switch(DXL_RX_MODE);
+    itf->hw_switch(itf->itf_idx, DXL_RX_MODE);
 
     itf->status = DXL_STATUS_NO_ERROR;
 
@@ -99,10 +99,10 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     status = DXL_STATUS_NO_ERROR;
 
     // Flush RX before receiving anything
-    itf->hw_flush();
+    itf->hw_flush(itf->itf_idx);
 
     do {
-        status = itf->hw_receive_byte(&rx_buffer);
+        status = itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
     } while((rx_buffer != DXL_V1_HEADER) && (!(status))); /* TEMP FIXME */
 
     /* Detect a timeout error */
@@ -113,7 +113,7 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     }
 
     // Wait for the 2nd header and retrieve it
-    status |= itf->hw_receive_byte(&rx_buffer);
+    status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
     if(rx_buffer != DXL_V1_HEADER) {
         itf->status = DXL_STATUS_ERR_HEADER;
         itf->nb_errors++;
@@ -121,15 +121,15 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     }
 
     // Wait for the id and retrieve it
-    status |= itf->hw_receive_byte(&rx_buffer);
+    status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
     packet->id = rx_buffer;
 
     // Wait for the length and retrieve it
-    status |= itf->hw_receive_byte(&rx_buffer);
+    status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
     packet->length = rx_buffer;
 
     // Wait for the status and retrieve it
-    status |= itf->hw_receive_byte(&rx_buffer);
+    status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
     packet->content = rx_buffer;
 
     // Retrieve parameters, length must be greater than a given value
@@ -137,13 +137,13 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
         for(idx_param=0; idx_param < packet->length-DXL_V1_PACKET_MIN_LENGTH ; idx_param++)
         {
             // Wait for the parameter and retrieve it
-            status |= itf->hw_receive_byte(&rx_buffer);
+            status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
             (packet->parameters)[idx_param] = rx_buffer;
         }
     }
 
     // Wait for the checksum and retrieve it
-    status |= itf->hw_receive_byte(&rx_buffer);
+    status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
     packet->checksum = rx_buffer & 0xFF;
 
     // TODO: check received checksum
@@ -191,7 +191,6 @@ uint16_t dxl_v1_get_status(dxl_v1_packet_t* instruction_packet,
 // Ping a servo from its ID
 void dxl_v1_ping(dxl_interface_t* itf, uint8_t id)
 {
-    uint16_t status;
     dxl_v1_packet_t ping_packet;
     dxl_v1_packet_t status_packet;
 
@@ -201,7 +200,7 @@ void dxl_v1_ping(dxl_interface_t* itf, uint8_t id)
     ping_packet.content  = DXL_V1_INS_PING;
     ping_packet.checksum = dxl_v1_compute_checksum(&ping_packet);
 
-    status = DXL_STATUS_NO_ERROR;
+    itf->status = DXL_STATUS_NO_ERROR;
 
     // Send the ping instruction
     dxl_v1_send_packet(itf, &ping_packet);
@@ -217,9 +216,54 @@ void dxl_v1_ping(dxl_interface_t* itf, uint8_t id)
         itf->status |= dxl_v1_get_status(&ping_packet, &status_packet, 0);
     }
 
-    if(status != DXL_STATUS_NO_ERROR) {
+    if(itf->status != DXL_STATUS_NO_ERROR) {
         itf->nb_errors++;
     }
 }
+
+// Write instruction
+// If registered parameter is set, it'll be a reg_write instruction.
+void dxl_v1_write(dxl_interface_t* itf, uint8_t id, uint8_t address, uint8_t* parameters,
+                  size_t nb_param, bool registered)
+{
+    uint8_t idx_param;
+    dxl_v1_packet_t write_packet;
+    dxl_v1_packet_t status_packet;
+
+    // Build the packet
+    write_packet.id            = id;
+    write_packet.length        = 3+nb_param;
+    write_packet.content       = registered ? DXL_V1_INS_REG_WRITE:DXL_V1_INS_WRITE;
+    write_packet.parameters[0] = address;
+
+    for(idx_param=0; idx_param < nb_param; idx_param++) {
+        write_packet.parameters[idx_param+1] = parameters[idx_param];
+    }
+
+    write_packet.checksum = dxl_v1_compute_checksum(&write_packet);
+
+    // Send the instruction
+    dxl_v1_send_packet(itf, &write_packet);
+
+    itf->status = DXL_STATUS_NO_ERROR;
+
+    // A status packet is returned only if address is not broadcast and
+    // the status return level is set to "all packets".
+    if((id != DXL_V1_ID_BROADCAST) &&
+        itf->return_level == DXL_V1_STATUS_EVERYTHING)
+    {
+        // Retrieve a status packet, add the UART error flags
+        dxl_v1_receive_packet(itf, &status_packet);
+
+        // Get the overall status
+        itf->status |= dxl_v1_get_status(&write_packet, &status_packet, 0);
+    }
+
+    if(itf->status != DXL_STATUS_NO_ERROR) {
+        itf->nb_errors++;
+    }
+
+}
+
 
 

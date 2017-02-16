@@ -18,6 +18,7 @@
 #define __DYNAMIXEL_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 /**
@@ -94,27 +95,36 @@ typedef struct {
 } dxl_servo_model_t;
 
 
+/* Pin mode for half-duplex communication */
+typedef enum {
+    DXL_MODE_TX = 0U,
+    DXL_MODE_RX = 1U
+} dxl_switch_mode_e;
+
 /* Dynamixel Interface definition
  * Define hardware handlers (function pointers) as well as
  * other interface-specific constants
  */
 typedef struct {
 
+    // Unique index of the interface
+    uint8_t itf_idx;
+
     // Interface protocol to be used
     dxl_protocol_e protocol;
 
     // Switch to TX/RX the half-duplex link
-    void (* hw_switch)(uint8_t);
+    void (* hw_switch)(uint8_t chan_idx, dxl_switch_mode_e mode);
 
     // Send a byte and return error if not successful
-    uint8_t (* hw_send_byte)(uint8_t);
+    uint8_t (* hw_send_byte)(uint8_t chan_idx, uint8_t tx_data);
 
     // Receive a byte and return error if not successful
-    uint8_t (* hw_receive_byte) (uint8_t*);
+    uint8_t (* hw_receive_byte) (uint8_t chan_idx, uint8_t* rx_data);
 
     // Flush the receiver (used to make sure its clean before
     // starting to receive actual datas)
-    void (* hw_flush) (void);
+    void (* hw_flush) (uint8_t chan_idx);
 
     // Return level that needs to be remembered to know if
     // something has to be expected.
@@ -133,6 +143,7 @@ typedef struct {
     uint32_t nb_errors; // Number of errors
 
 } dxl_interface_t;
+
 
 /**
 ********************************************************************************

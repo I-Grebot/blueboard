@@ -110,11 +110,17 @@ typedef struct {
 ********************************************************************************
 */
 
+/* Hardware and low-level routines */
 uint8_t dxl_v1_compute_checksum(dxl_v1_packet_t* packet);
 void dxl_v1_send_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet);
 void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet);
 uint16_t dxl_v1_get_status(dxl_v1_packet_t* instruction_packet,
                            dxl_v1_packet_t* status_packet,
                            uint8_t expected_param_length);
+
+/* Instructions */
+void dxl_v1_ping(dxl_interface_t* itf, uint8_t id);
+void dxl_v1_write(dxl_interface_t* itf, uint8_t id, uint8_t address, uint8_t* parameters,
+                  size_t nb_param, bool registered);
 
 #endif /* ___DXL_PROTOCOL_V1_H_ */

@@ -58,6 +58,18 @@
  #define ENC_CHANNEL_LEFT            BB_ENC_CHANNEL1
  #define ENC_CHANNEL_RIGHT           BB_ENC_CHANNEL2
 
+/**
+ ********************************************************************************
+ **
+ **  Digital Servos
+ **
+ ********************************************************************************
+ */
+
+/* This must be defined if the RS485 interface is used as the 2nd digital servo channel */
+#define BB_USE_RS485_DSV_CHAN2
+
+
  /**
  ********************************************************************************
  **
