@@ -31,9 +31,6 @@
 /* Packet Header */
 #define DXL_V1_HEADER            0xFF
 
-/* Broadcast ID used to talk to all servos connected on the bus */
-#define DXL_V1_ID_BROADCAST      0xFE
-
 /* Minimum length of a packet */
 #define DXL_V1_PACKET_MIN_LENGTH 2U
 
@@ -64,10 +61,6 @@
  ********************************************************************************
  */
 
-/* Status answer level definition */
-#define DXL_V1_STATUS_NO_AWNSER   0x00 // Except for PING command
-#define DXL_V1_STATUS_READ_ONLY   0x01 // Only when a READ command is issued
-#define DXL_V1_STATUS_EVERYTHING  0x02
 
 /* Error flags definition */
 #define DXL_V1_ERR_INPUT_VOLTAGE    1U
@@ -119,8 +112,18 @@ uint16_t dxl_v1_get_status(dxl_v1_packet_t* instruction_packet,
                            uint8_t expected_param_length);
 
 /* Instructions */
-void dxl_v1_ping(dxl_interface_t* itf, uint8_t id);
-void dxl_v1_write(dxl_interface_t* itf, uint8_t id, uint8_t address, uint8_t* parameters,
-                  size_t nb_param, bool registered);
+void dxl_v1_ping(dxl_servo_t* servo);
+void dxl_v1_reset(dxl_servo_t* servo);
+void dxl_v1_write(dxl_servo_t* servo, uint8_t address, uint8_t* parameters, size_t nb_param, bool registered);
+void dxl_v1_read(dxl_servo_t* servo, uint8_t address, uint8_t* datas, size_t nb_data);
+void dxl_v1_action(dxl_servo_t* servo);
+
+/* Debug */
+#ifdef DXL_DEBUG
+
+
+void dxl_v1_print_packet(dxl_v1_packet_t* packet);
+
+#endif // DXL_DEBUG
 
 #endif /* ___DXL_PROTOCOL_V1_H_ */

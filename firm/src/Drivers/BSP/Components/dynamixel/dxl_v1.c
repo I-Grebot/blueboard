@@ -50,7 +50,7 @@ void dxl_v1_send_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     uint8_t idx_param;
 
     // Set uart2 half duplex to TX mode
-    itf->hw_switch(itf->itf_idx, DXL_TX_MODE);
+    //itf->hw_switch(itf->itf_idx, DXL_TX_MODE);
 
     itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
     itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
@@ -68,8 +68,13 @@ void dxl_v1_send_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     // Checksum
     itf->hw_send_byte(itf->itf_idx, packet->checksum);
 
+#ifdef DXL_DEBUG
+    serial_puts("[DXL] V1 Send:"DXL_DEBUG_EOL);
+    dxl_v1_print_packet(packet);
+#endif
+
     // Get back to RX mode
-    itf->hw_switch(itf->itf_idx, DXL_RX_MODE);
+    //itf->hw_switch(itf->itf_idx, DXL_RX_MODE);
 
     itf->status = DXL_STATUS_NO_ERROR;
 
@@ -101,19 +106,32 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     // Flush RX before receiving anything
     itf->hw_flush(itf->itf_idx);
 
-    do {
-        status = itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
-    } while((rx_buffer != DXL_V1_HEADER) && (!(status))); /* TEMP FIXME */
+    serial_puts("Start RX\n\r");
+
+    status = itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
 
     /* Detect a timeout error */
-    if(status) {
+    if(status != DXL_PASS) {
       itf->status = DXL_STATUS_ERR_TIMEOUT;
       itf->nb_errors++;
+      serial_puts("Failed RX\n\r");
       return;
     }
 
+    serial_puts("Header RX\n\r");
+
     // Wait for the 2nd header and retrieve it
     status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
+
+    /* Detect a timeout error */
+    if(status != DXL_PASS) {
+      itf->status = DXL_STATUS_ERR_TIMEOUT;
+      itf->nb_errors++;
+      serial_puts("Failed RX\n\r");
+      return;
+    }
+
+    /* Detect a header error */
     if(rx_buffer != DXL_V1_HEADER) {
         itf->status = DXL_STATUS_ERR_HEADER;
         itf->nb_errors++;
@@ -132,6 +150,14 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
     packet->content = rx_buffer;
 
+    /* Detect a timeout error */
+    if(status != DXL_PASS) {
+      itf->status = DXL_STATUS_ERR_TIMEOUT;
+      itf->nb_errors++;
+      serial_puts("Failed RX\n\r");
+      return;
+    }
+
     // Retrieve parameters, length must be greater than a given value
     if(packet->length > DXL_V1_PACKET_MIN_LENGTH) {
         for(idx_param=0; idx_param < packet->length-DXL_V1_PACKET_MIN_LENGTH ; idx_param++)
@@ -145,6 +171,11 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     // Wait for the checksum and retrieve it
     status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
     packet->checksum = rx_buffer & 0xFF;
+
+#ifdef DXL_DEBUG
+    serial_puts("[DXL] V1 Receive:"DXL_DEBUG_EOL);
+    dxl_v1_print_packet(packet);
+#endif
 
     // TODO: check received checksum
 
@@ -188,50 +219,73 @@ uint16_t dxl_v1_get_status(dxl_v1_packet_t* instruction_packet,
 ********************************************************************************
 */
 
-// Ping a servo from its ID
-void dxl_v1_ping(dxl_interface_t* itf, uint8_t id)
+// Ping a servo
+void dxl_v1_ping(dxl_servo_t* servo)
 {
     dxl_v1_packet_t ping_packet;
     dxl_v1_packet_t status_packet;
 
     // Build the instruction packet
-    ping_packet.id       = id;
+    ping_packet.id       = servo->id;
     ping_packet.length   = DXL_V1_MAKE_LENGTH(0);
     ping_packet.content  = DXL_V1_INS_PING;
     ping_packet.checksum = dxl_v1_compute_checksum(&ping_packet);
 
-    itf->status = DXL_STATUS_NO_ERROR;
+    servo->itf->status = DXL_STATUS_NO_ERROR;
 
     // Send the ping instruction
-    dxl_v1_send_packet(itf, &ping_packet);
+    dxl_v1_send_packet(servo->itf, &ping_packet);
 
     // A status packet is always returned after a ping instruction.
     // However check that id was not broadcast, even if that's a dum operation.
-    if((id !=  DXL_V1_ID_BROADCAST))
+    if((servo->id !=  DXL_ID_BROADCAST))
     {
         // Retrieve a status packet, add the UART error flags
-        dxl_v1_receive_packet(itf, &status_packet);
+        dxl_v1_receive_packet(servo->itf, &status_packet);
 
         // Get the overall status, add the error flags
-        itf->status |= dxl_v1_get_status(&ping_packet, &status_packet, 0);
+        servo->itf->status |= dxl_v1_get_status(&ping_packet, &status_packet, 0);
     }
 
-    if(itf->status != DXL_STATUS_NO_ERROR) {
-        itf->nb_errors++;
+    if(servo->itf->status != DXL_STATUS_NO_ERROR) {
+        servo->itf->nb_errors++;
+    }
+}
+
+// Reset instruction
+void dxl_v1_reset(dxl_servo_t* servo)
+{
+    dxl_v1_packet_t reset_packet;
+
+    // Build the instruction packet
+    reset_packet.id       = servo->id;
+    reset_packet.length   = DXL_V1_MAKE_LENGTH(0);
+    reset_packet.content  = DXL_V1_INS_RESET;
+    reset_packet.checksum = dxl_v1_compute_checksum(&reset_packet);
+
+    servo->itf->status = DXL_STATUS_NO_ERROR;
+
+    // Send the reset instruction
+    dxl_v1_send_packet(servo->itf, &reset_packet);
+
+    // Never check for return status packet
+
+    if(servo->itf->status != DXL_STATUS_NO_ERROR) {
+        servo->itf->nb_errors++;
     }
 }
 
 // Write instruction
 // If registered parameter is set, it'll be a reg_write instruction.
-void dxl_v1_write(dxl_interface_t* itf, uint8_t id, uint8_t address, uint8_t* parameters,
-                  size_t nb_param, bool registered)
+void dxl_v1_write(dxl_servo_t* servo, uint8_t address, uint8_t* parameters, size_t nb_param, bool registered)
 {
+
     uint8_t idx_param;
     dxl_v1_packet_t write_packet;
     dxl_v1_packet_t status_packet;
 
     // Build the packet
-    write_packet.id            = id;
+    write_packet.id            = servo->id;
     write_packet.length        = 3+nb_param;
     write_packet.content       = registered ? DXL_V1_INS_REG_WRITE:DXL_V1_INS_WRITE;
     write_packet.parameters[0] = address;
@@ -243,27 +297,126 @@ void dxl_v1_write(dxl_interface_t* itf, uint8_t id, uint8_t address, uint8_t* pa
     write_packet.checksum = dxl_v1_compute_checksum(&write_packet);
 
     // Send the instruction
-    dxl_v1_send_packet(itf, &write_packet);
+    dxl_v1_send_packet(servo->itf, &write_packet);
 
-    itf->status = DXL_STATUS_NO_ERROR;
+    servo->itf->status = DXL_STATUS_NO_ERROR;
 
     // A status packet is returned only if address is not broadcast and
     // the status return level is set to "all packets".
-    if((id != DXL_V1_ID_BROADCAST) &&
-        itf->return_level == DXL_V1_STATUS_EVERYTHING)
+    if((servo->id != DXL_ID_BROADCAST) &&
+            servo->itf->return_level == DXL_STATUS_EVERYTHING)
     {
         // Retrieve a status packet, add the UART error flags
-        dxl_v1_receive_packet(itf, &status_packet);
+        dxl_v1_receive_packet(servo->itf, &status_packet);
 
         // Get the overall status
-        itf->status |= dxl_v1_get_status(&write_packet, &status_packet, 0);
+        servo->itf->status |= dxl_v1_get_status(&write_packet, &status_packet, 0);
     }
 
-    if(itf->status != DXL_STATUS_NO_ERROR) {
-        itf->nb_errors++;
+    if(servo->itf->status != DXL_STATUS_NO_ERROR) {
+        servo->itf->nb_errors++;
+    }
+
+
+}
+
+// Read
+void dxl_v1_read(dxl_servo_t* servo, uint8_t address, uint8_t* datas, size_t nb_data)
+{
+    dxl_v1_packet_t read_packet;
+    dxl_v1_packet_t status_packet;
+    uint8_t idx_data;
+
+    // Build the packet
+    read_packet.id            = servo->id;
+    read_packet.length        = 4;
+    read_packet.content       = DXL_V1_INS_READ;
+    read_packet.parameters[0] = address;
+    read_packet.parameters[1] = nb_data;
+    read_packet.checksum      = dxl_v1_compute_checksum(&read_packet);
+
+    // Send the instruction
+    dxl_v1_send_packet(servo->itf, &read_packet);
+
+    servo->itf->status = DXL_STATUS_NO_ERROR;
+
+    // A read status packet is returned only if address is not broadcast and
+    // the status return level is different than "no answer".
+    if((servo->id != DXL_ID_BROADCAST) &&
+            servo->itf->return_level != DXL_STATUS_NO_AWNSER)
+    {
+        // Retrieve a status packet, add the UART error flags
+        dxl_v1_receive_packet(servo->itf, &status_packet);
+
+        // Get the overall status, add the CDS55XX and APP error flags
+        servo->itf->status |= dxl_v1_get_status(&read_packet, &status_packet, nb_data);
+
+        // Affect read datas if no critical error happened during the
+        // status packet reception
+        if(servo->itf->status == DXL_STATUS_NO_ERROR) {
+            for(idx_data=0; idx_data < status_packet.length-2; idx_data++) {
+                datas[idx_data] = status_packet.parameters[idx_data];
+            }
+        }
+    }
+
+    if(servo->itf->status != DXL_STATUS_NO_ERROR) {
+        servo->itf->nb_errors++;
     }
 
 }
 
+void dxl_v1_action(dxl_servo_t* servo)
+{
+    dxl_v1_packet_t action_packet;
+
+    // Build the packet
+    action_packet.id        = DXL_ID_BROADCAST;
+    action_packet.length    = 2;
+    action_packet.content   = DXL_V1_INS_ACTION;
+    action_packet.checksum  = dxl_v1_compute_checksum(&action_packet);
+
+    // Send the instruction
+    dxl_v1_send_packet(servo->itf, &action_packet);
+
+    if(servo->itf->status != DXL_STATUS_NO_ERROR) {
+        servo->itf->nb_errors++;
+    }
+}
+
+/**
+********************************************************************************
+**
+**  Debug
+**
+********************************************************************************
+*/
+#ifdef DXL_DEBUG
+
+// Print a packet content in the given string
+void dxl_v1_print_packet(dxl_v1_packet_t* packet)
+{
+    char str[100];
+    uint8_t idx_param;
+
+    sprintf(str, "  Id:   %02X"DXL_DEBUG_EOL
+                 "  Ins:  %02X"DXL_DEBUG_EOL
+                 "  Len:  %02X"DXL_DEBUG_EOL
+                 "  Data: ",
+            packet->id, packet->content, packet->length);
+    serial_puts(str);
+
+    if(packet->length > DXL_V1_PACKET_MIN_LENGTH) {
+        for(idx_param = 0; idx_param < packet->length-DXL_V1_PACKET_MIN_LENGTH ; idx_param++) {
+            sprintf(str, "%02X ", packet->parameters[idx_param]);
+            serial_puts(str);
+        }
+    }
+
+    sprintf(str, DXL_DEBUG_EOL"  Chk:  %02X"DXL_DEBUG_EOL, packet->checksum);
+    serial_puts(str);
+}
+
+#endif // DXL_DEBUG
 
 

@@ -43,7 +43,8 @@
 
 /* Components libraries */
 #include "dynamixel.h"
-#include "xl_320.h"
+
+#include "xl_320.h" // TEMP
 
  /**
  ********************************************************************************
@@ -86,6 +87,12 @@ typedef enum {
     BB_ASV_CHANNEL7 = 6,
     BB_ASV_CHANNEL8 = 7
 } BB_ASV_ChannelTypeDef;
+
+/* List of available Digital Servo channels */
+typedef enum {
+    BB_DSV_CHANNEL1 = 0,
+    BB_DSV_CHANNEL2 = 1
+} BB_DSV_ChannelTypeDef;
 
 typedef enum {
     BB_MOT_CHANNEL1 = 0,
@@ -188,9 +195,13 @@ void bb_asv_init(void);
 void bb_asv_set_pwm_pulse_length(BB_ASV_ChannelTypeDef ASV_Channel, uint16_t pulseLength);
 
 /* Digital Servo */
-void bb_dsv_init(uint8_t chan_idx, USART_InitTypeDef * USART_InitStruct);
-void bb_dsv_switch(uint8_t chan_idx, dxl_switch_mode_e mode);
-void bb_dsv_put(uint8_t chan_idx, uint8_t ch);
+void bb_dsv_init(uint8_t dsv_chan, USART_InitTypeDef * USART_InitStruct);
+void bb_dsv_enable(uint8_t dsv_chan, uint32_t nvic_priority);
+void bb_dsv_disable(uint8_t dsv_chan);
+void bb_dsv_switch(uint8_t dsv_chan, dxl_switch_mode_e mode);
+//void bb_dsv_put(uint8_t dsv_chan, uint8_t ch);
+//uint8_t bb_dsv_receive(uint8_t dsv_chan, uint8_t* rx_data);
+//void bb_dsv_flush(uint8_t dsv_chan);
 
 /* Analog Monitoring */
 void bb_mon_init(void);

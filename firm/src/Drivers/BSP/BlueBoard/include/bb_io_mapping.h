@@ -724,8 +724,7 @@
 #define RS485_RX_AF                       GPIO_AF7_USART2
 #define RS485_RX_PIN_SOURCE               GPIO_PinSource6
 
-/* RS485_TX Mapped on PD5
- * Can also serve as TXRX for 2nd digital servo channel */
+/* RS485_TX Mapped on PD5 */
 #define RS485_TX_GPIO_PORT                GPIOD
 #define RS485_TX_PIN                      GPIO_Pin_5
 #define RS485_TX_GPIO_CLK_ENABLE()        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
@@ -738,12 +737,14 @@
 #define RS485_DE_PIN                      GPIO_Pin_4
 #define RS485_DE_GPIO_CLK_ENABLE()        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
 #define RS485_DE_GPIO_CLK_DISABLE()       RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+#define RS485_DE_WRITE(_v)                GPIO_WriteBit(RS485_DE_GPIO_PORT, RS485_DE_PIN, (_v))
 
-/* RS485_RE Mapped on PD3 */
-#define RS485_RE_GPIO_PORT                GPIOD
-#define RS485_RE_PIN                      GPIO_Pin_3
-#define RS485_RE_GPIO_CLK_ENABLE()        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
-#define RS485_RE_GPIO_CLK_DISABLE()       RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+/* RS485_NRE Mapped on PD3 */
+#define RS485_NRE_GPIO_PORT               GPIOD
+#define RS485_NRE_PIN                     GPIO_Pin_3
+#define RS485_NRE_GPIO_CLK_ENABLE()       RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define RS485_NRE_GPIO_CLK_DISABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+#define RS485_NRE_WRITE(_v)               GPIO_WriteBit(RS485_NRE_GPIO_PORT, RS485_NRE_PIN, (_v))
 
 /**
  * @}

@@ -55,9 +55,9 @@ int main( void )
     motion_start();
     avoidance_start();
     asv_start();
-    dsv_start();
+    //dsv_start();
 
-    led_start();
+    //led_start();
 
     /*strategy_start();
 

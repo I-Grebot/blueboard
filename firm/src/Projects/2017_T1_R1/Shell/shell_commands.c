@@ -652,7 +652,13 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
         lParameterNumber++;
 
-        if(!strncasecmp(pcCommand, "set_id", strlen( "set_id"))) {
+        if(!strncasecmp(pcCommand, "update", strlen( "update"))) {
+            // [init]
+            dsv_update_config();
+            snprintf( pcWriteBuffer, xWriteBufferLen, "end init"SHELL_EOL);
+            pcWriteBuffer += strlen(pcWriteBuffer);
+
+        } else if(!strncasecmp(pcCommand, "set_id", strlen( "set_id"))) {
             // [set_id] [new id]
 
             snprintf( pcWriteBuffer, xWriteBufferLen, "start set_id"SHELL_EOL);
@@ -683,13 +689,26 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
         } else if(!strncasecmp(pcCommand, "ping", strlen( "ping"))) {
             // [ping] [id]
 
+            while(1) {
+                dsv_ping(servoId);
+                vTaskDelay(pdMS_TO_TICKS(500));
+            }
+
             // not implemented yet
         } else if(!strncasecmp(pcCommand, "set_pos", strlen( "set_pos"))) {
             // [set_pos] [id] [position]
 
             if((pcParameter = FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength )) != NULL) {
                 servoPosition = strtol(pcParameter, NULL, 10);
-                xl_320_set_position(servoId, servoPosition);
+                //xl_320_set_position(servoId, servoPosition);
+
+                //bb_dsv_switch(2, DXL_MODE_TX);
+                //dsv_test_led(servoId, servoPosition);
+
+                dsv_test_pos(servoId, servoPosition);
+                //dsv_reset();
+
+                //dsv_scan_servos();
 
                 lParameterNumber++;
             } else {

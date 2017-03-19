@@ -19,7 +19,9 @@
 /* External variables; for setting and probing */
 extern OS_SHL_ConfigTypeDef OS_SHL_Config;
 extern RobotTypeDef robot;
-extern USART_InitTypeDef Dsv_Config;
+
+extern dsv_channel_t dsv_chan1;
+extern dsv_channel_t dsv_chan2;
 
 /*
  * Variables definition list holder
@@ -42,7 +44,8 @@ const OS_SHL_VarItemTypeDef OS_SHL_varList[] = {
 #endif
 
          // Digital Servos Configuration
-         ,{"dsv.baudrate"               , TYPE_UINT32,  ACC_WR, &Dsv_Config.USART_BaudRate,                   "bps"}
+         ,{"dsv1.baudrate"              , TYPE_UINT32,  ACC_WR, &dsv_chan1.uart.USART_BaudRate,            "bps"}
+         ,{"dsv2.baudrate"              , TYPE_UINT32,  ACC_WR, &dsv_chan2.uart.USART_BaudRate,            "bps"}
 
          // Motion configuration for D filter
          ,{"robot.cs.pid_d.kp"          , TYPE_INT16,  ACC_WR, &robot.cs.pid_d.gain_P,                   "NA"}

@@ -49,3 +49,56 @@ const dxl_servo_model_t dxl_servo_models[] = {
         { 1020,    "XM430-W350"     , DXL_V2,        DXL_REG5}, /* XM430-W350-T / XM430-W350-R */
         { 1030,    "XM430-W210"     , DXL_V2,        DXL_REG5}  /* XM430-W210-T / XM430-W210-R */
 };
+
+
+const uint32_t dxl_baudrates[] = {
+           9600,
+          19200,
+          57600,
+         115200,
+         200000,
+         250000,
+         400000,
+         500000,
+        1000000
+};
+
+const size_t dxl_baudrates_size = sizeof(dxl_baudrates)/sizeof(uint32_t);
+
+/* Find a corresponding DXL servo by its name. Returns NULL if not found.
+ * This function is not really optimized, so it shouldn't be called too often
+ */
+const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name)
+{
+    dxl_servo_model_t* model = dxl_servo_models;
+    uint16_t model_idx;
+    // FIXME
+/*
+    for(model_idx = 0;
+        model_idx < sizeof(dxl_servo_models)/sizeof(dxl_servo_model_t);
+        model_idx++, model++)
+    {
+        if(!strcasecmp(name, model->name)) {
+            return model;
+        }
+    }
+
+    return NULL;*/
+
+    return dxl_servo_models + 6;
+
+}
+
+#ifdef DXL_DEBUG
+void dxl_print_servo(dxl_servo_t* servo)
+{
+    char str[100];
+    sprintf(str, "[DXL] Servo:"DXL_DEBUG_EOL
+                 "  ITF:%u"DXL_DEBUG_EOL
+                 "  ID:%u"DXL_DEBUG_EOL
+                 "  Model:%u (%s)"DXL_DEBUG_EOL,
+            servo->itf->itf_idx, servo->id, servo->model->model_id, servo->model->name);
+    serial_puts(str);
+}
+
+#endif // DXL_DEBUG

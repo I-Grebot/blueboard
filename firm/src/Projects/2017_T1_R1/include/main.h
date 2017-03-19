@@ -84,6 +84,7 @@
 
 /* Project files */
 #include "motion.h"
+#include "digital_servo.h"
 #include "strategy.h"
 #include "shell.h"
 #include "physics_const.h"
@@ -115,6 +116,7 @@
   * ISR Save FreeRTOS API Routines!
   */
 #define OS_ISR_PRIORITY_SER             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 )
+#define OS_ISR_PRIORITY_DSV             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 2 )
 
  /* Events periodicity */
 #define MOTION_CONTROL_PERIOD_MS      50
@@ -155,7 +157,14 @@ BaseType_t asv_start(void);
 
 /* Digital Servos */
 void dsv_init(void);
+void dsv_update_config(void);
+uint8_t dsv_put(uint8_t chan_idx, uint8_t tx_data);
+uint8_t dsv_get(uint8_t chan_idx, const uint8_t* data);
+uint8_t dsv_flush(uint8_t chan_idx);
+
 BaseType_t dsv_start(void);
+
+void dsv_test_pos(uint8_t id, uint16_t pos); // TEMP
 
 /* RGB LED */
 BaseType_t led_start(void);
