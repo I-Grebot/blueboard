@@ -70,9 +70,9 @@
 #define DXL_STATUS_EVERYTHING  0x02
 
 /* Defined when debug mode is required */
-//#define DXL_DEBUG
-
-#define DXL_DEBUG_EOL "\n\r" // End-Of-Line character for debug
+#define DXL_DEBUG
+#define DXL_DEBUG_PFX "[DXL]" // Debug prefix
+#define DXL_DEBUG_EOL "\n\r"  // End-Of-Line character for debug
 
  /**
  ********************************************************************************
@@ -157,8 +157,7 @@ typedef struct {
     // An error is a non-zero code
     uint8_t (* hw_receive_byte) (uint8_t chan_idx, const uint8_t* rx_data);
 
-    // Flush the receiver (used to make sure its clean before
-    // starting to receive actual datas)
+    // Flush the receiver (cleanup all unprocessed data)
     uint8_t (* hw_flush) (uint8_t chan_idx);
 
     // Return level that needs to be remembered to know if
@@ -229,6 +228,7 @@ void dxl_set_position(dxl_servo_t* servo, uint16_t new_position);
 extern long serial_puts(const char* str);
 
 void dxl_print_servo(dxl_servo_t* servo);
+void dxl_print_error(uint16_t status);
 
 
 #endif // DXL_DEBUG

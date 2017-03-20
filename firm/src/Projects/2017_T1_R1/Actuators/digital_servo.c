@@ -209,7 +209,7 @@ uint8_t dsv_put(uint8_t chan_idx, uint8_t tx_data)
      */
     } else {
 
-        if(xQueueSend(*tx_queue, &tx_data, SERIAL_TX_TIMEOUT) == pdPASS)
+        if(xQueueSend(*tx_queue, &tx_data, DSV_TX_TIMEOUT) == pdPASS)
         {
             USART_ITConfig(usart_if, USART_IT_TC, ENABLE);
             return pdPASS;
@@ -231,12 +231,12 @@ uint8_t dsv_put(uint8_t chan_idx, uint8_t tx_data)
 uint8_t dsv_get(uint8_t chan_idx, const uint8_t* data)
 {
     if(chan_idx == BB_DSV_CHANNEL1) {
-        if(xQueueReceive(dsv_chan1.rx_queue, data, pdMS_TO_TICKS(dsv_chan1.dxl.return_delay_ms + 1)) == pdPASS) {
+        if(xQueueReceive(dsv_chan1.rx_queue, data, DSV_RX_TIMEOUT) == pdPASS) {
             return DXL_PASS;
         }
 
     } else if(chan_idx == BB_DSV_CHANNEL2) {
-        if(xQueueReceive(dsv_chan2.rx_queue, data, pdMS_TO_TICKS(dsv_chan2.dxl.return_delay_ms + 1)) == pdPASS) {
+        if(xQueueReceive(dsv_chan2.rx_queue, data, DSV_RX_TIMEOUT) == pdPASS) {
             return DXL_PASS;
         }
     }
@@ -245,7 +245,7 @@ uint8_t dsv_get(uint8_t chan_idx, const uint8_t* data)
 }
 
 /**
-  * @brief  Flush an interface (empty queues)
+  * @brief  Flush a receiver interface (empty queue)
   * @param  chan_idx: DSV channel
   * @retval Pass/Fail status
   */
@@ -254,11 +254,9 @@ uint8_t dsv_flush(uint8_t chan_idx)
 
     if(chan_idx == BB_DSV_CHANNEL1) {
         xQueueGenericReset(dsv_chan1.rx_queue, pdFALSE);
-        xQueueGenericReset(dsv_chan1.tx_queue, pdFALSE);
 
     } else if(chan_idx == BB_DSV_CHANNEL2) {
-        xQueueGenericReset(dsv_chan2.rx_queue, pdFALSE);
-        xQueueGenericReset(dsv_chan2.tx_queue, pdFALSE);
+        xQueueGenericReset(dsv_chan2.rx_queue, pdTRUE);
     }
 
     return pdPASS;

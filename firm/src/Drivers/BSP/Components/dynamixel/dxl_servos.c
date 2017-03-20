@@ -93,7 +93,7 @@ const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name)
 void dxl_print_servo(dxl_servo_t* servo)
 {
     char str[100];
-    sprintf(str, "[DXL] Servo:"DXL_DEBUG_EOL
+    sprintf(str, DXL_DEBUG_PFX" Servo:"DXL_DEBUG_EOL
                  "  ITF:%u"DXL_DEBUG_EOL
                  "  ID:%u"DXL_DEBUG_EOL
                  "  Model:%u (%s)"DXL_DEBUG_EOL,

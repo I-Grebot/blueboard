@@ -49,9 +49,6 @@ void dxl_v1_send_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
 {
     uint8_t idx_param;
 
-    // Set uart2 half duplex to TX mode
-    //itf->hw_switch(itf->itf_idx, DXL_TX_MODE);
-
     itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
     itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
     itf->hw_send_byte(itf->itf_idx, packet->id);
@@ -69,12 +66,9 @@ void dxl_v1_send_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     itf->hw_send_byte(itf->itf_idx, packet->checksum);
 
 #ifdef DXL_DEBUG
-    serial_puts("[DXL] V1 Send:"DXL_DEBUG_EOL);
+    serial_puts(DXL_DEBUG_PFX" V1 Send:"DXL_DEBUG_EOL);
     dxl_v1_print_packet(packet);
 #endif
-
-    // Get back to RX mode
-    //itf->hw_switch(itf->itf_idx, DXL_RX_MODE);
 
     itf->status = DXL_STATUS_NO_ERROR;
 
@@ -101,33 +95,24 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     idx_param = 0;
 
     // Initialize the status buffer
-    status = DXL_STATUS_NO_ERROR;
+    status = DXL_PASS;
+    itf->status = DXL_STATUS_NO_ERROR;
 
-    // Flush RX before receiving anything
     itf->hw_flush(itf->itf_idx);
 
-    serial_puts("Start RX\n\r");
-
-    status = itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
-
-    /* Detect a timeout error */
-    if(status != DXL_PASS) {
+    // Wait for the 1st header and retrieve it
+    // Detect a timeout error
+    if(itf->hw_receive_byte(itf->itf_idx, &rx_buffer) != DXL_PASS) {
       itf->status = DXL_STATUS_ERR_TIMEOUT;
       itf->nb_errors++;
-      serial_puts("Failed RX\n\r");
       return;
     }
 
-    serial_puts("Header RX\n\r");
-
     // Wait for the 2nd header and retrieve it
-    status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
-
-    /* Detect a timeout error */
-    if(status != DXL_PASS) {
+    // Detect a timeout error
+    if(itf->hw_receive_byte(itf->itf_idx, &rx_buffer) != DXL_PASS) {
       itf->status = DXL_STATUS_ERR_TIMEOUT;
       itf->nb_errors++;
-      serial_puts("Failed RX\n\r");
       return;
     }
 
@@ -154,7 +139,6 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     if(status != DXL_PASS) {
       itf->status = DXL_STATUS_ERR_TIMEOUT;
       itf->nb_errors++;
-      serial_puts("Failed RX\n\r");
       return;
     }
 
@@ -172,12 +156,17 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     status |= itf->hw_receive_byte(itf->itf_idx, &rx_buffer);
     packet->checksum = rx_buffer & 0xFF;
 
+    // Detect a checksum error
+    if(packet->checksum != dxl_v1_compute_checksum(packet)) {
+        itf->status = DXL_STATUS_ERR_CHECKSUM;
+        itf->nb_errors++;
+        return;
+    }
+
 #ifdef DXL_DEBUG
-    serial_puts("[DXL] V1 Receive:"DXL_DEBUG_EOL);
+    serial_puts(DXL_DEBUG_PFX" V1 Receive:"DXL_DEBUG_EOL);
     dxl_v1_print_packet(packet);
 #endif
-
-    // TODO: check received checksum
 
     // End of RX
     itf->status = status;
@@ -249,6 +238,10 @@ void dxl_v1_ping(dxl_servo_t* servo)
 
     if(servo->itf->status != DXL_STATUS_NO_ERROR) {
         servo->itf->nb_errors++;
+
+#ifdef DXL_DEBUG
+        dxl_print_error(servo->itf->status);
+#endif // DXL_DEBUG
     }
 }
 

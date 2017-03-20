@@ -47,6 +47,18 @@
 /* IND reading scanning time */
 #define IND_SCAN_PERIOD_TICK	100
 
+
+/**
+********************************************************************************
+**
+**  Digital Servos
+**
+********************************************************************************
+*/
+
+#define DSV_RX_TIMEOUT      pdMS_TO_TICKS( 10 ) // Must be at least longest TX + Return-time delay
+#define DSV_TX_TIMEOUT      pdMS_TO_TICKS(  5 )
+
 /**
 ********************************************************************************
 **

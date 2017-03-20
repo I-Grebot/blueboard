@@ -689,10 +689,15 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
         } else if(!strncasecmp(pcCommand, "ping", strlen( "ping"))) {
             // [ping] [id]
 
-            while(1) {
+            /*snprintf( pcWriteBuffer, xWriteBufferLen, "Pinging Servo %u"SHELL_EOL, servoId);
+            pcWriteBuffer += strlen(pcWriteBuffer);*/
+            dsv_ping(servoId);
+            return pdFALSE;
+
+            /*while(1) {
                 dsv_ping(servoId);
-                vTaskDelay(pdMS_TO_TICKS(500));
-            }
+                vTaskDelay(pdMS_TO_TICKS(2));
+            }*/
 
             // not implemented yet
         } else if(!strncasecmp(pcCommand, "set_pos", strlen( "set_pos"))) {

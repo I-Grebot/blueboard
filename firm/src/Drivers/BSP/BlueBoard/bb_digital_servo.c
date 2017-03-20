@@ -61,9 +61,9 @@ void bb_dsv_init(uint8_t dsv_chan, USART_InitTypeDef * USART_InitStruct)
         /* Enable USART */
         USART_Cmd(DSV_COM, ENABLE);
 
-    /* Configure channel 2 -- Only available when RS485 interface is remapped */
     }
 
+    /* Configure channel 2 -- Only available when RS485 interface is remapped */
 #ifdef BB_USE_RS485_DSV_CHAN2
     else if(dsv_chan == BB_DSV_CHANNEL2) {
 
@@ -192,11 +192,9 @@ void bb_dsv_switch(uint8_t dsv_chan, dxl_switch_mode_e mode)
         if(mode == DXL_MODE_TX) {
             RS485_DE_WRITE(Bit_SET);
             RS485_NRE_WRITE(Bit_SET);
-            LEDB_WRITE(LEDx_ON);
         } else {
             RS485_DE_WRITE(Bit_RESET);
             RS485_NRE_WRITE(Bit_RESET);
-            LEDB_WRITE(LEDx_OFF);
         }
     }
 #endif /* BB_USE_RS485_DSV_CHAN2 */

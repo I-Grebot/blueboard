@@ -158,3 +158,36 @@ void dxl_set_led(dxl_servo_t* servo, uint8_t led)
 
 }
 
+/**
+********************************************************************************
+**
+**  Debug
+**
+********************************************************************************
+*/
+#ifdef DXL_DEBUG
+
+void dxl_print_error(uint16_t status)
+{
+    if(status & DXL_STATUS_ERR_TIMEOUT) {
+        serial_puts(DXL_DEBUG_PFX" Error: Timeout"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_STATUS_ERR_HEADER) {
+        serial_puts(DXL_DEBUG_PFX" Error: Header"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_STATUS_ERR_ID) {
+        serial_puts(DXL_DEBUG_PFX" Error: ID"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_STATUS_ERR_LENGTH) {
+        serial_puts(DXL_DEBUG_PFX" Error: Data Length"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_STATUS_ERR_CHECKSUM) {
+        serial_puts(DXL_DEBUG_PFX" Error: Checksum"DXL_DEBUG_EOL);
+    }
+}
+
+#endif // DXL_DEBUG
