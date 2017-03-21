@@ -16,8 +16,15 @@
 
 #include "dynamixel.h"
 
+/**
+********************************************************************************
+**
+**  Initialization and configuration
+**
+********************************************************************************
+*/
 
-/* Initialize a DXL Interface with default values.
+/* @brief: Initialize a DXL Interface with default values.
  * @param itf: Dynamixel Interface to write into
  */
 void dxl_init_itf(dxl_interface_t* itf, uint8_t itf_idx)
@@ -70,36 +77,42 @@ void dxl_init_servo(dxl_servo_t* servo, dxl_interface_t* itf, const char* model_
     servo->current_position = 0;
 
 #ifdef DXL_DEBUG
-    serial_puts("[DXL] Init:"DXL_DEBUG_EOL);
     dxl_print_servo(servo);
 #endif
 
 }
 
-/* Basic write access
- * Branch correctly on the dxl_vN protocol version.
- * @param servo: Servo to send the write access
- * @param addr: Register address
- * @param values: Array of values to write
- * @param size: Size of the value array in number of bytes
- * @param reg: True if the write is registered
+/**
+********************************************************************************
+**
+**  Main handlers
+**
+********************************************************************************
+*/
+
+/* @brief: Ping the selected servo
+ * @param servo: Servo to send the reset access
  */
-void dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size, bool reg)
+dxl_status_t dxl_ping(dxl_servo_t* servo)
 {
     if(servo->itf->protocol == DXL_V1) {
-        dxl_v1_write(servo, addr, values, size, reg);
+        dxl_v1_ping(servo);
 
     } else if(servo->itf->protocol == DXL_V2) {
         // TODO
 
     // Error
     } else {
-        return;
+        return DXL_STATUS_ERR_PROTOCOL;
     }
 
+    return servo->itf->status;
 }
 
-void dxl_reset(dxl_servo_t* servo)
+/* @brief: Factory-reset of the selected servo
+ * @param servo: Servo to send the reset access
+ */
+dxl_status_t dxl_reset(dxl_servo_t* servo)
 {
 
     if(servo->itf->protocol == DXL_V1) {
@@ -110,25 +123,86 @@ void dxl_reset(dxl_servo_t* servo)
 
     // Error
     } else {
-        return;
+        return DXL_STATUS_ERR_PROTOCOL;
     }
+
+    return servo->itf->status;
 }
 
-
-void dxl_ping(dxl_servo_t* servo)
+/* @brief: Basic write access
+ * @param servo: Servo to send the write access
+ * @param addr: Register address
+ * @param values: Array of values to write
+ * @param size: Size of the value array in number of bytes
+ * @param reg: True if the write is registered
+ */
+dxl_status_t dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size, bool reg)
 {
     if(servo->itf->protocol == DXL_V1) {
-        dxl_v1_ping(servo);
+        dxl_v1_write(servo, addr, values, size, reg);
 
     } else if(servo->itf->protocol == DXL_V2) {
         // TODO
 
     // Error
     } else {
-        return;
+        return DXL_STATUS_ERR_PROTOCOL;
     }
+
+    return servo->itf->status;
 }
 
+/* @brief: Basic read access
+ * @param servo: Servo to send the read access
+ * @param addr: Register address
+ * @param values: Array of values to store the read values
+ * @param size: Size of the value array in number of bytes
+ */
+dxl_status_t dxl_read(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size)
+{
+    if(servo->itf->protocol == DXL_V1) {
+        dxl_v1_read(servo, addr, values, size);
+
+    } else if(servo->itf->protocol == DXL_V2) {
+        // TODO
+
+    // Error
+    } else {
+        return DXL_STATUS_ERR_PROTOCOL;
+    }
+
+    return servo->itf->status;
+}
+
+
+/* @brief: Trigger action
+ * @param servo: Servo to send the action command
+ */
+dxl_status_t dxl_action(dxl_servo_t* servo)
+{
+    if(servo->itf->protocol == DXL_V1) {
+        dxl_v1_action(servo);
+
+    } else if(servo->itf->protocol == DXL_V2) {
+        // TODO
+
+    // Error
+    } else {
+        return DXL_STATUS_ERR_PROTOCOL;
+    }
+
+    return servo->itf->status;
+}
+
+/**
+********************************************************************************
+**
+**  Common short-hands
+**
+********************************************************************************
+*/
+
+// TODO: cleanup
 void dxl_set_torque(dxl_servo_t* servo, uint8_t torque)
 {
     extern const dxl_register_t* dxl_reg_v1_torque_enable;
@@ -161,14 +235,29 @@ void dxl_set_led(dxl_servo_t* servo, uint8_t led)
 /**
 ********************************************************************************
 **
+**  High-level procedures
+**
+********************************************************************************
+*/
+
+// Interface scan (baudrate + protocol)
+
+
+/**
+********************************************************************************
+**
 **  Debug
 **
 ********************************************************************************
 */
 #ifdef DXL_DEBUG
 
-void dxl_print_error(uint16_t status)
+/* @brief: Print a DXL error
+ * @param status: status to print (does not print anything if no error)
+ */
+void dxl_print_error(dxl_status_t status, dxl_protocol_e protocol)
 {
+    /* Common DXL errors */
     if(status & DXL_STATUS_ERR_TIMEOUT) {
         serial_puts(DXL_DEBUG_PFX" Error: Timeout"DXL_DEBUG_EOL);
     }
@@ -188,6 +277,19 @@ void dxl_print_error(uint16_t status)
     if(status & DXL_STATUS_ERR_CHECKSUM) {
         serial_puts(DXL_DEBUG_PFX" Error: Checksum"DXL_DEBUG_EOL);
     }
+
+    if(status & DXL_STATUS_ERR_PROTOCOL) {
+        serial_puts(DXL_DEBUG_PFX" Error: Protocol"DXL_DEBUG_EOL);
+    }
+
+    /* Protocol-Specific errors */
+    if(protocol == DXL_V1) {
+        dxl_v1_print_error(status);
+
+    } else if(protocol == DXL_V2) {
+        // TODO
+    }
+
 }
 
 #endif // DXL_DEBUG

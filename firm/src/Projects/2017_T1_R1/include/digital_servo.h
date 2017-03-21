@@ -1,4 +1,18 @@
-
+/* -----------------------------------------------------------------------------
+ * BlueBoard
+ * I-Grebot
+ * -----------------------------------------------------------------------------
+ * @file       digital_servo.h
+ * @author     Bebop35
+ * @date       Mar 20, 2017
+ * -----------------------------------------------------------------------------
+ * @brief
+ *   Digital servo module definitions
+ * -----------------------------------------------------------------------------
+ * Versionning informations
+ * Repository: https://github.com/I-Grebot/blueboard.git
+ * -----------------------------------------------------------------------------
+ */
 
 #ifndef __DIGITAL_SERVO_H_
 #define __DIGITAL_SERVO_H_
@@ -6,9 +20,6 @@
 #include "FreeRTOS.h"
 #include "blueboard.h"
 
-/* Queues size for each channel, in Bytes */
-#define DSV_RX_QUEUE_SIZE   64
-#define DSV_TX_QUEUE_SIZE   64
 
 typedef struct {
 
@@ -21,6 +32,8 @@ typedef struct {
 
     /* Dynamixel Interface */
     dxl_interface_t dxl;
+
+    // TODO: add mutex (maybe?)
 
 } dsv_channel_t;
 

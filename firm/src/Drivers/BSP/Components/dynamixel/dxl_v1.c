@@ -15,7 +15,7 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "dxl_v1.h"
+#include "dynamixel.h"
 
  /**
  ********************************************************************************
@@ -83,7 +83,7 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
 {
     uint8_t idx_param;
     uint8_t rx_buffer;
-    uint16_t status;
+    dxl_status_t status;
 
     // Initialize values
     packet->id      = -1;   // Because nobody can have this ID
@@ -178,7 +178,7 @@ uint16_t dxl_v1_get_status(dxl_v1_packet_t* instruction_packet,
                            dxl_v1_packet_t* status_packet,
                            uint8_t expected_param_length)
 {
-    uint16_t status;
+    dxl_status_t status;
 
     // Retrieve hardware status from DXL_V1
     status = (status_packet->content) & 0xFF;
@@ -240,7 +240,7 @@ void dxl_v1_ping(dxl_servo_t* servo)
         servo->itf->nb_errors++;
 
 #ifdef DXL_DEBUG
-        dxl_print_error(servo->itf->status);
+        dxl_print_error(servo->itf->status, servo->itf->protocol);
 #endif // DXL_DEBUG
     }
 }
@@ -272,7 +272,6 @@ void dxl_v1_reset(dxl_servo_t* servo)
 // If registered parameter is set, it'll be a reg_write instruction.
 void dxl_v1_write(dxl_servo_t* servo, uint8_t address, uint8_t* parameters, size_t nb_param, bool registered)
 {
-
     uint8_t idx_param;
     dxl_v1_packet_t write_packet;
     dxl_v1_packet_t status_packet;
@@ -308,6 +307,10 @@ void dxl_v1_write(dxl_servo_t* servo, uint8_t address, uint8_t* parameters, size
 
     if(servo->itf->status != DXL_STATUS_NO_ERROR) {
         servo->itf->nb_errors++;
+
+#ifdef DXL_DEBUG
+        dxl_print_error(servo->itf->status, servo->itf->protocol);
+#endif // DXL_DEBUG
     }
 
 
@@ -355,6 +358,10 @@ void dxl_v1_read(dxl_servo_t* servo, uint8_t address, uint8_t* datas, size_t nb_
 
     if(servo->itf->status != DXL_STATUS_NO_ERROR) {
         servo->itf->nb_errors++;
+
+#ifdef DXL_DEBUG
+        dxl_print_error(servo->itf->status, servo->itf->protocol);
+#endif // DXL_DEBUG
     }
 
 }
@@ -374,6 +381,10 @@ void dxl_v1_action(dxl_servo_t* servo)
 
     if(servo->itf->status != DXL_STATUS_NO_ERROR) {
         servo->itf->nb_errors++;
+
+#ifdef DXL_DEBUG
+        dxl_print_error(servo->itf->status, servo->itf->protocol);
+#endif // DXL_DEBUG
     }
 }
 
@@ -404,10 +415,44 @@ void dxl_v1_print_packet(dxl_v1_packet_t* packet)
             sprintf(str, "%02X ", packet->parameters[idx_param]);
             serial_puts(str);
         }
+    } else {
+        serial_puts("(none)");
     }
 
     sprintf(str, DXL_DEBUG_EOL"  Chk:  %02X"DXL_DEBUG_EOL, packet->checksum);
     serial_puts(str);
+}
+
+void dxl_v1_print_error(dxl_status_t status)
+{
+
+    if(status & DXL_V1_ERR_INPUT_VOLTAGE) {
+        serial_puts(DXL_DEBUG_PFX" V1 Error: Input voltage"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_V1_ERR_ANGLE_LIMIT) {
+        serial_puts(DXL_DEBUG_PFX" V1 Error: Angle limit"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_V1_ERR_OVERHEATING) {
+        serial_puts(DXL_DEBUG_PFX" V1 Error: Overheating"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_V1_ERR_RANGE) {
+        serial_puts(DXL_DEBUG_PFX" V1 Error: Range"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_V1_ERR_CHECKSUM) {
+        serial_puts(DXL_DEBUG_PFX" V1 Error: Checksum"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_V1_ERR_OVERLOAD) {
+        serial_puts(DXL_DEBUG_PFX" V1 Error: Overload"DXL_DEBUG_EOL);
+    }
+
+    if(status & DXL_V1_ERR_INSTRUCTION) {
+        serial_puts(DXL_DEBUG_PFX" V1 Error: Instruction"DXL_DEBUG_EOL);
+    }
 }
 
 #endif // DXL_DEBUG

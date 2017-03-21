@@ -627,13 +627,17 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     UBaseType_t lParameterNumber;
 
     //snprintf(pcWriteBuffer, xWriteBufferLen, SHELL_PRB_PFX);
-    pcWriteBuffer += strlen(pcWriteBuffer);
+    //pcWriteBuffer += strlen(pcWriteBuffer);
 
     uint8_t servoId;
     uint8_t servoBaudrate;
     uint16_t servoPosition;
     uint16_t servoTorque;
     uint8_t servoLed;
+
+
+    uint8_t address;
+    uint8_t data;
 
     lParameterNumber = 1;
 
@@ -672,8 +676,6 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             vTaskDelay(pdMS_TO_TICKS(2000));
             xl_320_set_led(servoId, 2);
 
-            snprintf( pcWriteBuffer, xWriteBufferLen, "end set_id"SHELL_EOL);
-            pcWriteBuffer += strlen(pcWriteBuffer);
         } else if(!strncasecmp(pcCommand, "set_br", strlen( "set_br"))) {
             //[set_br] [id] [servo baudrate]
 
@@ -684,6 +686,7 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
                 lParameterNumber++;
             } else {
                 snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"No baudrate defined"SHELL_EOL);
+                pcWriteBuffer += strlen(pcWriteBuffer);
                 return pdFALSE;
             }
         } else if(!strncasecmp(pcCommand, "ping", strlen( "ping"))) {
@@ -700,6 +703,26 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             }*/
 
             // not implemented yet
+
+            // Temp; TODO: add interface no
+        } else if(!strncasecmp(pcCommand, "read", strlen( "read"))) {
+        // [read] [id] [address]
+
+            if((pcParameter = FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength )) != NULL) {
+                address = strtol(pcParameter, NULL, 10);
+
+                data = dsv_read(2, servoId, address);
+
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Read data: %u"SHELL_EOL, data);
+                return pdFALSE;
+
+                lParameterNumber++;
+            } else {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"No address defined"SHELL_EOL);
+                return pdFALSE;
+            }
+
+
         } else if(!strncasecmp(pcCommand, "set_pos", strlen( "set_pos"))) {
             // [set_pos] [id] [position]
 
@@ -720,6 +743,7 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
                 snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"No position defined"SHELL_EOL);
                 return pdFALSE;
             }
+
         } else if(!strncasecmp(pcCommand, "set_torque", strlen( "set_torque"))) {
             // [set_torque] [id] [torque]
 

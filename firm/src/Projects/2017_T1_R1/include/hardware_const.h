@@ -56,6 +56,11 @@
 ********************************************************************************
 */
 
+/* Queues size for each channel, in Bytes */
+#define DSV_RX_QUEUE_SIZE   64
+#define DSV_TX_QUEUE_SIZE   64
+
+/* Timeouts */
 #define DSV_RX_TIMEOUT      pdMS_TO_TICKS( 10 ) // Must be at least longest TX + Return-time delay
 #define DSV_TX_TIMEOUT      pdMS_TO_TICKS(  5 )
 

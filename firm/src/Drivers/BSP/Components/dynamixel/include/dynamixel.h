@@ -17,10 +17,15 @@
 #ifndef __DYNAMIXEL_H_
 #define __DYNAMIXEL_H_
 
+/* Required standard libraries */
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <strings.h>
+
+/* Protocol-specific definitions & types */
+#include "dxl_v1.h"
+//#include "dxl_v2.h"
 
 /**
  ********************************************************************************
@@ -38,13 +43,17 @@
 #define DXL_PASS    0U
 #define DXL_FAIL    1U
 
-/* Status constants */
+/* Status constants:
+ * 1st byte reserved for protocol-specific error
+ * 2nd byte reserved for common DXL errors
+ */
 #define DXL_STATUS_NO_ERROR             0x0000
 #define DXL_STATUS_ERR_TIMEOUT          0x0100  // Returned packet timeout
 #define DXL_STATUS_ERR_HEADER           0x0200  // Header error
 #define DXL_STATUS_ERR_ID               0x0300  // Returned ID does not match
 #define DXL_STATUS_ERR_LENGTH           0x0400  // Packet length error
 #define DXL_STATUS_ERR_CHECKSUM         0x0500  // Packet checksum is wrong
+#define DXL_STATUS_ERR_PROTOCOL         0x1000  // Unknown protocol
 
 /* LEDs color */
 #define DXL_LED_OFF    0U
@@ -71,8 +80,12 @@
 
 /* Defined when debug mode is required */
 #define DXL_DEBUG
+
+#ifdef DXL_DEBUG
+#warning "Dynamixel Library: using debug mode"
 #define DXL_DEBUG_PFX "[DXL]" // Debug prefix
 #define DXL_DEBUG_EOL "\n\r"  // End-Of-Line character for debug
+#endif // DXL_DEBUG
 
  /**
  ********************************************************************************
@@ -81,6 +94,9 @@
  **
  ********************************************************************************
  */
+
+/* Status & Error type */
+typedef uint16_t dxl_status_t;
 
 /* Communication Protocols */
 typedef enum {
@@ -127,7 +143,6 @@ typedef struct {
     dxl_reg_table_e reg_table;
 } dxl_servo_model_t;
 
-
 /* Pin mode for half-duplex communication */
 typedef enum {
     DXL_MODE_TX = 0U,
@@ -169,7 +184,7 @@ typedef struct {
     uint8_t return_delay_ms;
 
     // Status that can contain various things but mostly errors
-    uint16_t status;
+    dxl_status_t status;
 
     // Statistics counters
     uint32_t nb_pkt_tx; // Number of transmitted packets
@@ -205,7 +220,7 @@ typedef struct {
 /**
 ********************************************************************************
 **
-**  Prototypes
+**  Main library functions
 **
 ********************************************************************************
 */
@@ -213,12 +228,16 @@ typedef struct {
 // Servo Models
 const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name);
 
-
+// Configuration
 void dxl_init_itf(dxl_interface_t* itf, uint8_t itf_idx);
+void dxl_init_servo(dxl_servo_t* servo, dxl_interface_t* itf, const char* model_name);
 
-void dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size, bool reg);
-void dxl_reset(dxl_servo_t* servo);
-void dxl_ping(dxl_servo_t* servo);
+// Main handlers
+dxl_status_t dxl_ping(dxl_servo_t* servo);
+dxl_status_t dxl_reset(dxl_servo_t* servo);
+dxl_status_t dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size, bool reg);
+dxl_status_t dxl_read(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size);
+dxl_status_t dxl_action(dxl_servo_t* servo);
 
 void dxl_set_position(dxl_servo_t* servo, uint16_t new_position);
 
@@ -228,9 +247,49 @@ void dxl_set_position(dxl_servo_t* servo, uint16_t new_position);
 extern long serial_puts(const char* str);
 
 void dxl_print_servo(dxl_servo_t* servo);
-void dxl_print_error(uint16_t status);
+void dxl_print_error(dxl_status_t status, dxl_protocol_e protocol);
 
 
 #endif // DXL_DEBUG
+
+/**
+********************************************************************************
+**
+**  Protocol V1 functions
+**
+********************************************************************************
+*/
+
+/* Hardware and low-level routines */
+uint8_t dxl_v1_compute_checksum(dxl_v1_packet_t* packet);
+void dxl_v1_send_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet);
+void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet);
+uint16_t dxl_v1_get_status(dxl_v1_packet_t* instruction_packet,
+                           dxl_v1_packet_t* status_packet,
+                           uint8_t expected_param_length);
+
+/* Instructions */
+void dxl_v1_ping(dxl_servo_t* servo);
+void dxl_v1_reset(dxl_servo_t* servo);
+void dxl_v1_write(dxl_servo_t* servo, uint8_t address, uint8_t* parameters, size_t nb_param, bool registered);
+void dxl_v1_read(dxl_servo_t* servo, uint8_t address, uint8_t* datas, size_t nb_data);
+void dxl_v1_action(dxl_servo_t* servo);
+
+/* Debug */
+#ifdef DXL_DEBUG
+
+void dxl_v1_print_packet(dxl_v1_packet_t* packet);
+void dxl_v1_print_error(dxl_status_t status);
+
+#endif // DXL_DEBUG
+
+
+/**
+********************************************************************************
+**
+**  Protocol V2 functions
+**
+********************************************************************************
+*/
 
 #endif /* __DYNAMIXEL_H_ */

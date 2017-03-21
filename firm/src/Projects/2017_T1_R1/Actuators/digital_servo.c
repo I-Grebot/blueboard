@@ -326,8 +326,6 @@ void RS485_ISR (void)
     if(USART_GetITStatus(RS485_COM, USART_IT_RXNE) != RESET)
     {
 
-        LEDG_TOGGLE();
-
         // RXNE Flag cleared with the USAR_ReceiveData() call
         rxChar = USART_ReceiveData(RS485_COM);
 
@@ -370,6 +368,8 @@ void RS485_ISR (void)
 ********************************************************************************
 */
 
+/**** THIS IS ALL TEMPORARY ****/
+
 void dsv_test_pos(uint8_t id, uint16_t pos)
 {
 
@@ -401,6 +401,18 @@ void dsv_reset(uint8_t id)
     servo1.id = DXL_ID_BROADCAST;
 
     dxl_reset(&servo1);
+}
+
+uint8_t dsv_read(uint8_t itf_idx, uint8_t id, uint8_t address) {
+
+    uint8_t data;
+    char str[8];
+
+    servo1.id = id;
+    dxl_read(&servo1, address, &data, 1); // size temp
+
+    return data;
+
 }
 
 void dsv_scan_servos(void)

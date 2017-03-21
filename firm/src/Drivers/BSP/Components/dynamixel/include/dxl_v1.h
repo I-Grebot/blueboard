@@ -2,7 +2,7 @@
  * BlueBoard
  * I-Grebot
  * -----------------------------------------------------------------------------
- * @file       dxl_v1.c
+ * @file       dxl_v1.h
  * @author     Bebop35
  * @date       Feb 09, 2017
  * -----------------------------------------------------------------------------
@@ -17,8 +17,8 @@
 #ifndef ___DXL_PROTOCOL_V1_H_
 #define ___DXL_PROTOCOL_V1_H_
 
-#include "dynamixel.h"
-
+#include <stdint.h>
+#include <stdbool.h>
 
 /**
  ********************************************************************************
@@ -61,7 +61,6 @@
  ********************************************************************************
  */
 
-
 /* Error flags definition */
 #define DXL_V1_ERR_INPUT_VOLTAGE    1U
 #define DXL_V1_ERR_ANGLE_LIMIT      2U
@@ -94,36 +93,5 @@ typedef struct {
     uint8_t checksum;
 } dxl_v1_packet_t;
 
-
-/**
-********************************************************************************
-**
-**  Prototypes
-**
-********************************************************************************
-*/
-
-/* Hardware and low-level routines */
-uint8_t dxl_v1_compute_checksum(dxl_v1_packet_t* packet);
-void dxl_v1_send_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet);
-void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet);
-uint16_t dxl_v1_get_status(dxl_v1_packet_t* instruction_packet,
-                           dxl_v1_packet_t* status_packet,
-                           uint8_t expected_param_length);
-
-/* Instructions */
-void dxl_v1_ping(dxl_servo_t* servo);
-void dxl_v1_reset(dxl_servo_t* servo);
-void dxl_v1_write(dxl_servo_t* servo, uint8_t address, uint8_t* parameters, size_t nb_param, bool registered);
-void dxl_v1_read(dxl_servo_t* servo, uint8_t address, uint8_t* datas, size_t nb_data);
-void dxl_v1_action(dxl_servo_t* servo);
-
-/* Debug */
-#ifdef DXL_DEBUG
-
-
-void dxl_v1_print_packet(dxl_v1_packet_t* packet);
-
-#endif // DXL_DEBUG
 
 #endif /* ___DXL_PROTOCOL_V1_H_ */
