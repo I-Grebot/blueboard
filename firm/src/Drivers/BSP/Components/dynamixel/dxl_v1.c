@@ -388,6 +388,54 @@ void dxl_v1_action(dxl_servo_t* servo)
     }
 }
 
+
+/**
+********************************************************************************
+**
+**  Service routines
+**
+********************************************************************************
+*/
+
+void dxl_v1_get_error_str(char* status_str, size_t status_str_len, dxl_status_t status)
+{
+
+    if(status & DXL_V1_ERR_INPUT_VOLTAGE) {
+        snprintf(status_str, status_str_len, "V1: Input voltage ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_V1_ERR_ANGLE_LIMIT) {
+        snprintf(status_str, status_str_len, "V1: Angle limit ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_V1_ERR_OVERHEATING) {
+        snprintf(status_str, status_str_len, "V1: Overheating ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_V1_ERR_RANGE) {
+        snprintf(status_str, status_str_len, "V1: Range ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_V1_ERR_CHECKSUM) {
+        snprintf(status_str, status_str_len, "V1: Checksum ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_V1_ERR_OVERLOAD) {
+        snprintf(status_str, status_str_len, "V1: Overload ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_V1_ERR_INSTRUCTION) {
+        snprintf(status_str, status_str_len, "V1: Instruction ");
+        status_str += strlen(status_str);
+    }
+}
+
 /**
 ********************************************************************************
 **
@@ -421,38 +469,6 @@ void dxl_v1_print_packet(dxl_v1_packet_t* packet)
 
     sprintf(str, DXL_DEBUG_EOL"  Chk:  %02X"DXL_DEBUG_EOL, packet->checksum);
     serial_puts(str);
-}
-
-void dxl_v1_print_error(dxl_status_t status)
-{
-
-    if(status & DXL_V1_ERR_INPUT_VOLTAGE) {
-        serial_puts(DXL_DEBUG_PFX" V1 Error: Input voltage"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_V1_ERR_ANGLE_LIMIT) {
-        serial_puts(DXL_DEBUG_PFX" V1 Error: Angle limit"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_V1_ERR_OVERHEATING) {
-        serial_puts(DXL_DEBUG_PFX" V1 Error: Overheating"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_V1_ERR_RANGE) {
-        serial_puts(DXL_DEBUG_PFX" V1 Error: Range"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_V1_ERR_CHECKSUM) {
-        serial_puts(DXL_DEBUG_PFX" V1 Error: Checksum"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_V1_ERR_OVERLOAD) {
-        serial_puts(DXL_DEBUG_PFX" V1 Error: Overload"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_V1_ERR_INSTRUCTION) {
-        serial_puts(DXL_DEBUG_PFX" V1 Error: Instruction"DXL_DEBUG_EOL);
-    }
 }
 
 #endif // DXL_DEBUG

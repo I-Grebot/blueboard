@@ -50,6 +50,7 @@ const dxl_servo_model_t dxl_servo_models[] = {
         { 1030,    "XM430-W210"     , DXL_V2,        DXL_REG5}  /* XM430-W210-T / XM430-W210-R */
 };
 
+static const size_t dxl_nb_servo_models = sizeof(dxl_servo_models) / sizeof(dxl_servo_model_t);
 
 const uint32_t dxl_baudrates[] = {
            9600,
@@ -75,7 +76,7 @@ const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name)
     // FIXME
 /*
     for(model_idx = 0;
-        model_idx < sizeof(dxl_servo_models)/sizeof(dxl_servo_model_t);
+        model_idx < dxl_nb_servo_models;
         model_idx++, model++)
     {
         if(!strcasecmp(name, model->name)) {
@@ -87,6 +88,18 @@ const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name)
 
     return dxl_servo_models + 6;
 
+}
+
+const dxl_servo_model_t* dxl_find_servo_model_by_id(uint16_t id)
+{
+    uint16_t model_idx;
+
+    for(model_idx = 0; model_idx < dxl_nb_servo_models; model_idx++)
+    {
+        if(id == dxl_servo_models[model_idx].model_id) {
+            return &dxl_servo_models[model_idx];
+        }
+    }
 }
 
 #ifdef DXL_DEBUG

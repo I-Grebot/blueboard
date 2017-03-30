@@ -427,8 +427,16 @@ void dsv_scan_servos(void)
     {
         sprintf(str, "> BR = %ld\n\r", dxl_baudrates[i]);
         serial_puts(str);
+
+        //dsv_update_config();
+
+        //bb_dsv_disable(dsv_chan2.dxl.itf_idx);
+        USART_Cmd(RS485_COM, DISABLE);
         dsv_chan2.uart.USART_BaudRate = dxl_baudrates[i];
-        dsv_update_config();
+        bb_dsv_init(dsv_chan2.dxl.itf_idx, &dsv_chan2.uart);
+        //bb_dsv_enable(dsv_chan2.dxl.itf_idx, OS_ISR_PRIORITY_DSV);
+        USART_Cmd(RS485_COM, ENABLE);
+
         dsv_test_led(254, 1);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }

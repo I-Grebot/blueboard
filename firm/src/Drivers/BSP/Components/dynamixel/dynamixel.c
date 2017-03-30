@@ -202,6 +202,21 @@ dxl_status_t dxl_action(dxl_servo_t* servo)
 ********************************************************************************
 */
 
+dxl_status_t dxl_get_model(dxl_servo_t* servo, uint32_t* model)
+{
+    uint8_t data[4];
+    dxl_status_t status;
+
+    extern const dxl_register_t* dxl_reg_v1_model_number;
+    extern const dxl_register_t* dxl_reg_v4_model_number;
+
+    status = dxl_read(servo, dxl_reg_v1_model_number->address, data, dxl_reg_v1_model_number->size);
+    dxl_bytes_array_to_data(&model, dxl_reg_v1_model_number->size, data);
+
+    return status;
+}
+
+
 // TODO: cleanup
 void dxl_set_torque(dxl_servo_t* servo, uint8_t torque)
 {
@@ -232,6 +247,7 @@ void dxl_set_led(dxl_servo_t* servo, uint8_t led)
 
 }
 
+
 /**
 ********************************************************************************
 **
@@ -242,6 +258,115 @@ void dxl_set_led(dxl_servo_t* servo, uint8_t led)
 
 // Interface scan (baudrate + protocol)
 
+
+
+/**
+********************************************************************************
+**
+**  Some service routines
+**
+********************************************************************************
+*/
+
+/* @brief: Convert a data into a byte array of the correct endianess.
+ * @param data: data to be converted
+ * @param size: data size in bytes
+ * @param data: returned data in bytes array
+ */
+void dxl_data_to_bytes_array(uint32_t data, size_t size, uint8_t* data_arr)
+{
+    switch(size) {
+        default:
+        case 1:
+            data_arr[0] = (uint8_t) (data & 0x00FF) & 0xFF;
+            break;
+        case 2:
+            data &= 0x0000FFFF;
+            data_arr[0] = (uint8_t) (data & 0xFF);
+            data_arr[1] = (uint8_t) (data >> 8L) & 0xFF;
+            break;
+        case 4:
+            data_arr[0] = (uint8_t) (data & 0xFF);
+            data_arr[1] = (uint8_t) (data >> 8L) & 0xFF;
+            data_arr[2] = (uint8_t) (data >> 16L) & 0xFF;
+            data_arr[3] = (uint8_t) (data >> 24L) & 0xFF;
+            break;
+    }
+}
+
+/* @brief: Convert a byte array into a data with the correct endianess
+ * @param data: returned data
+ * @param size: data size in bytes
+ * @param data: data in bytes array to be converted
+ */
+void dxl_bytes_array_to_data(uint32_t* data, size_t size, uint8_t* data_arr)
+{
+    switch(size) {
+        default:
+        case 1:
+            *data = data_arr[0];
+            break;
+        case 2:
+            *data = data_arr[0] + (data_arr[1] << 8L);
+            break;
+        case 4:
+            *data = data_arr[0] + (data_arr[1] << 8L) + (data_arr[2] << 16L) + (data_arr[3] << 24L);
+            break;
+    }
+}
+
+/* @brief: Get an error message as a string. If there is no error,
+ *         the written string is empty.
+ * @param status_str: string in which the error is returned as a string
+ * @param status_str_len: maximum length of the status string
+ * @param status: status to print (does not print anything if no error)
+ * @param protocol: interface protocol
+ */
+
+void dxl_get_error_str(char* status_str, size_t status_str_len, dxl_status_t status, dxl_protocol_e protocol) {
+
+    /* Common DXL errors */
+    if(status & DXL_STATUS_ERR_TIMEOUT) {
+        snprintf(status_str, status_str_len, "Timeout ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_STATUS_ERR_HEADER) {
+        snprintf(status_str, status_str_len, "Header ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_STATUS_ERR_ID) {
+        snprintf(status_str, status_str_len, "ID ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_STATUS_ERR_LENGTH) {
+        snprintf(status_str, status_str_len, "Data length ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_STATUS_ERR_CHECKSUM) {
+        snprintf(status_str, status_str_len, "Checksum ");
+        status_str += strlen(status_str);
+    }
+
+    if(status & DXL_STATUS_ERR_PROTOCOL) {
+        snprintf(status_str, status_str_len, "Protocol ");
+        status_str += strlen(status_str);
+    }
+
+
+    /* Protocol-Specific errors */
+    if(protocol == DXL_V1) {
+        dxl_v1_get_error_str(status_str, status_str_len, status);
+
+    } else if(protocol == DXL_V2) {
+        //dxl_v2_get_error_str(status_str, status_str_len, status);
+    }
+
+
+}
 
 /**
 ********************************************************************************
@@ -257,38 +382,15 @@ void dxl_set_led(dxl_servo_t* servo, uint8_t led)
  */
 void dxl_print_error(dxl_status_t status, dxl_protocol_e protocol)
 {
-    /* Common DXL errors */
-    if(status & DXL_STATUS_ERR_TIMEOUT) {
-        serial_puts(DXL_DEBUG_PFX" Error: Timeout"DXL_DEBUG_EOL);
+    char error_str[128];
+    char error_msg[128];
+
+    if(status != DXL_PASS) {
+        dxl_get_error_str(error_str, sizeof(error_str), status, protocol);
+        sprintf(error_msg, DXL_DEBUG_PFX" Error: %s"DXL_DEBUG_EOL, error_str);
+        serial_puts(error_msg);
     }
 
-    if(status & DXL_STATUS_ERR_HEADER) {
-        serial_puts(DXL_DEBUG_PFX" Error: Header"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_STATUS_ERR_ID) {
-        serial_puts(DXL_DEBUG_PFX" Error: ID"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_STATUS_ERR_LENGTH) {
-        serial_puts(DXL_DEBUG_PFX" Error: Data Length"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_STATUS_ERR_CHECKSUM) {
-        serial_puts(DXL_DEBUG_PFX" Error: Checksum"DXL_DEBUG_EOL);
-    }
-
-    if(status & DXL_STATUS_ERR_PROTOCOL) {
-        serial_puts(DXL_DEBUG_PFX" Error: Protocol"DXL_DEBUG_EOL);
-    }
-
-    /* Protocol-Specific errors */
-    if(protocol == DXL_V1) {
-        dxl_v1_print_error(status);
-
-    } else if(protocol == DXL_V2) {
-        // TODO
-    }
 
 }
 

@@ -21,7 +21,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
+//#include <strings.h>
+#include <stdio.h>
 
 /* Protocol-specific definitions & types */
 #include "dxl_v1.h"
@@ -79,7 +81,7 @@
 #define DXL_STATUS_EVERYTHING  0x02
 
 /* Defined when debug mode is required */
-#define DXL_DEBUG
+//#define DXL_DEBUG
 
 #ifdef DXL_DEBUG
 #warning "Dynamixel Library: using debug mode"
@@ -227,6 +229,7 @@ typedef struct {
 
 // Servo Models
 const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name);
+const dxl_servo_model_t* dxl_find_servo_model_by_id(uint16_t id);
 
 // Configuration
 void dxl_init_itf(dxl_interface_t* itf, uint8_t itf_idx);
@@ -239,7 +242,14 @@ dxl_status_t dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t
 dxl_status_t dxl_read(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size);
 dxl_status_t dxl_action(dxl_servo_t* servo);
 
+// Shorthands
+dxl_status_t dxl_get_model(dxl_servo_t* servo, uint32_t* model);
 void dxl_set_position(dxl_servo_t* servo, uint16_t new_position);
+
+// Service handlers
+void dxl_data_to_bytes_array(uint32_t data, size_t size, uint8_t* data_arr);
+void dxl_bytes_array_to_data(uint32_t* data, size_t size, uint8_t* data_arr);
+void dxl_get_error_str(char* status_str, size_t status_str_len, dxl_status_t status, dxl_protocol_e protocol);
 
 /* Debug */
 #ifdef DXL_DEBUG
@@ -275,11 +285,12 @@ void dxl_v1_write(dxl_servo_t* servo, uint8_t address, uint8_t* parameters, size
 void dxl_v1_read(dxl_servo_t* servo, uint8_t address, uint8_t* datas, size_t nb_data);
 void dxl_v1_action(dxl_servo_t* servo);
 
+/* Service */
+void dxl_v1_get_error_str(char* status_str, size_t status_str_len, dxl_status_t status);
+
 /* Debug */
 #ifdef DXL_DEBUG
-
 void dxl_v1_print_packet(dxl_v1_packet_t* packet);
-void dxl_v1_print_error(dxl_status_t status);
 
 #endif // DXL_DEBUG
 

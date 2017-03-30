@@ -153,12 +153,18 @@ static const CLI_Command_Definition_t xDsv =
     SHELL_EOL
     "dsv [command] [value1]... [valueN]: Run a digital-servo command."SHELL_EOL
     " List of available commands:"SHELL_EOL
+    "  - [ping] [if] [id]"SHELL_EOL
+    "  - [reset] [if] [id]"SHELL_EOL
+    "  - [write] [if] [id] [add] [size] [data]"SHELL_EOL
+    "  - [read] [if] [id] [add] [size]"SHELL_EOL
+    "  - [scan]"SHELL_EOL
+    /*" List of available commands:"SHELL_EOL
     "  - [set_id] [new id]"SHELL_EOL
     "  - [set_br] [id] [servo baudrate]"SHELL_EOL
     "  - [ping] [id]"SHELL_EOL
     "  - [set_pos] [id] [position]"SHELL_EOL
     "  - [set_torque] [id] [torque]"SHELL_EOL
-    "  - [set_led] [id] [led value]"SHELL_EOL
+    "  - [set_led] [id] [led value]"SHELL_EOL*/
     ,OS_SHL_DsvCmd,
     -1 // Variable
 };
@@ -620,6 +626,195 @@ static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
+    char* pcParameter;
+    BaseType_t lParameterStringLength;
+    BaseType_t xReturn;
+    static BaseType_t lParameterNumber = 0;
+    dxl_status_t status;
+    char error_str[128];
+    uint32_t servo_model_id;
+    const dxl_servo_model_t* servo_model;
+
+    static char* command;
+    static BaseType_t command_str_length;
+    static uint8_t itf;
+    static uint8_t id;
+    static uint16_t add;
+    static uint8_t size;
+    static uint32_t data;
+    uint8_t data_arr[4];
+
+    // Interface Channels, defined outside of this module
+    extern dsv_channel_t dsv_chan1;
+    extern dsv_channel_t dsv_chan2;
+
+    // Local service servo for commands handling
+    dxl_servo_t servo;
+
+    // Nothing to display by default
+    memset( pcWriteBuffer, 0x00, xWriteBufferLen );
+
+    // Command start
+    if(lParameterNumber == 0)
+    {
+        lParameterNumber = 1;
+        xReturn = pdPASS;
+
+    } else {
+
+        // Get the parameter as a string
+        pcParameter = (char*) FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength );
+
+        // Parameter is fetched
+        if(pcParameter != NULL) {
+
+            switch(lParameterNumber) {
+                case 1:
+                    command = pcParameter;
+                    command_str_length = lParameterStringLength;
+                    break;
+
+                case 2: itf = strtol(pcParameter, NULL, 10); break;
+                case 3: id = strtol(pcParameter, NULL, 10); break;
+                case 4: add = strtol(pcParameter, NULL, 10); break;
+                case 5: size = strtol(pcParameter, NULL, 10); break;
+                case 6: data = strtol(pcParameter, NULL, 10); break;
+                default: break;
+            }
+
+            // Ensure we keep going for the next parameter
+            xReturn = pdTRUE;
+            lParameterNumber++;
+
+        // End of decoding, launch the command
+        } else {
+
+            // Terminate the command string. Can be done only after all parameters are fetched
+            command[command_str_length] = 0;
+
+            // Set the servo interface with the correct channel
+            switch(itf) {
+                case 1: servo.itf = &dsv_chan1.dxl; break;
+                case 2: servo.itf = &dsv_chan2.dxl; break;
+            }
+
+            // Set the servo ID
+            servo.id = id;
+
+            // Decode the command
+            if((!strcasecmp(command, "ping")) && (lParameterNumber == 4)) {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Pinging on interface #%u ID %u..."SHELL_EOL, itf, id);
+                pcWriteBuffer += strlen(pcWriteBuffer);
+
+                status = dxl_ping(&servo);
+
+                if(status != DXL_PASS) {
+                    dxl_get_error_str(error_str, sizeof(error_str), status, servo.itf->protocol);
+                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Error(s): %s"SHELL_EOL, error_str);
+                } else {
+                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Found!"SHELL_EOL);
+                }
+            } // ping
+
+
+            else if((!strcasecmp(command, "reset")) && (lParameterNumber == 4)) {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Factory Reset on interface #%u ID %u..."SHELL_EOL, itf, id);
+                pcWriteBuffer += strlen(pcWriteBuffer);
+
+                status = dxl_reset(&servo);
+
+                if(status != DXL_PASS) {
+                    dxl_get_error_str(error_str, sizeof(error_str), status, servo.itf->protocol);
+                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Error(s): %s"SHELL_EOL, error_str);
+                } else {
+                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Done"SHELL_EOL);
+                }
+            } // reset
+
+            else if((!strcasecmp(command, "read")) && (lParameterNumber == 6)) {
+                status = dxl_read(&servo, add, data_arr, size);
+
+                if(status != DXL_PASS) {
+                    dxl_get_error_str(error_str, sizeof(error_str), status, servo.itf->protocol);
+                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Error(s): %s"SHELL_EOL, error_str);
+                } else {
+                    dxl_bytes_array_to_data(&data, size, data_arr);
+                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Reading on interface #%u ID %u: @0x%02X = 0x%X (%u Bytes)"SHELL_EOL, itf, id, add, data, size);
+                }
+            } // read
+
+            else if((!strcasecmp(command, "write")) && (lParameterNumber == 7)) {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Writing on interface #%u ID %u: @0x%02X = 0x%X (%u Bytes)"SHELL_EOL, itf, id, add, data, size);
+                pcWriteBuffer += strlen(pcWriteBuffer);
+                dxl_data_to_bytes_array(data, size, data_arr);
+
+                status = dxl_write(&servo, add, data_arr, size, false);
+
+                if(status != DXL_PASS) {
+                    dxl_get_error_str(error_str, sizeof(error_str), status, servo.itf->protocol);
+                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Error(s): %s"SHELL_EOL, error_str);
+                }
+            } // write
+
+            else if((!strcasecmp(command, "scan")) && (lParameterNumber == 2)) {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Scanning all interfaces..."SHELL_EOL);
+                pcWriteBuffer += strlen(pcWriteBuffer);
+
+                for(itf = 2; itf <= 2; itf++) {
+
+                    switch(itf) {
+                        case 1: servo.itf = &dsv_chan1.dxl; break;
+                        case 2: servo.itf = &dsv_chan2.dxl; break;
+                    }
+
+                    // Scan all IDs. Broadcast ID automatically skipped
+                    for(servo.id = 0; servo.id < 254; servo.id++) {
+
+                        // Check to see if a servo at ID %x is found
+                        if(dxl_ping(&servo) == DXL_PASS) {
+
+                            status = dxl_get_model(&servo, &servo_model_id);
+
+                            //if(status == DXL_PASS) {
+                                //servo_model = dxl_find_servo_model_by_id(servo_model_id);
+
+                                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"[SCAN] #%u %u %u"SHELL_EOL, itf, servo.id, servo_model_id); //servo_model->name
+                                pcWriteBuffer += strlen(pcWriteBuffer);
+                            //}
+
+                        }
+
+                    }
+
+                }
+
+
+            } // scan
+
+            else {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unrecognized command '%s' or parameters error"SHELL_EOL, command);
+            }
+
+            // Ensure the function can start again
+            lParameterNumber = 0;
+            xReturn = pdFALSE;
+        }
+
+    }
+
+    return xReturn;
+
+}
+
+//"  - [ping] [if] [id]"SHELL_EOL
+//"  - [reset] [if] [id]"SHELL_EOL
+//"  - [write] [if] [id] [add] [size] [data]"SHELL_EOL
+//"  - [read] [if] [id] [add] [size]"SHELL_EOL
+//"  - [scan]"SHELL_EOL
+
+/*
+static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
+{
     char *pcCommand;
     char *pcParameter;
     BaseType_t lCommandStringLength;
@@ -692,15 +887,11 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
         } else if(!strncasecmp(pcCommand, "ping", strlen( "ping"))) {
             // [ping] [id]
 
-            /*snprintf( pcWriteBuffer, xWriteBufferLen, "Pinging Servo %u"SHELL_EOL, servoId);
-            pcWriteBuffer += strlen(pcWriteBuffer);*/
+            //snprintf( pcWriteBuffer, xWriteBufferLen, "Pinging Servo %u"SHELL_EOL, servoId);
+           // pcWriteBuffer += strlen(pcWriteBuffer);
             dsv_ping(servoId);
             return pdFALSE;
 
-            /*while(1) {
-                dsv_ping(servoId);
-                vTaskDelay(pdMS_TO_TICKS(2));
-            }*/
 
             // not implemented yet
 
@@ -785,7 +976,7 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     return pdFALSE;
 
-}
+}*/
 
 static BaseType_t OS_SHL_AsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
