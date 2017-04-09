@@ -141,10 +141,10 @@ intersect_segment(const point_t *s1, const point_t *s2,
 	int8_t u1, u2;
 	vect_t v, w;
 
-	debug_printf("s1:%"PRIi32",%"PRIi32" s2:%"PRIi32",%"PRIi32" "
+	/*debug_printf("s1:%"PRIi32",%"PRIi32" s2:%"PRIi32",%"PRIi32" "
 		     "t1:%"PRIi32",%"PRIi32" t2:%"PRIi32",%"PRIi32"\r\n",
 		     s1->x, s1->y, s2->x, s2->y,
-		     t1->x, t1->y, t2->x, t2->y);
+		     t1->x, t1->y, t2->x, t2->y);*/
 
 	pts2line(s1, s2, &l1);
 	pts2line(t1, t2, &l2);
@@ -190,7 +190,7 @@ intersect_segment(const point_t *s1, const point_t *s2,
 		return 2;
 	}
 	
-	debug_printf("px=%" PRIi32 " py=%" PRIi32 "\n", p->x, p->y);
+	//debug_printf("px=%" PRIi32 " py=%" PRIi32 "\n", p->x, p->y);
 
 	/* Consider as parallel if intersection is too far */
 	if (ABS(p->x) > (1L << 15) || ABS(p->y) > (1L << 15))
@@ -210,7 +210,7 @@ intersect_segment(const point_t *s1, const point_t *s2,
 	w.y = p->y-t2->y;
 	u2 = vect_pscal_sign(&v, &w);
 
-	debug_printf("u1=%d u2=%d\n", u1, u2);
+	//debug_printf("u1=%d u2=%d\n", u1, u2);
 
 	if (u1>0 || u2>0)
 		return 0;

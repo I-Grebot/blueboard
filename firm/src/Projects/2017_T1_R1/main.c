@@ -26,8 +26,6 @@
 ********************************************************************************
 */
 
-
-
 /**
 ********************************************************************************
 **
@@ -57,11 +55,10 @@ int main( void )
     asv_start();
     //dsv_start();
 
-    //led_start();
+    led_start();
 
-    /*strategy_start();
+    strategy_start();
 
-    */
 
     /* Start FreeRTOS Scheduler */
     vTaskStartScheduler();

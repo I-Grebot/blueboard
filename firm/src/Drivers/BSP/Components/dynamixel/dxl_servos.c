@@ -100,6 +100,8 @@ const dxl_servo_model_t* dxl_find_servo_model_by_id(uint16_t id)
             return &dxl_servo_models[model_idx];
         }
     }
+
+    return NULL;
 }
 
 #ifdef DXL_DEBUG

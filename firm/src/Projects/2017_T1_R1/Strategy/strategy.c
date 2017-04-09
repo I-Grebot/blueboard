@@ -40,7 +40,26 @@ static void OS_StrategyTask(void *pvParameters);
 
 BaseType_t strategy_start(void)
 {
-    return xTaskCreate(OS_StrategyTask, "Strategy", 250, NULL, OS_TASK_PRIORITY_STRATEGY, NULL );
+    poi_t reset_pos;
+
+    strategy_init();
+
+    // Default reset position
+    reset_pos = phys.reset;
+    phys_update_with_color(&reset_pos);
+    motion_set_x(reset_pos.x);
+    motion_set_y(reset_pos.y);
+    motion_set_a(reset_pos.a);
+
+    motion_set_speed(SPEED_SLOW_D, SPEED_SLOW_A);
+    motion_power_enable();
+
+    robot.init_done = 1;
+    led_set_color(BB_LED_BLUE);
+
+    return pdPASS;
+
+    //return xTaskCreate(OS_StrategyTask, "Strategy", 250, NULL, OS_TASK_PRIORITY_STRATEGY, NULL );
 }
 
 static void OS_StrategyTask( void *pvParameters )
@@ -260,7 +279,7 @@ void strategy_init(void) {
 void do_match(void) {
 	//static strategy_state_e strat_state = STRAT_EXIT;
 
-	if(Os_MotionTrajectoryFinished()&&(strat<STRAT_FINISHED))
+	/*if(Os_MotionTrajectoryFinished()&&(strat<STRAT_FINISHED))
 	{
 		phys_update_with_color(&checkpoints[strat].coord.abs);
 		motion_send_wp(&checkpoints[strat++]);
@@ -282,5 +301,5 @@ void do_match(void) {
 		OS_MotionTrajectoryHardStop();
 		if(strat>STRAT_EXIT)
 			strat--;
-	}
+	}*/
 } // do_match()

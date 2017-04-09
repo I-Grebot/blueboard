@@ -211,7 +211,7 @@ dxl_status_t dxl_get_model(dxl_servo_t* servo, uint32_t* model)
     extern const dxl_register_t* dxl_reg_v4_model_number;
 
     status = dxl_read(servo, dxl_reg_v1_model_number->address, data, dxl_reg_v1_model_number->size);
-    dxl_bytes_array_to_data(&model, dxl_reg_v1_model_number->size, data);
+    dxl_bytes_array_to_data(model, dxl_reg_v1_model_number->size, data);
 
     return status;
 }

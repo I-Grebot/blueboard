@@ -96,9 +96,9 @@ bool avoidance_detection_is_valid(void) {
 
   // Sample values at once and use local variables only from here.
   // This ensure atomicity (almost ~).
-  x = OS_MotionGetX();		// TODO : handle mutex here
-  y = OS_MotionGetY();
-  a = OS_MotionGetA();
+  //x = OS_MotionGetX();		// TODO : handle mutex here
+  //y = OS_MotionGetY();
+  //a = OS_MotionGetA();
 
   // Look at the robot orientation and mask sensors pointing outside
   // of the playground.

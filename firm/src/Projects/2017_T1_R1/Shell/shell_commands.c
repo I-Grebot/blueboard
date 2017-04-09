@@ -157,6 +157,7 @@ static const CLI_Command_Definition_t xDsv =
     "  - [reset] [if] [id]"SHELL_EOL
     "  - [write] [if] [id] [add] [size] [data]"SHELL_EOL
     "  - [read] [if] [id] [add] [size]"SHELL_EOL
+    "  - [dump] [if] [id]"SHELL_EOL
     "  - [scan]"SHELL_EOL
     /*" List of available commands:"SHELL_EOL
     "  - [set_id] [new id]"SHELL_EOL
@@ -493,6 +494,8 @@ static BaseType_t OS_SHL_PrbCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 static BaseType_t OS_SHL_StoCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
+	snprintf( pcWriteBuffer, xWriteBufferLen, "Test: %f\n\r", 1.42);
+
     return pdFALSE;
 }
 
@@ -553,75 +556,97 @@ static BaseType_t OS_SHL_PowCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     return pdFALSE;
 }
 
-// Motor control. Not reentrant function
+// Motion
+// [goto] [x] [y]
+
 static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
-    const char *pcParameter;
+
+    char* pcParameter;
     BaseType_t lParameterStringLength;
     BaseType_t xReturn;
-
-    /* Note that the use of the static parameter means this function is not reentrant. */
     static BaseType_t lParameterNumber = 0;
 
-        if( lParameterNumber == 0 )
-        {
-            /* lParameterNumber is 0, so this is the first time the function has been
-            called since the command was entered.  Return the string "The parameters
-            were:" before returning any parameter strings. */
-            sprintf( pcWriteBuffer, "The parameters were:\r\n" );
 
-            /* Next time the function is called the first parameter will be echoed
-            back. */
-            lParameterNumber = 1L;
+    static char* command;
+    static BaseType_t command_str_length;
 
-            /* There is more data to be returned as no parameters have been echoed
-            back yet, so set xReturn to pdPASS so the function will be called again. */
-            xReturn = pdPASS;
-        }
-        else
-        {
-            /* lParameter is not 0, so holds the number of the parameter that should
-            be returned.  Obtain the complete parameter string. */
-            pcParameter = FreeRTOS_CLIGetParameter
-                            (
-                                /* The command string itself. */
-                                pcCommandString,
-                                /* Return the next parameter. */
-                                lParameterNumber,
-                                /* Store the parameter string length. */
-                                &lParameterStringLength
-                            );
+    static wp_t wp;
+    //static int32_t pos_x;
+    //static int32_t pos_y;
 
-            if( pcParameter != NULL )
-            {
-                /* There was another parameter to return.  Copy it into pcWriteBuffer.
-                in the format "[number]: [Parameter String". */
-                memset( pcWriteBuffer, 0x00, xWriteBufferLen );
-                sprintf( pcWriteBuffer, "%ld: ", lParameterNumber );
-                strncat( pcWriteBuffer, pcParameter, lParameterStringLength );
-                strncat( pcWriteBuffer, "\r\n", strlen( "\r\n" ) );
+    // Nothing to display by default
+    memset( pcWriteBuffer, 0x00, xWriteBufferLen );
 
-                /* There might be more parameters to return after this one, so again
-                set xReturn to pdTRUE. */
-                xReturn = pdTRUE;
-                lParameterNumber++;
+    // Command start
+    if(lParameterNumber == 0)
+    {
+        lParameterNumber = 1;
+        xReturn = pdPASS;
+
+    } else {
+
+        // Get the parameter as a string
+        pcParameter = (char*) FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength );
+
+        // Parameter is fetched
+        if(pcParameter != NULL) {
+
+            switch(lParameterNumber) {
+                case 1:
+                    command = pcParameter;
+                    command_str_length = lParameterStringLength;
+                    break;
+
+                case 2: wp.coord.abs.x = strtol(pcParameter, NULL, 10); break;
+                case 3: wp.coord.abs.y = strtol(pcParameter, NULL, 10); break;
+                default: break;
             }
-            else
-            {
-                /* No more parameters were found.  Make sure the write buffer does
-                not contain a valid string to prevent junk being printed out. */
-                pcWriteBuffer[ 0 ] = 0x00;
 
-                /* There is no more data to return, so this time set xReturn to
-                pdFALSE. */
-                xReturn = pdFALSE;
+            // Static items of the waypoints
+            wp.coord.abs.a = 0;
+            wp.offset.x = 0;
+            wp.offset.y = 0;
+            wp.offset.a = 0;
+            wp.speed = WP_SPEED_NORMAL;
+            wp.trajectory_must_finish = true;
+            wp.type = WP_GOTO_FWD;
 
-                /* Start over the next time this command is executed. */
-                lParameterNumber = 0;
+            // Ensure we keep going for the next parameter
+            xReturn = pdTRUE;
+            lParameterNumber++;
+
+        // End of decoding, launch the command
+        } else {
+
+            // Terminate the command string. Can be done only after all parameters are fetched
+            command[command_str_length] = 0;
+
+            // Decode the command
+            // ------------------
+
+            // Goto
+            if((!strcasecmp(command, "goto")) && (lParameterNumber == 4)) {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Goto (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
+                pcWriteBuffer += strlen(pcWriteBuffer);
+
+                motion_send_wp(&wp);
+
+            } // goto
+
+
+            else {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unrecognized command '%s' or parameters error"SHELL_EOL, command);
             }
+
+            // Ensure the function can start again
+            lParameterNumber = 0;
+            xReturn = pdFALSE;
         }
 
-        return xReturn;
+    }
+
+    return xReturn;
 }
 
 static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
@@ -633,7 +658,7 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     dxl_status_t status;
     char error_str[128];
     uint32_t servo_model_id;
-    const dxl_servo_model_t* servo_model;
+    dxl_servo_model_t* servo_model;
 
     static char* command;
     static BaseType_t command_str_length;
@@ -773,13 +798,17 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
                         // Check to see if a servo at ID %x is found
                         if(dxl_ping(&servo) == DXL_PASS) {
 
+                            //servo_model_id = 28;
+
                             status = dxl_get_model(&servo, &servo_model_id);
 
                             //if(status == DXL_PASS) {
-                                //servo_model = dxl_find_servo_model_by_id(servo_model_id);
+                                servo_model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
 
-                                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"[SCAN] #%u %u %u"SHELL_EOL, itf, servo.id, servo_model_id); //servo_model->name
-                                pcWriteBuffer += strlen(pcWriteBuffer);
+                                if(servo_model != NULL) {
+                                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"[SCAN] #%u %u %s"SHELL_EOL, itf, servo.id, servo_model->name);
+                                    pcWriteBuffer += strlen(pcWriteBuffer);
+                                }
                             //}
 
                         }
@@ -788,8 +817,29 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
                 }
 
-
             } // scan
+
+            // Dump
+            else if((!strcasecmp(command, "dump")) && (lParameterNumber == 4)) {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Dumping on interface #%u ID %u..."SHELL_EOL, itf, id);
+                pcWriteBuffer += strlen(pcWriteBuffer);
+
+                // Get model ID
+                status = dxl_get_model(&servo, &servo_model_id);
+                if(status != DXL_PASS) {
+                    dxl_get_error_str(error_str, sizeof(error_str), status, servo.itf->protocol);
+                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Error(s): %s"SHELL_EOL, error_str);
+                    lParameterNumber = 0;
+                    return pdFALSE;
+                }
+
+                // Fetch model
+                servo_model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
+
+                // TODO: iterator on reg table + read + display
+                //servo_model->reg_table
+
+            }
 
             else {
                 snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unrecognized command '%s' or parameters error"SHELL_EOL, command);
@@ -810,6 +860,7 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 //"  - [reset] [if] [id]"SHELL_EOL
 //"  - [write] [if] [id] [add] [size] [data]"SHELL_EOL
 //"  - [read] [if] [id] [add] [size]"SHELL_EOL
+//"  - [dump] [if] [id]
 //"  - [scan]"SHELL_EOL
 
 /*

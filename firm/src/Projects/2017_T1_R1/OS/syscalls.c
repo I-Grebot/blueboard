@@ -21,6 +21,7 @@
 
 /* Variables */
 //#undef errno
+/*
 extern int errno;
 extern int __io_putchar(int ch) __attribute__((weak));
 extern int __io_getchar(void) __attribute__((weak));
@@ -29,9 +30,11 @@ register char * stack_ptr asm("sp");
 
 char *__env[1] = { 0 };
 char **environ = __env;
-
+*/
 
 /* Functions */
+
+/*
 void initialise_monitor_handles()
 {
 }
@@ -50,7 +53,7 @@ int _kill(int pid, int sig)
 void _exit (int status)
 {
     _kill(status, -1);
-    while (1) {}        /* Make sure we hang here */
+    while (1) {}
 }
 
 int _read (int file, char *ptr, int len)
@@ -99,6 +102,7 @@ caddr_t _sbrk(int incr)
     return (caddr_t) prev_heap_end;
 }
 
+
 int _close(int file)
 {
     return -1;
@@ -123,7 +127,6 @@ int _lseek(int file, int ptr, int dir)
 
 int _open(char *path, int flags, ...)
 {
-    /* Pretend like we always fail */
     return -1;
 }
 
@@ -167,3 +170,4 @@ int _execve(char *name, char **argv, char **env)
     errno = ENOMEM;
     return -1;
 }
+*/

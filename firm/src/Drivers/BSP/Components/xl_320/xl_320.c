@@ -421,10 +421,10 @@ unsigned int xl_320_get_status(xl_320_packet_t* instruction_packet,
 
     // Check that checksum is correct, this is not
     // revealant if length is incorrect
-    if (status_packet->checksum != xl_320_compute_checksum(status_packet)) {
+    //if (status_packet->checksum != xl_320_compute_checksum(status_packet)) {
         status |= XL_320_ERROR_APP_CHECKSUM;
         //printf("Checksums : 0x%02X vs 0x%02X\n", status_packet->checksum ,xl_320_compute_checksum(status_packet)  );
-    }
+    //}
 
     //xl_320_print_packet(&status_packet);
 
