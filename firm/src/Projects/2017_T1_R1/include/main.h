@@ -166,6 +166,8 @@ BaseType_t dsv_start(void);
 
 void dsv_test_pos(uint8_t id, uint16_t pos); // TEMP
 
+BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength);
+
 /* RGB LED */
 BaseType_t led_start(void);
 void led_set_mode(BB_LED_ModeTypeDef mode);

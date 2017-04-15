@@ -20,6 +20,7 @@
 extern OS_SHL_ConfigTypeDef OS_SHL_Config;
 extern RobotTypeDef robot;
 
+extern const uint8_t dsv_nb_channels;
 extern dsv_channel_t dsv_chan1;
 extern dsv_channel_t dsv_chan2;
 
@@ -44,6 +45,7 @@ const OS_SHL_VarItemTypeDef OS_SHL_varList[] = {
 #endif
 
          // Digital Servos Configuration
+         ,{"dsv.nb_channels"            , TYPE_UINT8,   ACC_RD, &dsv_nb_channels,            			   "NA"}
          ,{"dsv1.baudrate"              , TYPE_UINT32,  ACC_WR, &dsv_chan1.uart.USART_BaudRate,            "bps"}
          ,{"dsv2.baudrate"              , TYPE_UINT32,  ACC_WR, &dsv_chan2.uart.USART_BaudRate,            "bps"}
 

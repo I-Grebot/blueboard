@@ -231,6 +231,10 @@ typedef struct {
 const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name);
 const dxl_servo_model_t* dxl_find_servo_model_by_id(uint16_t id);
 
+// Registers
+const char* dxl_get_area_as_string(const dxl_reg_area_e area);
+const char* dxl_get_access_as_string(const dxl_reg_access_e acc);
+
 // Configuration
 void dxl_init_itf(dxl_interface_t* itf, uint8_t itf_idx);
 void dxl_init_servo(dxl_servo_t* servo, dxl_interface_t* itf, const char* model_name);
@@ -239,7 +243,9 @@ void dxl_init_servo(dxl_servo_t* servo, dxl_interface_t* itf, const char* model_
 dxl_status_t dxl_ping(dxl_servo_t* servo);
 dxl_status_t dxl_reset(dxl_servo_t* servo);
 dxl_status_t dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size, bool reg);
+dxl_status_t dxl_write_int(dxl_servo_t* servo, uint8_t addr, uint32_t value, size_t size, bool reg);
 dxl_status_t dxl_read(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size);
+dxl_status_t dxl_read_int(dxl_servo_t* servo, uint8_t addr, uint32_t* value, size_t size);
 dxl_status_t dxl_action(dxl_servo_t* servo);
 
 // Shorthands

@@ -22,55 +22,57 @@ dxl_register_t dxl_registers_v1[] = {
 /* ---------------------------------------------------------------------------------------------*/
 /*   Area         Address     Name                         Access       Size    Value (Default) */
 /* ---------------------------------------------------------------------------------------------*/
-    {DXL_EEPROM,  0x00,       "Model Number"             , DXL_R,        2,       0}
-   ,{DXL_EEPROM,  0x02,       "Firmware Version"         , DXL_R,        2,       0}
-   ,{DXL_EEPROM,  0x03,       "ID"                       , DXL_RW,       1,       1}
-   ,{DXL_EEPROM,  0x04,       "Baud-Rate"                , DXL_RW,       1,      34}
-   ,{DXL_EEPROM,  0x05,       "Return Delay Time"        , DXL_RW,       1,     250}
-   ,{DXL_EEPROM,  0x06,       "CW Angle Limit"           , DXL_RW,       2,       0}
-   ,{DXL_EEPROM,  0x08,       "CCW Angle Limit"          , DXL_RW,       2,    1023}
-   ,{DXL_EEPROM,  0x0B,       "Temperature Limit"        , DXL_RW,       1,      80}
-   ,{DXL_EEPROM,  0x0C,       "Low Voltage Limit"        , DXL_RW,       1,      60}
-   ,{DXL_EEPROM,  0x0D,       "High Voltage Limit"       , DXL_RW,       1,     190}
-   ,{DXL_EEPROM,  0x0E,       "Max Torque"               , DXL_RW,       2,    1023}
-   ,{DXL_EEPROM,  0x10,       "Status Return Level"      , DXL_RW,       1,       2}
-   ,{DXL_EEPROM,  0x11,       "Alarm Led"                , DXL_RW,       1,      36}
-   ,{DXL_EEPROM,  0x12,       "Alarm Shutdown"           , DXL_RW,       1,      36}
+    {DXL_EEPROM,  0x00,       "model_number"             , DXL_R,        2,       0}
+   ,{DXL_EEPROM,  0x02,       "firmware_version"         , DXL_R,        2,       0}
+   ,{DXL_EEPROM,  0x03,       "id"                       , DXL_RW,       1,       1}
+   ,{DXL_EEPROM,  0x04,       "baudrate"                 , DXL_RW,       1,      34}
+   ,{DXL_EEPROM,  0x05,       "return_delay_time"        , DXL_RW,       1,     250}
+   ,{DXL_EEPROM,  0x06,       "cw_angle_limit"           , DXL_RW,       2,       0}
+   ,{DXL_EEPROM,  0x08,       "ccw_angle_limit"          , DXL_RW,       2,    1023}
+   ,{DXL_EEPROM,  0x0B,       "temperature_limit"        , DXL_RW,       1,      80}
+   ,{DXL_EEPROM,  0x0C,       "low_Voltage_limit"        , DXL_RW,       1,      60}
+   ,{DXL_EEPROM,  0x0D,       "high_voltage_limit"       , DXL_RW,       1,     190}
+   ,{DXL_EEPROM,  0x0E,       "max_torque"               , DXL_RW,       2,    1023}
+   ,{DXL_EEPROM,  0x10,       "status_return_level"      , DXL_RW,       1,       2}
+   ,{DXL_EEPROM,  0x11,       "alarm_led"                , DXL_RW,       1,      36}
+   ,{DXL_EEPROM,  0x12,       "alarm_shutdown"           , DXL_RW,       1,      36}
 /* -- REGISTER TABLE V2/V3 ONLY ----------------------------------------------------------------*/
-   ,{DXL_EEPROM,  0x14,       "Multi-Turn Offset"        , DXL_RW,       2,       0}
-   ,{DXL_EEPROM,  0x16,       "Resolution Divider"       , DXL_RW,       1,       1}
+   ,{DXL_EEPROM,  0x14,       "multi-turn_offset"        , DXL_RW,       2,       0}
+   ,{DXL_EEPROM,  0x16,       "resolution_divider"       , DXL_RW,       1,       1}
 /* ---------------------------------------------------------------------------------------------*/
-   ,{DXL_RAM,     0x18,       "Torque Enable"            , DXL_RW,       1,       0}
-   ,{DXL_RAM,     0x19,       "LED"                      , DXL_RW,       1,       0}
+   ,{DXL_RAM,     0x18,       "torque_enable"            , DXL_RW,       1,       0}
+   ,{DXL_RAM,     0x19,       "led"                      , DXL_RW,       1,       0}
 /* -- REGISTER TABLE V1 ONLY --------------------------------------------------------------------*/
-   ,{DXL_RAM,     0x1A,       "CW Compliance Margin"     , DXL_RW,       1,       1}
-   ,{DXL_RAM,     0x1B,       "CCW Compliance Margin"    , DXL_RW,       1,       0}
-   ,{DXL_RAM,     0x1C,       "CW Compliance Slope"      , DXL_RW,       1,      32}
-   ,{DXL_RAM,     0x1D,       "CCW Compliance Slope"     , DXL_RW,       1,      32}
+   ,{DXL_RAM,     0x1A,       "cw_compliance_margin"     , DXL_RW,       1,       1}
+   ,{DXL_RAM,     0x1B,       "ccw_compliance_margin"    , DXL_RW,       1,       0}
+   ,{DXL_RAM,     0x1C,       "cw_compliance_slope"      , DXL_RW,       1,      32}
+   ,{DXL_RAM,     0x1D,       "ccw_compliance_slope"     , DXL_RW,       1,      32}
 /* -- REGISTER TABLE V2/V3 ONLY ----------------------------------------------------------------*/
-   ,{DXL_RAM,     0x1A,       "D Gain"                   , DXL_RW,       1,       8}
-   ,{DXL_RAM,     0x1B,       "I Gain"                   , DXL_RW,       1,       0}
-   ,{DXL_RAM,     0x1C,       "P Gain"                   , DXL_RW,       1,       8}
+   ,{DXL_RAM,     0x1A,       "d_gain"                   , DXL_RW,       1,       8}
+   ,{DXL_RAM,     0x1B,       "i_gain"                   , DXL_RW,       1,       0}
+   ,{DXL_RAM,     0x1C,       "p_gain"                   , DXL_RW,       1,       8}
 /* ---------------------------------------------------------------------------------------------*/
-   ,{DXL_RAM,     0x1E,       "Goal Position"            , DXL_RW,       2,       0}
-   ,{DXL_RAM,     0x20,       "Moving Speed"             , DXL_RW,       2,       0}
-   ,{DXL_RAM,     0x22,       "Torque Limit"             , DXL_RW,       2,    1023}
-   ,{DXL_RAM,     0x24,       "Present Position"         , DXL_R,        2,       0}
-   ,{DXL_RAM,     0x26,       "Present Velocity"         , DXL_R,        2,       0}
-   ,{DXL_RAM,     0x28,       "Present Load"             , DXL_R,        2,       0}
-   ,{DXL_RAM,     0x2A,       "Present Voltage"          , DXL_R,        1,       0}
-   ,{DXL_RAM,     0x2B,       "Present Temperature"      , DXL_R,        1,       0}
-   ,{DXL_RAM,     0x2C,       "Registered"               , DXL_R,        1,       0}
-   ,{DXL_RAM,     0x2E,       "Moving"                   , DXL_R,        1,       0}
-   ,{DXL_RAM,     0x2F,       "Lock"                     , DXL_RW,       1,       0}
-   ,{DXL_RAM,     0x30,       "Punch"                    , DXL_RW,       2,      32}
+   ,{DXL_RAM,     0x1E,       "goal_position"            , DXL_RW,       2,       0}
+   ,{DXL_RAM,     0x20,       "moving_speed"             , DXL_RW,       2,       0}
+   ,{DXL_RAM,     0x22,       "torque_limit"             , DXL_RW,       2,    1023}
+   ,{DXL_RAM,     0x24,       "present_position"         , DXL_R,        2,       0}
+   ,{DXL_RAM,     0x26,       "present_velocity"         , DXL_R,        2,       0}
+   ,{DXL_RAM,     0x28,       "present_load"             , DXL_R,        2,       0}
+   ,{DXL_RAM,     0x2A,       "present_voltage"          , DXL_R,        1,       0}
+   ,{DXL_RAM,     0x2B,       "present_temperature"      , DXL_R,        1,       0}
+   ,{DXL_RAM,     0x2C,       "registered"               , DXL_R,        1,       0}
+   ,{DXL_RAM,     0x2E,       "moving"                   , DXL_R,        1,       0}
+   ,{DXL_RAM,     0x2F,       "lock"                     , DXL_RW,       1,       0}
+   ,{DXL_RAM,     0x30,       "punch"                    , DXL_RW,       2,      32}
 /* -- REGISTER TABLE V3 ONLY -------------------------------------------------------------------*/
-   ,{DXL_RAM,     0x44,       "Current"                  , DXL_RW,       2,       0}
-   ,{DXL_RAM,     0x46,       "Torque Control Enable"    , DXL_RW,       1,       0}
-   ,{DXL_RAM,     0x47,       "Goal Torque"              , DXL_RW,       2,       0}
-   ,{DXL_RAM,     0x49,       "Goal Acceleration"        , DXL_RW,       1,       0}
+   ,{DXL_RAM,     0x44,       "current"                  , DXL_RW,       2,       0}
+   ,{DXL_RAM,     0x46,       "torque_control_enable"    , DXL_RW,       1,       0}
+   ,{DXL_RAM,     0x47,       "goal_torque"              , DXL_RW,       2,       0}
+   ,{DXL_RAM,     0x49,       "goal_acceleration"        , DXL_RW,       1,       0}
 /* ---------------------------------------------------------------------------------------------*/
 };
+
+const size_t dxl_registers_v1_length = sizeof(dxl_registers_v1) / sizeof(dxl_register_t);
 
 /* Control Register Table for Version 4 */
 dxl_register_t dxl_registers_v4[] = {
@@ -193,3 +195,28 @@ const dxl_register_t* dxl_reg_v4_punch                    = dxl_registers_v4 + 3
 
 
 
+/*
+ * Converts an area type into a printable string
+ */
+const char* dxl_get_area_as_string(const dxl_reg_area_e area)
+{
+    switch(area)
+    {
+        case DXL_EEPROM: return "EEPROM";
+        case DXL_RAM: 	 return "RAM";
+        default:     	 return "NC"; // Error
+    }
+}
+
+/*
+ * Converts an access type into a printable string
+ */
+const char* dxl_get_access_as_string(const dxl_reg_access_e acc)
+{
+    switch(acc)
+    {
+        case DXL_RW: return "RW";
+        case DXL_R:  return "R";
+        default:     return "NC"; // Error
+    }
+}

@@ -27,6 +27,7 @@
 //dxl_interface_t dxl2;
 
 /* Digital servo channels configuration structures */
+const uint8_t dsv_nb_channels = 2;
 dsv_channel_t dsv_chan1;
 dsv_channel_t dsv_chan2;
 
@@ -442,6 +443,83 @@ void dsv_scan_servos(void)
     }
 
 }
+
+
+/*
+ * Dump in the buffer string the current servo content
+ */
+BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength)
+{
+	/* Local constants */
+    const char* header = "             Itf.  ID Area   Acc. Addr. Size Name                           Value"SHELL_EOL
+                         "---------------------------------------------------------------------------------"SHELL_EOL;
+
+    /* Some externally defined variables */
+    extern dxl_register_t dxl_registers_v1[];
+    extern const size_t dxl_registers_v1_length;
+
+    /* Local handlers for outputting variables one at a time */
+    static const dxl_register_t* var = NULL;
+    static size_t id;
+
+    dxl_status_t read_status;
+    uint32_t reg_value;
+
+    // Temp: Only handle REG V1
+    // Correct branching per reg set is required
+    if(var == NULL)
+    {
+        var = dxl_registers_v1;
+        id = 0;
+
+        /* Header */
+        strcpy(ret, header);
+        ret += strlen(ret);
+    }
+
+    // Read the current reg value and display it if no error occured
+    read_status = dxl_read_int(servo, var->address, &reg_value, var->size);
+
+    if(read_status == DXL_PASS)
+    {
+		snprintf(ret, retLength, SHELL_DSV_PFX"[DUMP] %4u %3u %-6s %-4s %-5u %-4u %-30s %5u"SHELL_EOL,
+				servo->itf->itf_idx,
+				servo->id,
+				dxl_get_area_as_string(var->area),
+				dxl_get_access_as_string(var->access),
+				var->address,
+				var->size,
+				var->name,
+				reg_value);
+		ret += strlen(ret);
+    } else {
+    	snprintf(ret, retLength, SHELL_DSV_PFX"[DUMP %1u %3u] ERROR: ",
+				servo->itf->itf_idx,
+				servo->id);
+    	ret += strlen(ret);
+    	dxl_get_error_str(ret, retLength, read_status, servo->itf->protocol);
+    	ret += strlen(ret);
+    	snprintf(ret, retLength, SHELL_EOL);
+    	ret += strlen(ret);
+    }
+
+    /* There are still items to process, move to the next one */
+    id++;
+    if(id < dxl_registers_v1_length)
+    {
+        var++;
+        return pdTRUE;
+
+    /* We have finished */
+    } else {
+        var = NULL;
+        id = 0;
+        return pdFALSE;
+    }
+
+}
+
+
 
 /**
 ********************************************************************************

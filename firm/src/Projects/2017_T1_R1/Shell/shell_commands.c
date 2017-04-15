@@ -36,6 +36,7 @@ static BaseType_t OS_SHL_StoCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 static BaseType_t OS_SHL_PowCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Power
 static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Motors
 static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Digital Servos
+static BaseType_t OS_SHL_DsdCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Digital Servos Dump
 static BaseType_t OS_SHL_AsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Analog Servos
 static BaseType_t OS_SHL_MonCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Monitoring
 static BaseType_t OS_SHL_DioCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Digital I/Os
@@ -168,6 +169,20 @@ static const CLI_Command_Definition_t xDsv =
     "  - [set_led] [id] [led value]"SHELL_EOL*/
     ,OS_SHL_DsvCmd,
     -1 // Variable
+};
+
+// Digital Servos dump
+static const CLI_Command_Definition_t xDsd =
+{
+    "led",
+    SHELL_EOL
+    "led [mode] [color]: Set the LED state"SHELL_EOL
+    "  [mode]  : STATIC|BLINK_SLOW|BLINK_FAST"SHELL_EOL
+    "  [color] : OFF  | WHITE   |"SHELL_EOL
+    "            RED  | GREEN   | BLUE |"SHELL_EOL
+    "            CYAN | MAGENTA | YELLOW ]"SHELL_EOL
+    ,OS_SHL_LedCmd,
+    2
 };
 
 // Analog Servos commands
@@ -781,60 +796,49 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
                 }
             } // write
 
-            else if((!strcasecmp(command, "scan")) && (lParameterNumber == 2)) {
-                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Scanning all interfaces..."SHELL_EOL);
+            else if((!strcasecmp(command, "scan")) && (lParameterNumber == 3)) {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Scanning interface #%u ..."SHELL_EOL, itf);
                 pcWriteBuffer += strlen(pcWriteBuffer);
 
-                for(itf = 2; itf <= 2; itf++) {
+				// Scan all IDs. Broadcast ID automatically skipped
+				for(servo.id = 0; servo.id < 254; servo.id++) {
 
-                    switch(itf) {
-                        case 1: servo.itf = &dsv_chan1.dxl; break;
-                        case 2: servo.itf = &dsv_chan2.dxl; break;
-                    }
+					// Check to see if a servo at ID %x is found
+					if(dxl_ping(&servo) == DXL_PASS) {
 
-                    // Scan all IDs. Broadcast ID automatically skipped
-                    for(servo.id = 0; servo.id < 254; servo.id++) {
+						// This is also used to retrieve potential errors like overheating, input voltage etc.
+						status = dxl_get_model(&servo, &servo_model_id);
+						servo_model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
 
-                        // Check to see if a servo at ID %x is found
-                        if(dxl_ping(&servo) == DXL_PASS) {
+						if(servo_model != NULL) {
+							snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"[SCAN] %u %-3u %-20s %-3u"SHELL_EOL, itf, servo.id, servo_model->name, status);
+							pcWriteBuffer += strlen(pcWriteBuffer);
+						}
 
-                            //servo_model_id = 28;
+					}
 
-                            status = dxl_get_model(&servo, &servo_model_id);
-
-                            //if(status == DXL_PASS) {
-                                servo_model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
-
-                                if(servo_model != NULL) {
-                                    snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"[SCAN] #%u %u %s"SHELL_EOL, itf, servo.id, servo_model->name);
-                                    pcWriteBuffer += strlen(pcWriteBuffer);
-                                }
-                            //}
-
-                        }
-
-                    }
-
-                }
+				}
 
             } // scan
 
             // Dump
             else if((!strcasecmp(command, "dump")) && (lParameterNumber == 4)) {
-                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Dumping on interface #%u ID %u..."SHELL_EOL, itf, id);
-                pcWriteBuffer += strlen(pcWriteBuffer);
+                //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Dumping on interface #%u ID %u..."SHELL_EOL, itf, id);
+                //pcWriteBuffer += strlen(pcWriteBuffer);
 
                 // Get model ID
-                status = dxl_get_model(&servo, &servo_model_id);
-                if(status != DXL_PASS) {
+                //status = dxl_get_model(&servo, &servo_model_id);
+                /*if(status != DXL_PASS) {
                     dxl_get_error_str(error_str, sizeof(error_str), status, servo.itf->protocol);
                     snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Error(s): %s"SHELL_EOL, error_str);
                     lParameterNumber = 0;
                     return pdFALSE;
-                }
+                }*/
 
                 // Fetch model
-                servo_model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
+                //servo_model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
+
+                return dsv_dump_servo(&servo, pcWriteBuffer, xWriteBufferLen);
 
                 // TODO: iterator on reg table + read + display
                 //servo_model->reg_table

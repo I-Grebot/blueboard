@@ -152,6 +152,20 @@ dxl_status_t dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t
     return servo->itf->status;
 }
 
+/* @brief: Write access with 32-bits cast
+ * @param servo: Servo to send the write access
+ * @param addr: Register address
+ * @param value: Value to write
+ * @param size: Size of the value in number of bytes
+ * @param reg: True if the write is registered
+ */
+dxl_status_t dxl_write_int(dxl_servo_t* servo, uint8_t addr, uint32_t value, size_t size, bool reg)
+{
+	uint8_t value_bytes[4];
+	dxl_data_to_bytes_array(value, size, value_bytes);
+	return dxl_write(servo, addr, value_bytes, size, reg);
+}
+
 /* @brief: Basic read access
  * @param servo: Servo to send the read access
  * @param addr: Register address
@@ -174,6 +188,24 @@ dxl_status_t dxl_read(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t 
     return servo->itf->status;
 }
 
+/* @brief: Read access with 32-bits cast
+ * @param servo: Servo to send the read access
+ * @param addr: Register address
+ * @param value: Read value
+ * @param size: Size of the value in number of bytes
+ */
+dxl_status_t dxl_read_int(dxl_servo_t* servo, uint8_t addr, uint32_t* value, size_t size)
+{
+	uint8_t value_bytes[4];
+	dxl_status_t ret;
+	ret = dxl_read(servo, addr, value_bytes, size);
+
+	if(ret == DXL_PASS) {
+		dxl_bytes_array_to_data(value, size, value_bytes);
+	}
+
+	return ret;
+}
 
 /* @brief: Trigger action
  * @param servo: Servo to send the action command
