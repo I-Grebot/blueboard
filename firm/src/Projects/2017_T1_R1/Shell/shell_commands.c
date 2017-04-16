@@ -734,8 +734,8 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
             // Set the servo interface with the correct channel
             switch(itf) {
-                case 1: servo.itf = &dsv_chan1.dxl; break;
-                case 2: servo.itf = &dsv_chan2.dxl; break;
+                case 1: servo.itf = &(dsv_chan1.dxl); break;
+                case 2: servo.itf = &(dsv_chan2.dxl); break;
             }
 
             // Set the servo ID
@@ -822,7 +822,8 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             } // scan
 
             // Dump
-            else if((!strcasecmp(command, "dump")) && (lParameterNumber == 4)) {
+            else if((!strcasecmp(command, "dump")) && (lParameterNumber == 4))
+            {
                 //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Dumping on interface #%u ID %u..."SHELL_EOL, itf, id);
                 //pcWriteBuffer += strlen(pcWriteBuffer);
 
@@ -838,14 +839,17 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
                 // Fetch model
                 //servo_model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
 
-                return dsv_dump_servo(&servo, pcWriteBuffer, xWriteBufferLen);
+            	xReturn = dsv_dump_servo(&servo, pcWriteBuffer, xWriteBufferLen);
 
-                // TODO: iterator on reg table + read + display
-                //servo_model->reg_table
+            	if(xReturn == pdFALSE) {
+            		lParameterNumber = 0;
+            	}
+
+            	return xReturn;
 
             }
-
-            else {
+            else
+            {
                 snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unrecognized command '%s' or parameters error"SHELL_EOL, command);
             }
 

@@ -76,7 +76,6 @@ void dsv_init(void)
     /*
      * Configure the Digital Servo UART for channel 1 structure:
      *   8 bits length + 1 stop bit, no parity
-     *   Baudrate 57600 kbps
      */
     dsv_chan1.uart.USART_Mode                = USART_Mode_Rx | USART_Mode_Tx;
     dsv_chan1.uart.USART_BaudRate            = 57600;
@@ -88,7 +87,6 @@ void dsv_init(void)
     /*
      * Configure the Digital Servo UART for channel 2 structure:
      *   8 bits length + 1 stop bit, no parity
-     *   Baudrate 1 Mbps
      */
     dsv_chan2.uart.USART_Mode                = USART_Mode_Rx | USART_Mode_Tx;
     dsv_chan2.uart.USART_BaudRate            = 57600;
@@ -103,20 +101,12 @@ void dsv_init(void)
 
     /* Configure XL-320 interface */
     dsv_chan1.dxl.protocol = DXL_V2;
-    dsv_chan1.dxl.hw_switch = bb_dsv_switch;
-//    dsv_chan1.dxl.hw_send_byte = bb_dsv_put;
-//    dsv_chan1.dxl.hw_receive_byte = bb_dsv_receive;
-//    dsv_chan1.dxl.hw_flush = bb_dsv_flush;
+    dsv_chan1.dxl.hw_send_byte = dsv_put;
+    dsv_chan1.dxl.hw_receive_byte = dsv_get;
+    dsv_chan1.dxl.hw_flush = dsv_flush;
 
     /* Configure RX-28 interface */
     dsv_chan2.dxl.protocol = DXL_V1;
-    dsv_chan2.dxl.hw_switch = bb_dsv_switch;
-
-    // TEMP
-    //dsv_chan2.dxl.hw_send_byte = bb_dsv_put;
-    //dsv_chan2.dxl.hw_receive_byte = bb_dsv_receive;
-    //dsv_chan2.dxl.hw_flush = bb_dsv_flush;
-
     dsv_chan2.dxl.hw_send_byte = dsv_put;
     dsv_chan2.dxl.hw_receive_byte = dsv_get;
     dsv_chan2.dxl.hw_flush = dsv_flush;
@@ -133,6 +123,7 @@ void dsv_init(void)
     bb_dsv_enable(dsv_chan1.dxl.itf_idx, OS_ISR_PRIORITY_DSV);
     bb_dsv_enable(dsv_chan2.dxl.itf_idx, OS_ISR_PRIORITY_DSV);
 
+    // TEMP
      /* Initialize XL-320 Library */
      //xl_320_init(XL_320_TX_ONLY);
      //xl_320_set_hw_send(bb_dsv_put);

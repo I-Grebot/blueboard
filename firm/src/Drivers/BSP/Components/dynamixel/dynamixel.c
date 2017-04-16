@@ -31,9 +31,9 @@ void dxl_init_itf(dxl_interface_t* itf, uint8_t itf_idx)
 {
     itf->itf_idx = itf_idx;
     itf->protocol = DXL_V1;
-    itf->hw_switch = NULL;
     itf->hw_send_byte = NULL;
     itf->hw_receive_byte = NULL;
+    itf->hw_flush = NULL;
     itf->nb_pkt_tx = 0;
     itf->nb_pkt_rx = 0;
     itf->nb_errors = 0;
@@ -99,7 +99,7 @@ dxl_status_t dxl_ping(dxl_servo_t* servo)
         dxl_v1_ping(servo);
 
     } else if(servo->itf->protocol == DXL_V2) {
-        // TODO
+        dxl_v2_ping(servo);
 
     // Error
     } else {
@@ -119,7 +119,7 @@ dxl_status_t dxl_reset(dxl_servo_t* servo)
         dxl_v1_reset(servo);
 
     } else if(servo->itf->protocol == DXL_V2) {
-        // TODO
+    	dxl_v2_reset(servo);
 
     // Error
     } else {
@@ -142,7 +142,7 @@ dxl_status_t dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t
         dxl_v1_write(servo, addr, values, size, reg);
 
     } else if(servo->itf->protocol == DXL_V2) {
-        // TODO
+    	dxl_v2_write(servo, addr, values, size, reg);
 
     // Error
     } else {
@@ -178,7 +178,7 @@ dxl_status_t dxl_read(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t 
         dxl_v1_read(servo, addr, values, size);
 
     } else if(servo->itf->protocol == DXL_V2) {
-        // TODO
+    	dxl_v2_read(servo, addr, values, size);
 
     // Error
     } else {
@@ -216,7 +216,7 @@ dxl_status_t dxl_action(dxl_servo_t* servo)
         dxl_v1_action(servo);
 
     } else if(servo->itf->protocol == DXL_V2) {
-        // TODO
+    	dxl_v2_action(servo);
 
     // Error
     } else {
@@ -394,7 +394,7 @@ void dxl_get_error_str(char* status_str, size_t status_str_len, dxl_status_t sta
         dxl_v1_get_error_str(status_str, status_str_len, status);
 
     } else if(protocol == DXL_V2) {
-        //dxl_v2_get_error_str(status_str, status_str_len, status);
+        dxl_v2_get_error_str(status_str, status_str_len, status);
     }
 
 
@@ -422,7 +422,6 @@ void dxl_print_error(dxl_status_t status, dxl_protocol_e protocol)
         sprintf(error_msg, DXL_DEBUG_PFX" Error: %s"DXL_DEBUG_EOL, error_str);
         serial_puts(error_msg);
     }
-
 
 }
 

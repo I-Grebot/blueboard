@@ -27,7 +27,7 @@
 
 /* Protocol-specific definitions & types */
 #include "dxl_v1.h"
-//#include "dxl_v2.h"
+#include "dxl_v2.h"
 
 /**
  ********************************************************************************
@@ -162,9 +162,6 @@ typedef struct {
 
     // Interface protocol to be used
     dxl_protocol_e protocol;
-
-    // Switch to TX/RX the half-duplex link
-    void (* hw_switch)(uint8_t chan_idx, dxl_switch_mode_e mode);
 
     // Send a byte and return error if not successful
     // An error is a non-zero code
@@ -308,5 +305,25 @@ void dxl_v1_print_packet(dxl_v1_packet_t* packet);
 **
 ********************************************************************************
 */
+
+/* Hardware and low-level routines */
+uint16_t dxl_v2_compute_crc(uint8_t *data, uint8_t data_size);
+void dxl_v2_send_packet(dxl_interface_t* itf, dxl_v2_packet_t* packet);
+
+/* Instructions */
+void dxl_v2_ping(dxl_servo_t* servo);
+void dxl_v2_reset(dxl_servo_t* servo);
+void dxl_v2_write(dxl_servo_t* servo, uint8_t address, uint8_t* parameters, size_t nb_param, bool registered);
+void dxl_v2_read(dxl_servo_t* servo, uint8_t address, uint8_t* datas, size_t nb_data);
+void dxl_v2_action(dxl_servo_t* servo);
+
+/* Service */
+void dxl_v2_get_error_str(char* status_str, size_t status_str_len, dxl_status_t status);
+
+/* Debug */
+#ifdef DXL_DEBUG
+void dxl_v2_print_packet(dxl_v2_packet_t* packet);
+
+#endif // DXL_DEBUG
 
 #endif /* __DYNAMIXEL_H_ */

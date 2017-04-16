@@ -30,7 +30,7 @@ dxl_register_t dxl_registers_v1[] = {
    ,{DXL_EEPROM,  0x06,       "cw_angle_limit"           , DXL_RW,       2,       0}
    ,{DXL_EEPROM,  0x08,       "ccw_angle_limit"          , DXL_RW,       2,    1023}
    ,{DXL_EEPROM,  0x0B,       "temperature_limit"        , DXL_RW,       1,      80}
-   ,{DXL_EEPROM,  0x0C,       "low_Voltage_limit"        , DXL_RW,       1,      60}
+   ,{DXL_EEPROM,  0x0C,       "low_voltage_limit"        , DXL_RW,       1,      60}
    ,{DXL_EEPROM,  0x0D,       "high_voltage_limit"       , DXL_RW,       1,     190}
    ,{DXL_EEPROM,  0x0E,       "max_torque"               , DXL_RW,       2,    1023}
    ,{DXL_EEPROM,  0x10,       "status_return_level"      , DXL_RW,       1,       2}

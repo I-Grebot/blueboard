@@ -29,7 +29,7 @@ void bb_dsv_init(uint8_t dsv_chan, USART_InitTypeDef * USART_InitStruct)
     /* Configure Channel 1 */
     if(dsv_chan == BB_DSV_CHANNEL1) {
 
-        /* Disable USART during config*/
+        /* Disable USART during config */
         USART_Cmd(DSV_COM, DISABLE);
 
         /* Enable TXRX Clock */
@@ -67,7 +67,7 @@ void bb_dsv_init(uint8_t dsv_chan, USART_InitTypeDef * USART_InitStruct)
 #ifdef BB_USE_RS485_DSV_CHAN2
     else if(dsv_chan == BB_DSV_CHANNEL2) {
 
-        /* Disable USART during config*/
+        /* Disable USART during config */
         USART_Cmd(RS485_COM, DISABLE);
 
         /* Enable I/O Clocks */
@@ -172,14 +172,13 @@ void bb_dsv_disable(uint8_t dsv_chan)
 /* Switch a given interface from TX to RX */
 void bb_dsv_switch(uint8_t dsv_chan, dxl_switch_mode_e mode)
 {
-
     if(dsv_chan == BB_DSV_CHANNEL1) {
         if(mode == DXL_MODE_TX) {
                 USART_DirectionModeCmd(DSV_COM, USART_Mode_Tx, ENABLE);
-                USART_DirectionModeCmd(DSV_COM, USART_Mode_Rx, DISABLE);
+                //USART_DirectionModeCmd(DSV_COM, USART_Mode_Rx, DISABLE);
             } else {
-                USART_DirectionModeCmd(DSV_COM, USART_Mode_Tx, DISABLE);
-                USART_DirectionModeCmd(DSV_COM, USART_Mode_Rx, ENABLE);
+                //USART_DirectionModeCmd(DSV_COM, USART_Mode_Tx, DISABLE);
+                //USART_DirectionModeCmd(DSV_COM, USART_Mode_Rx, ENABLE);
             }
     }
 
@@ -201,41 +200,4 @@ void bb_dsv_switch(uint8_t dsv_chan, dxl_switch_mode_e mode)
 
 }
 
-/**
-  * @brief  Send a byte through DSV UART and wait for end of transmission
-  * @param  ch: character to send
-  * @retval None
-  */
-/*
-void bb_dsv_put(uint8_t dsv_chan, uint8_t ch)
-{
-    if(dsv_chan == BB_DSV_CHANNEL1) {
-        // TEMP
-        USART_SendData(DSV_COM, (uint8_t) ch);
-        while(USART_GetFlagStatus(DSV_COM, USART_FLAG_TC) == RESET);
-    }
-
-#ifdef BB_USE_RS485_DSV_CHAN2
-    else if(dsv_chan == BB_DSV_CHANNEL2) {
-        // TEMP
-        USART_SendData(RS485_COM, (uint8_t) ch);
-        while(USART_GetFlagStatus(RS485_COM, USART_FLAG_TC) == RESET);
-        USART_ClearFlag(RS485_COM, USART_FLAG_TC);
-    }
-#endif // BB_USE_RS485_DSV_CHAN2
-
-
-}
-
-uint8_t bb_dsv_receive(uint8_t dsv_chan, uint8_t* rx_data)
-{
-    // TEMP
-    return 0;
-}
-
-void bb_dsv_flush(uint8_t dsv_chan)
-{
-
-}
-*/
 
