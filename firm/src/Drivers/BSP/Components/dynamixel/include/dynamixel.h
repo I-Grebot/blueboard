@@ -52,9 +52,10 @@
 #define DXL_STATUS_NO_ERROR             0x0000
 #define DXL_STATUS_ERR_TIMEOUT          0x0100  // Returned packet timeout
 #define DXL_STATUS_ERR_HEADER           0x0200  // Header error
-#define DXL_STATUS_ERR_ID               0x0300  // Returned ID does not match
-#define DXL_STATUS_ERR_LENGTH           0x0400  // Packet length error
-#define DXL_STATUS_ERR_CHECKSUM         0x0500  // Packet checksum is wrong
+#define DXL_STATUS_ERR_INSTRUCTION      0x0300  // Returned instruction dos not match
+#define DXL_STATUS_ERR_ID               0x0400  // Returned ID does not match
+#define DXL_STATUS_ERR_LENGTH           0x0500  // Packet length error
+#define DXL_STATUS_ERR_CHECKSUM         0x0600  // Packet checksum (or CRC) is wrong
 #define DXL_STATUS_ERR_PROTOCOL         0x1000  // Unknown protocol
 
 /* LEDs color */
@@ -85,8 +86,18 @@
 
 #ifdef DXL_DEBUG
 #warning "Dynamixel Library: using debug mode"
+
 #define DXL_DEBUG_PFX "[DXL]" // Debug prefix
 #define DXL_DEBUG_EOL "\n\r"  // End-Of-Line character for debug
+
+// Puts() function
+#define DXL_DEBUG_PUTS(_str) serial_puts((_str))
+extern long serial_puts(const char* str);
+
+#else
+
+#define DXL_DEBUG_PUTS(_str) {};
+
 #endif // DXL_DEBUG
 
  /**
@@ -106,13 +117,14 @@ typedef enum {
     DXL_V2
 } dxl_protocol_e;
 
-/* Registers Control Tables */
+/* Registers Control Tables
+ * Also serves as implementation masks for the table */
 typedef enum {
-    DXL_REG1,   /* Legacy table with V1 Communication (e.g. AX-12) */
-    DXL_REG2,   /* Table with PID controls */
-    DXL_REG3,   /* Table with PID controls and Torque Control */
-    DXL_REG4,    /* Table with Control Mode / PID; introduced with V2 Communication */
-    DXL_REG5    /* Table with full PID controls, introduced with XM servos */
+    DXL_REG1  = 0x01,  /* Legacy table with V1 Communication (e.g. AX-12) */
+    DXL_REG2  = 0x02,  /* Table with PID controls */
+    DXL_REG3  = 0x04,  /* Table with PID controls and Torque Control */
+    DXL_REG4  = 0x08,  /* Table with Control Mode / PID; introduced with V2 Communication */
+    DXL_REG5  = 0x10   /* Table with full PID controls, introduced with XM servos */
 } dxl_reg_table_e;
 
 /* Area */
@@ -129,12 +141,13 @@ typedef enum {
 
 /* Register definition */
 typedef struct {
+    uint8_t reg_table_mask; /* Implementation mask defining the reg-table */
     dxl_reg_area_e area;
-    uint8_t address;
+    uint16_t address;
     const char* name;
     dxl_reg_access_e access;
     size_t size;            /* Size in Bytes */
-    uint16_t value;         /* Registers are either 1 or 2 bytes; big-endian*/
+                            /* Values are not stored! */
 } dxl_register_t;
 
 /* Servo Models */
@@ -226,7 +239,7 @@ typedef struct {
 
 // Servo Models
 const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name);
-const dxl_servo_model_t* dxl_find_servo_model_by_id(uint16_t id);
+const dxl_servo_model_t* dxl_find_servo_model_by_id(uint32_t id);
 
 // Registers
 const char* dxl_get_area_as_string(const dxl_reg_area_e area);
@@ -239,10 +252,10 @@ void dxl_init_servo(dxl_servo_t* servo, dxl_interface_t* itf, const char* model_
 // Main handlers
 dxl_status_t dxl_ping(dxl_servo_t* servo);
 dxl_status_t dxl_reset(dxl_servo_t* servo);
-dxl_status_t dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size, bool reg);
-dxl_status_t dxl_write_int(dxl_servo_t* servo, uint8_t addr, uint32_t value, size_t size, bool reg);
-dxl_status_t dxl_read(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size);
-dxl_status_t dxl_read_int(dxl_servo_t* servo, uint8_t addr, uint32_t* value, size_t size);
+dxl_status_t dxl_write(dxl_servo_t* servo, uint16_t addr, uint8_t* values, size_t size, bool reg);
+dxl_status_t dxl_write_int(dxl_servo_t* servo, uint16_t addr, uint32_t value, size_t size, bool reg);
+dxl_status_t dxl_read(dxl_servo_t* servo, uint16_t addr, uint8_t* values, size_t size);
+dxl_status_t dxl_read_int(dxl_servo_t* servo, uint16_t addr, uint32_t* value, size_t size);
 dxl_status_t dxl_action(dxl_servo_t* servo);
 
 // Shorthands
@@ -256,8 +269,6 @@ void dxl_get_error_str(char* status_str, size_t status_str_len, dxl_status_t sta
 
 /* Debug */
 #ifdef DXL_DEBUG
-
-extern long serial_puts(const char* str);
 
 void dxl_print_servo(dxl_servo_t* servo);
 void dxl_print_error(dxl_status_t status, dxl_protocol_e protocol);
@@ -309,13 +320,15 @@ void dxl_v1_print_packet(dxl_v1_packet_t* packet);
 /* Hardware and low-level routines */
 uint16_t dxl_v2_compute_crc(uint8_t *data, uint8_t data_size);
 void dxl_v2_send_packet(dxl_interface_t* itf, dxl_v2_packet_t* packet);
+void dxl_v2_receive_packet(dxl_interface_t* itf, dxl_v2_packet_t* packet);
 
 /* Instructions */
 void dxl_v2_ping(dxl_servo_t* servo);
-void dxl_v2_reset(dxl_servo_t* servo);
-void dxl_v2_write(dxl_servo_t* servo, uint8_t address, uint8_t* parameters, size_t nb_param, bool registered);
-void dxl_v2_read(dxl_servo_t* servo, uint8_t address, uint8_t* datas, size_t nb_data);
+void dxl_v2_write(dxl_servo_t* servo, uint16_t address, uint8_t* parameters, size_t nb_param, bool registered);
+void dxl_v2_read(dxl_servo_t* servo, uint16_t address, uint8_t* datas, size_t nb_data);
 void dxl_v2_action(dxl_servo_t* servo);
+void dxl_v2_reset(dxl_servo_t* servo);
+void dxl_v2_reboot(dxl_servo_t* servo);
 
 /* Service */
 void dxl_v2_get_error_str(char* status_str, size_t status_str_len, dxl_status_t status);

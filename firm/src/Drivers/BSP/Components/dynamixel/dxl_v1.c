@@ -47,33 +47,33 @@ uint8_t dxl_v1_compute_checksum(dxl_v1_packet_t* packet)
 /* Send a packet through the given interface */
 void dxl_v1_send_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
 {
-    uint8_t idx_param;
+  uint8_t idx_param;
 
-    itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
-    itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
-    itf->hw_send_byte(itf->itf_idx, packet->id);
-    itf->hw_send_byte(itf->itf_idx, packet->length);
-    itf->hw_send_byte(itf->itf_idx, packet->content);
+  itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
+  itf->hw_send_byte(itf->itf_idx, DXL_V1_HEADER);
+  itf->hw_send_byte(itf->itf_idx, packet->id);
+  itf->hw_send_byte(itf->itf_idx, packet->length);
+  itf->hw_send_byte(itf->itf_idx, packet->content);
 
-    // Parameters
-    if(packet->length > DXL_V1_PACKET_MIN_LENGTH) {
-        for(idx_param = 0; idx_param < packet->length-DXL_V1_PACKET_MIN_LENGTH ; idx_param++) {
-            itf->hw_send_byte(itf->itf_idx, packet->parameters[idx_param]);
-        }
-    }
+  // Parameters
+  if(packet->length > DXL_V1_PACKET_MIN_LENGTH) {
+      for(idx_param = 0; idx_param < packet->length-DXL_V1_PACKET_MIN_LENGTH ; idx_param++) {
+          itf->hw_send_byte(itf->itf_idx, packet->parameters[idx_param]);
+      }
+  }
 
-    // Checksum
-    itf->hw_send_byte(itf->itf_idx, packet->checksum);
+  // Checksum
+  itf->hw_send_byte(itf->itf_idx, packet->checksum);
 
-#ifdef DXL_DEBUG
-    serial_puts(DXL_DEBUG_PFX" V1 Send:"DXL_DEBUG_EOL);
+  itf->status = DXL_STATUS_NO_ERROR;
+
+  // Stats
+  itf->nb_pkt_tx++;
+
+  #ifdef DXL_DEBUG
+    DXL_DEBUG_PUTS(DXL_DEBUG_PFX" V1 Send:"DXL_DEBUG_EOL);
     dxl_v1_print_packet(packet);
-#endif
-
-    itf->status = DXL_STATUS_NO_ERROR;
-
-    // Stats
-    itf->nb_pkt_tx++;
+  #endif
 }
 
 /* Receive a packet from the given interface.
@@ -164,7 +164,7 @@ void dxl_v1_receive_packet(dxl_interface_t* itf, dxl_v1_packet_t* packet)
     }
 
 #ifdef DXL_DEBUG
-    serial_puts(DXL_DEBUG_PFX" V1 Receive:"DXL_DEBUG_EOL);
+    DXL_DEBUG_PUTS(DXL_DEBUG_PFX" V1 Receive:"DXL_DEBUG_EOL);
     dxl_v1_print_packet(packet);
 #endif
 
@@ -456,19 +456,19 @@ void dxl_v1_print_packet(dxl_v1_packet_t* packet)
                  "  Len:  %02X"DXL_DEBUG_EOL
                  "  Data: ",
             packet->id, packet->content, packet->length);
-    serial_puts(str);
+    DXL_DEBUG_PUTS(str);
 
     if(packet->length > DXL_V1_PACKET_MIN_LENGTH) {
         for(idx_param = 0; idx_param < packet->length-DXL_V1_PACKET_MIN_LENGTH ; idx_param++) {
             sprintf(str, "%02X ", packet->parameters[idx_param]);
-            serial_puts(str);
+            DXL_DEBUG_PUTS(str);
         }
     } else {
-        serial_puts("(none)");
+      DXL_DEBUG_PUTS("(none)");
     }
 
     sprintf(str, DXL_DEBUG_EOL"  Chk:  %02X"DXL_DEBUG_EOL, packet->checksum);
-    serial_puts(str);
+    DXL_DEBUG_PUTS(str);
 }
 
 #endif // DXL_DEBUG

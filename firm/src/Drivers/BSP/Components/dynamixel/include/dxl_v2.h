@@ -57,11 +57,19 @@
 #define DXL_V2_INS_ACTION        0x05 // Nb. Param: 0
 #define DXL_V2_INS_RESET         0x06 // Nb. Param: 0
 #define DXL_V2_INS_REBOOT        0x08 // Nb. Param: TODO
-#define DXL_V2_INS_STATUS        0x55 // Nb. Param: TODO
+#define DXL_V2_INS_STATUS        0x55 // Nb. Param: 4
 #define DXL_V2_INS_SYNC_READ     0x82 // Nb. Param: N
 #define DXL_V2_INS_SYNC_WRITE    0x83 // Nb. Param: N
 #define DXL_V2_INS_BULK_READ     0x92 // Nb. Param: N
 #define DXL_V2_INS_BULK_WRITE    0x93 // Nb. Param: N
+
+/* Status packets lengths */
+#define DXL_V2_LEN_STATUS_PING            4U                // Error (1B) + Model (2B) + Firmware (1B)
+#define DXL_V2_LEN_STATUS_WRITE           1U                // Error (1B)
+#define DXL_V2_LEN_STATUS_READ(_nb_data) (1U + (_nb_data))  // Error (1B) + nb of requested data
+#define DXL_V2_LEN_STATUS_ACTION          1U                // Error (1B)
+#define DXL_V2_LEN_STATUS_RESET           1U                // Error (1B)
+#define DXL_V2_LEN_STATUS_REBOOT          1U                // Error (1B)
 
 /**
  ********************************************************************************
@@ -72,7 +80,7 @@
  */
 
 /* Error number definition */
-#define DXL_V2_ERR_RESULT		    1U
+#define DXL_V2_ERR_RESULT           1U
 #define DXL_V2_ERR_INSTRUCTION      2U
 #define DXL_V2_ERR_CRC              3U
 #define DXL_V2_ERR_DATA_RANGE       4U

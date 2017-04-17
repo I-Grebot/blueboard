@@ -50,7 +50,7 @@ const dxl_servo_model_t dxl_servo_models[] = {
         { 1030,    "XM430-W210"     , DXL_V2,        DXL_REG5}  /* XM430-W210-T / XM430-W210-R */
 };
 
-static const size_t dxl_nb_servo_models = sizeof(dxl_servo_models) / sizeof(dxl_servo_model_t);
+static const size_t dxl_nb_servo_models = sizeof(dxl_servo_models) / sizeof(dxl_servo_models[0]);
 
 const uint32_t dxl_baudrates[] = {
            9600,
@@ -90,7 +90,7 @@ const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name)
 
 }
 
-const dxl_servo_model_t* dxl_find_servo_model_by_id(uint16_t id)
+const dxl_servo_model_t* dxl_find_servo_model_by_id(uint32_t id)
 {
     uint16_t model_idx;
 

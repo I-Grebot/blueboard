@@ -27,7 +27,7 @@ void xl_320_init(XL_320_Com_Mode mode){
         break;
     }
 }
-void xl_320_set_hw_send(void (*hw_send)(uint8_t))
+void xl_320_set_hw_send(void (*hw_send)(uint8_t, uint8_t))
 {
     xl_320_cfg.hw_send_byte = hw_send;
 }
@@ -113,6 +113,7 @@ void xl_320_write(uint8_t id, uint8_t address, uint8_t* parameters, uint8_t nb_p
 }
 
 void xl_320_send_packet(xl_320_packet_t* packet){
+	char str[20];
     unsigned short crc16;
     uint8_t buffer[XL_320_MAX_PACKET];
     uint8_t idx_buffer=0;
@@ -152,12 +153,24 @@ void xl_320_send_packet(xl_320_packet_t* packet){
 
     if(xl_320_cfg.mode==XL_320_TXRX_ONE_PIN)
         xl_320_cfg.hw_switch(XL_320_TX);
+
+    sprintf(str, "XL Send: ");
+	serial_puts(str);
+
     for(idx_buffer = 0; idx_buffer<length; idx_buffer++)
     {
-        xl_320_cfg.hw_send_byte(buffer[idx_buffer]);
+        xl_320_cfg.hw_send_byte(0, buffer[idx_buffer]);
+        sprintf(str, "%02X ", buffer[idx_buffer]);
+        serial_puts(str);
     }
-    xl_320_cfg.hw_send_byte(crc16 & 0xFF); // CRC_L
-    xl_320_cfg.hw_send_byte((crc16>>8)&0xFF); // CRC_H
+    xl_320_cfg.hw_send_byte(0, crc16 & 0xFF); // CRC_L
+    xl_320_cfg.hw_send_byte(0, (crc16>>8)&0xFF); // CRC_H
+
+    sprintf(str, "%02X ", crc16 & 0xFF);
+    serial_puts(str);
+    sprintf(str, "%02X\n", (crc16>>8)&0xFF);
+    serial_puts(str);
+
     if(xl_320_cfg.mode==XL_320_TXRX_ONE_PIN)
         xl_320_cfg.hw_switch(XL_320_RX);
 }

@@ -136,13 +136,13 @@ dxl_status_t dxl_reset(dxl_servo_t* servo)
  * @param size: Size of the value array in number of bytes
  * @param reg: True if the write is registered
  */
-dxl_status_t dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size, bool reg)
+dxl_status_t dxl_write(dxl_servo_t* servo, uint16_t addr, uint8_t* values, size_t size, bool reg)
 {
     if(servo->itf->protocol == DXL_V1) {
-        dxl_v1_write(servo, addr, values, size, reg);
+        dxl_v1_write(servo, (uint8_t) addr, values, size, reg);
 
     } else if(servo->itf->protocol == DXL_V2) {
-    	dxl_v2_write(servo, addr, values, size, reg);
+    	dxl_v2_write(servo, (uint16_t) addr, values, size, reg);
 
     // Error
     } else {
@@ -159,7 +159,7 @@ dxl_status_t dxl_write(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t
  * @param size: Size of the value in number of bytes
  * @param reg: True if the write is registered
  */
-dxl_status_t dxl_write_int(dxl_servo_t* servo, uint8_t addr, uint32_t value, size_t size, bool reg)
+dxl_status_t dxl_write_int(dxl_servo_t* servo, uint16_t addr, uint32_t value, size_t size, bool reg)
 {
 	uint8_t value_bytes[4];
 	dxl_data_to_bytes_array(value, size, value_bytes);
@@ -172,13 +172,13 @@ dxl_status_t dxl_write_int(dxl_servo_t* servo, uint8_t addr, uint32_t value, siz
  * @param values: Array of values to store the read values
  * @param size: Size of the value array in number of bytes
  */
-dxl_status_t dxl_read(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t size)
+dxl_status_t dxl_read(dxl_servo_t* servo, uint16_t addr, uint8_t* values, size_t size)
 {
     if(servo->itf->protocol == DXL_V1) {
-        dxl_v1_read(servo, addr, values, size);
+        dxl_v1_read(servo, (uint8_t) addr, values, size);
 
     } else if(servo->itf->protocol == DXL_V2) {
-    	dxl_v2_read(servo, addr, values, size);
+    	dxl_v2_read(servo, (uint16_t) addr, values, size);
 
     // Error
     } else {
@@ -194,7 +194,7 @@ dxl_status_t dxl_read(dxl_servo_t* servo, uint8_t addr, uint8_t* values, size_t 
  * @param value: Read value
  * @param size: Size of the value in number of bytes
  */
-dxl_status_t dxl_read_int(dxl_servo_t* servo, uint8_t addr, uint32_t* value, size_t size)
+dxl_status_t dxl_read_int(dxl_servo_t* servo, uint16_t addr, uint32_t* value, size_t size)
 {
 	uint8_t value_bytes[4];
 	dxl_status_t ret;
@@ -236,16 +236,8 @@ dxl_status_t dxl_action(dxl_servo_t* servo)
 
 dxl_status_t dxl_get_model(dxl_servo_t* servo, uint32_t* model)
 {
-    uint8_t data[4];
-    dxl_status_t status;
-
-    extern const dxl_register_t* dxl_reg_v1_model_number;
-    extern const dxl_register_t* dxl_reg_v4_model_number;
-
-    status = dxl_read(servo, dxl_reg_v1_model_number->address, data, dxl_reg_v1_model_number->size);
-    dxl_bytes_array_to_data(model, dxl_reg_v1_model_number->size, data);
-
-    return status;
+    extern const dxl_register_t* dxl_reg_model_number;
+    return dxl_read_int(servo, dxl_reg_model_number->address, model, dxl_reg_model_number->size);
 }
 
 
@@ -253,11 +245,9 @@ dxl_status_t dxl_get_model(dxl_servo_t* servo, uint32_t* model)
 void dxl_set_torque(dxl_servo_t* servo, uint8_t torque)
 {
     extern const dxl_register_t* dxl_reg_v1_torque_enable;
-
-    dxl_write(servo, dxl_reg_v1_torque_enable->address, &torque, sizeof(torque), false);
-
+    dxl_write_int(servo, dxl_reg_v1_torque_enable->address, torque, dxl_reg_v1_torque_enable->size, false);
 }
-
+/*
 void dxl_set_position(dxl_servo_t* servo, uint16_t new_position)
 {
     // TEMP
@@ -278,7 +268,7 @@ void dxl_set_led(dxl_servo_t* servo, uint8_t led)
     dxl_write(servo, dxl_reg_v1_led->address, &led, sizeof(led), false);
 
 }
-
+*/
 
 /**
 ********************************************************************************

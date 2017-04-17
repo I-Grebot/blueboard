@@ -125,8 +125,9 @@ void dsv_init(void)
 
     // TEMP
      /* Initialize XL-320 Library */
-     //xl_320_init(XL_320_TX_ONLY);
-     //xl_320_set_hw_send(bb_dsv_put);
+     xl_320_init(XL_320_TX_ONLY);
+     xl_320_set_hw_send(dsv_put);
+     //xl_320_set_hw_switch(dsv_switch);
 
     // Initialize test servos
     dxl_init_servo(&servo1, &dsv_chan2.dxl, "RX-28");
@@ -361,7 +362,7 @@ void RS485_ISR (void)
 */
 
 /**** THIS IS ALL TEMPORARY ****/
-
+/*
 void dsv_test_pos(uint8_t id, uint16_t pos)
 {
 
@@ -371,15 +372,15 @@ void dsv_test_pos(uint8_t id, uint16_t pos)
     dxl_set_position(&servo1, pos);
     dxl_set_torque(&servo1, 1);
 
-}
+}*/
 
-void dsv_test_led(uint8_t id, uint8_t led)
+/*void dsv_test_led(uint8_t id, uint8_t led)
 {
 
     servo1.id = DXL_ID_BROADCAST;
 
     dxl_set_led(&servo1, led);
-}
+}*/
 
 void dsv_ping(uint8_t id)
 {
@@ -429,7 +430,7 @@ void dsv_scan_servos(void)
         //bb_dsv_enable(dsv_chan2.dxl.itf_idx, OS_ISR_PRIORITY_DSV);
         USART_Cmd(RS485_COM, ENABLE);
 
-        dsv_test_led(254, 1);
+        //dsv_test_led(254, 1);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
@@ -446,8 +447,8 @@ BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength)
                          "---------------------------------------------------------------------------------"SHELL_EOL;
 
     /* Some externally defined variables */
-    extern dxl_register_t dxl_registers_v1[];
-    extern const size_t dxl_registers_v1_length;
+    extern const dxl_register_t dxl_registers[];
+    extern const size_t dxl_registers_length;
 
     /* Local handlers for outputting variables one at a time */
     static const dxl_register_t* var = NULL;
@@ -456,11 +457,10 @@ BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength)
     dxl_status_t read_status;
     uint32_t reg_value;
 
-    // Temp: Only handle REG V1
-    // Correct branching per reg set is required
+    // Initialization for 1st call
     if(var == NULL)
     {
-        var = dxl_registers_v1;
+        var = dxl_registers;
         id = 0;
 
         /* Header */
@@ -468,35 +468,39 @@ BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength)
         ret += strlen(ret);
     }
 
-    // Read the current reg value and display it if no error occured
-    read_status = dxl_read_int(servo, var->address, &reg_value, var->size);
-
-    if(read_status == DXL_PASS)
+    // Check to see if register is mapped
+    if(var->reg_table_mask & servo->model->reg_table)
     {
-		snprintf(ret, retLength, SHELL_DSV_PFX"[DUMP] %4u %3u %-6s %-4s %-5u %-4u %-30s %5u"SHELL_EOL,
-				servo->itf->itf_idx,
-				servo->id,
-				dxl_get_area_as_string(var->area),
-				dxl_get_access_as_string(var->access),
-				var->address,
-				var->size,
-				var->name,
-				reg_value);
-		ret += strlen(ret);
-    } else {
-    	snprintf(ret, retLength, SHELL_DSV_PFX"[DUMP %1u %3u] ERROR: ",
-				servo->itf->itf_idx,
-				servo->id);
-    	ret += strlen(ret);
-    	dxl_get_error_str(ret, retLength, read_status, servo->itf->protocol);
-    	ret += strlen(ret);
-    	snprintf(ret, retLength, SHELL_EOL);
-    	ret += strlen(ret);
+      // Read the current reg value and display it if no error occured
+      read_status = dxl_read_int(servo, var->address, &reg_value, var->size);
+
+      if(read_status == DXL_PASS)
+      {
+      snprintf(ret, retLength, SHELL_DSV_PFX"[DUMP] %4u %3u %-6s %-4s %-5u %-4u %-30s %5u"SHELL_EOL,
+          servo->itf->itf_idx,
+          servo->id,
+          dxl_get_area_as_string(var->area),
+          dxl_get_access_as_string(var->access),
+          var->address,
+          var->size,
+          var->name,
+          reg_value);
+      ret += strlen(ret);
+      } else {
+        snprintf(ret, retLength, SHELL_DSV_PFX"[DUMP %1u %3u] ERROR: ",
+          servo->itf->itf_idx,
+          servo->id);
+        ret += strlen(ret);
+        dxl_get_error_str(ret, retLength, read_status, servo->itf->protocol);
+        ret += strlen(ret);
+        snprintf(ret, retLength, SHELL_EOL);
+        ret += strlen(ret);
+      }
     }
 
     /* There are still items to process, move to the next one */
     id++;
-    if(id < dxl_registers_v1_length)
+    if(id < dxl_registers_length)
     {
         var++;
         return pdTRUE;

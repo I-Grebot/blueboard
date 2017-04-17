@@ -199,7 +199,7 @@ void bb_dsv_init(uint8_t dsv_chan, USART_InitTypeDef * USART_InitStruct);
 void bb_dsv_enable(uint8_t dsv_chan, uint32_t nvic_priority);
 void bb_dsv_disable(uint8_t dsv_chan);
 void bb_dsv_switch(uint8_t dsv_chan, dxl_switch_mode_e mode);
-//void bb_dsv_put(uint8_t dsv_chan, uint8_t ch);
+void bb_dsv_put(uint8_t dsv_chan, uint8_t ch);
 //uint8_t bb_dsv_receive(uint8_t dsv_chan, uint8_t* rx_data);
 //void bb_dsv_flush(uint8_t dsv_chan);
 

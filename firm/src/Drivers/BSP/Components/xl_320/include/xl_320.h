@@ -36,7 +36,7 @@ typedef struct {
     void (* hw_switch)(uint8_t);
 
     // Send a byte and return error if not successful
-    void (* hw_send_byte)(uint8_t);
+    void (* hw_send_byte)(uint8_t, uint8_t);
 
     // Receive a byte and return error if not successful
     uint8_t (* hw_receive_byte) (uint8_t*);
@@ -193,7 +193,7 @@ typedef struct {
 
 // Initialization functions
 void xl_320_init(XL_320_Com_Mode mode);
-void xl_320_set_hw_send(void (*hw_send)(uint8_t));
+void xl_320_set_hw_send(void (*hw_send)(uint8_t, uint8_t));
 void xl_320_set_hw_receive(uint8_t (*hw_receive)(uint8_t*));
 void xl_320_set_hw_flush(void (*hw_flush)(void));
 void xl_320_set_hw_switch(void (*hw_switch)(uint8_t));

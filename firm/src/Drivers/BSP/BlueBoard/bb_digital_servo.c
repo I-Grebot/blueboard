@@ -51,6 +51,10 @@ void bb_dsv_init(uint8_t dsv_chan, USART_InitTypeDef * USART_InitStruct)
         /* USART configuration */
         USART_Init(DSV_COM, USART_InitStruct);
 
+        /* Enable USART Half-Duplex mode. Tx always ON, RX switched on/off */
+        USART_DirectionModeCmd(DSV_COM, USART_Mode_Tx, ENABLE);
+        USART_HalfDuplexCmd(DSV_COM, ENABLE);
+
         /* USART Clock default configuration */
         USART_ClockStructInit(&USART_ClockInitStruct);
         USART_ClockInit(DSV_COM, &USART_ClockInitStruct);
@@ -169,18 +173,20 @@ void bb_dsv_disable(uint8_t dsv_chan)
     }
 }
 
-/* Switch a given interface from TX to RX */
+/* Switch a given interface from TX to RX
+ * We only need to toggle the RX enable
+ */
 void bb_dsv_switch(uint8_t dsv_chan, dxl_switch_mode_e mode)
 {
-    if(dsv_chan == BB_DSV_CHANNEL1) {
-        if(mode == DXL_MODE_TX) {
-                USART_DirectionModeCmd(DSV_COM, USART_Mode_Tx, ENABLE);
-                //USART_DirectionModeCmd(DSV_COM, USART_Mode_Rx, DISABLE);
-            } else {
-                //USART_DirectionModeCmd(DSV_COM, USART_Mode_Tx, DISABLE);
-                //USART_DirectionModeCmd(DSV_COM, USART_Mode_Rx, ENABLE);
-            }
+  if(dsv_chan == BB_DSV_CHANNEL1)
+  {
+    if(mode == DXL_MODE_TX)
+    {
+      USART_DirectionModeCmd(DSV_COM, USART_Mode_Rx, DISABLE);
+    } else {
+      USART_DirectionModeCmd(DSV_COM, USART_Mode_Rx, ENABLE);
     }
+  }
 
 #ifdef BB_USE_RS485_DSV_CHAN2
     else if(dsv_chan == BB_DSV_CHANNEL2) {
@@ -200,4 +206,25 @@ void bb_dsv_switch(uint8_t dsv_chan, dxl_switch_mode_e mode)
 
 }
 
+void bb_dsv_put(uint8_t dsv_chan, uint8_t ch)
+{
+	dsv_chan =  BB_DSV_CHANNEL1;
+
+    if(dsv_chan == BB_DSV_CHANNEL1) {
+        // TEMP
+        USART_SendData(DSV_COM, (uint8_t) ch);
+        while(USART_GetFlagStatus(DSV_COM, USART_FLAG_TC) == RESET);
+    }
+
+#ifdef BB_USE_RS485_DSV_CHAN2
+    else if(dsv_chan == BB_DSV_CHANNEL2) {
+        // TEMP
+        USART_SendData(RS485_COM, (uint8_t) ch);
+        while(USART_GetFlagStatus(RS485_COM, USART_FLAG_TC) == RESET);
+        USART_ClearFlag(RS485_COM, USART_FLAG_TC);
+    }
+#endif // BB_USE_RS485_DSV_CHAN2
+
+
+}
 
