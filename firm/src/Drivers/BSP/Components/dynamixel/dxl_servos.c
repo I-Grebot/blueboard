@@ -92,16 +92,16 @@ const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name)
 
 const dxl_servo_model_t* dxl_find_servo_model_by_id(uint32_t id)
 {
-    uint16_t model_idx;
+  uint16_t model_idx;
 
-    for(model_idx = 0; model_idx < dxl_nb_servo_models; model_idx++)
-    {
-        if(id == dxl_servo_models[model_idx].model_id) {
-            return &dxl_servo_models[model_idx];
-        }
+  for(model_idx = 0; model_idx < dxl_nb_servo_models; model_idx++)
+  {
+    if(id == dxl_servo_models[model_idx].model_id) {
+      return &dxl_servo_models[model_idx];
     }
+  }
 
-    return NULL;
+  return NULL;
 }
 
 #ifdef DXL_DEBUG

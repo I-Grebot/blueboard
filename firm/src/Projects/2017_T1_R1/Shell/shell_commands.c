@@ -672,8 +672,6 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     static BaseType_t lParameterNumber = 0;
     dxl_status_t status;
     char error_str[128];
-    uint32_t servo_model_id;
-    dxl_servo_model_t* servo_model;
 
     static char* command;
     static BaseType_t command_str_length;
@@ -682,6 +680,11 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     static uint16_t add;
     static uint8_t size;
     static uint32_t data;
+    static bool dump_started;
+    static dxl_servo_t servo;
+
+    static uint16_t servo_model_id;
+
     uint8_t data_arr[4];
 
     // Interface Channels, defined outside of this module
@@ -690,8 +693,6 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     extern const dxl_servo_model_t dxl_servo_models[];
 
-    // Local service servo for commands handling
-    dxl_servo_t servo;
 
     // Nothing to display by default
     memset( pcWriteBuffer, 0x00, xWriteBufferLen );
@@ -727,6 +728,9 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             // Ensure we keep going for the next parameter
             xReturn = pdTRUE;
             lParameterNumber++;
+
+            // Default states before command execution
+            dump_started = false;
 
         // End of decoding, launch the command
         } else {
@@ -810,10 +814,10 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 						// This is also used to retrieve potential errors like overheating, input voltage etc.
 						status = dxl_get_model(&servo, &servo_model_id);
-						servo_model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
+						servo.model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
 
-						if(servo_model != NULL) {
-							snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"[SCAN] %u %-3u %-20s %-3u"SHELL_EOL, itf, servo.id, servo_model->name, status);
+						if(servo.model != NULL) {
+							snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"[SCAN] %u %-3u %-20s %-3u"SHELL_EOL, itf, servo.id, servo.model->name, status);
 							pcWriteBuffer += strlen(pcWriteBuffer);
 						}
 
@@ -821,46 +825,65 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 				}
 
-            } // scan
+      } // scan
 
-            // Dump
-            else if((!strcasecmp(command, "dump")) && (lParameterNumber == 4))
-            {
-              // FIXME: handle of 1st time getting the model ID
+      // Dump
+      else if((!strcasecmp(command, "dump")) && (lParameterNumber == 4))
+      {
 
-              // Get model ID
-              /*status = dxl_get_model(&servo, &servo_model_id);
-              if(status != DXL_PASS) {
-                  dxl_get_error_str(error_str, sizeof(error_str), status, servo.itf->protocol);
-                  snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Error(s): %s"SHELL_EOL, error_str);
-                  lParameterNumber = 0;
-                  return pdFALSE;
-              }*/
+        // Fetch model number before starting the dump
+        if(dump_started == false)
+        {
+          // Get model ID
+          status = dxl_get_model(&servo, &servo_model_id);
 
-              //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Read model %u"SHELL_EOL, servo_model_id);
-              //return pdFALSE;
+          if(status != DXL_PASS) {
+              dxl_get_error_str(error_str, sizeof(error_str), status, servo.itf->protocol);
+              snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Error(s): %s"SHELL_EOL, error_str);
+              lParameterNumber = 0;
+              return pdFALSE;
+          }
 
-              // Fetch model
-              //servo_model_id = 28;
-              //servo_model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
-              //servo.model = &dxl_servo_models[6]; // RX28, just for tests
-              servo.model = &dxl_servo_models[15]; // XL320, just for tests
+          //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Read model %u"SHELL_EOL, servo_model_id);
+          //return pdFALSE;
 
-              /*if(servo_model == NULL) {
-                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Could not fetch servo model %u"SHELL_EOL, servo_model_id);
-                lParameterNumber = 0;
-                return pdFALSE;
+          // Fetch model
+          //servo_model_id = 28;
+          servo.model = (dxl_servo_model_t*) dxl_find_servo_model_by_id(servo_model_id);
+          //servo.model = &dxl_servo_models[6]; // RX28, just for tests
+          //servo.model = &dxl_servo_models[15]; // XL320, just for tests
 
-              // Dump servo registers and print them out
-              } else {*/
-                xReturn = dsv_dump_servo(&servo, pcWriteBuffer, xWriteBufferLen);
-                if(xReturn == pdFALSE) {
-                  lParameterNumber = 0;
-                }
-              //}
+          if(servo.model == NULL) {
+            snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Could not fetch servo model %u"SHELL_EOL, servo_model_id);
+            lParameterNumber = 0;
+            return pdFALSE;
+          }
 
-            	return xReturn;
-            }
+          dump_started = true;
+          return pdTRUE;
+
+        // Actual dump
+        } else {
+          xReturn = dsv_dump_servo(&servo, pcWriteBuffer, xWriteBufferLen);
+
+          // Cleanup when finished
+          if(xReturn == pdFALSE) {
+            lParameterNumber = 0;
+          }
+
+          return xReturn;
+        }
+
+        // Dump servo registers and print them out
+        /*} else {
+          xReturn = dsv_dump_servo(&servo, pcWriteBuffer, xWriteBufferLen);
+          if(xReturn == pdFALSE) {
+            lParameterNumber = 0;
+          }
+        //}
+
+        return xReturn;*/
+      }
 
 			// Testings
 			else if(!strcasecmp(command, "test"))

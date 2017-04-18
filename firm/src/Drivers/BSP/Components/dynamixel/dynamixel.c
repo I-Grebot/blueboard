@@ -234,7 +234,7 @@ dxl_status_t dxl_action(dxl_servo_t* servo)
 ********************************************************************************
 */
 
-dxl_status_t dxl_get_model(dxl_servo_t* servo, uint32_t* model)
+dxl_status_t dxl_get_model(dxl_servo_t* servo, uint16_t* model)
 {
     extern const dxl_register_t* dxl_reg_model_number;
     return dxl_read_int(servo, dxl_reg_model_number->address, model, dxl_reg_model_number->size);

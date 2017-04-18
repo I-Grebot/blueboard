@@ -113,8 +113,8 @@ typedef uint16_t dxl_status_t;
 
 /* Communication Protocols */
 typedef enum {
-    DXL_V1,
-    DXL_V2
+    DXL_V1 = 1,
+    DXL_V2 = 2
 } dxl_protocol_e;
 
 /* Registers Control Tables
@@ -259,7 +259,7 @@ dxl_status_t dxl_read_int(dxl_servo_t* servo, uint16_t addr, uint32_t* value, si
 dxl_status_t dxl_action(dxl_servo_t* servo);
 
 // Shorthands
-dxl_status_t dxl_get_model(dxl_servo_t* servo, uint32_t* model);
+dxl_status_t dxl_get_model(dxl_servo_t* servo, uint16_t* model);
 void dxl_set_position(dxl_servo_t* servo, uint16_t new_position);
 
 // Service handlers

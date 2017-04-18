@@ -90,8 +90,8 @@ typedef enum {
 
 /* List of available Digital Servo channels */
 typedef enum {
-    BB_DSV_CHANNEL1 = 0,
-    BB_DSV_CHANNEL2 = 1
+    BB_DSV_CHANNEL1 = 1,
+    BB_DSV_CHANNEL2 = 2
 } BB_DSV_ChannelTypeDef;
 
 typedef enum {

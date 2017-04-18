@@ -443,8 +443,8 @@ void dsv_scan_servos(void)
 BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength)
 {
 	/* Local constants */
-    const char* header = "             Itf.  ID Area   Acc. Addr. Size Name                           Value"SHELL_EOL
-                         "---------------------------------------------------------------------------------"SHELL_EOL;
+    const char* header = "             Itf.  ID Area   Acc. Addr. Size Name                           Value"SHELL_EOL;
+    const char* line   = "---------------------------------------------------------------------------------"SHELL_EOL;
 
     /* Some externally defined variables */
     extern const dxl_register_t dxl_registers[];
@@ -464,7 +464,16 @@ BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength)
         id = 0;
 
         /* Header */
+        snprintf(ret, retLength, "Dump on interface %u (Protocol V%u) - Servo Model: %s (%u) with ID: %u"SHELL_EOL,
+            servo->itf->itf_idx,
+            (uint8_t) servo->itf->protocol,
+            servo->model->name,
+            servo->model->model_id,
+            servo->id);
+        ret += strlen(ret);
         strcpy(ret, header);
+        ret += strlen(ret);
+        strcpy(ret, line);
         ret += strlen(ret);
     }
 
@@ -474,6 +483,7 @@ BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength)
       // Read the current reg value and display it if no error occured
       read_status = dxl_read_int(servo, var->address, &reg_value, var->size);
 
+      // Keep printing interface and ID for future multi-interface / multi-servo dump compatibility
       if(read_status == DXL_PASS)
       {
       snprintf(ret, retLength, SHELL_DSV_PFX"[DUMP] %4u %3u %-6s %-4s %-5u %-4u %-30s %5u"SHELL_EOL,
@@ -487,9 +497,12 @@ BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength)
           reg_value);
       ret += strlen(ret);
       } else {
-        snprintf(ret, retLength, SHELL_DSV_PFX"[DUMP %1u %3u] ERROR: ",
+        snprintf(ret, retLength, SHELL_DSV_PFX"[DUMP] %4u %3u %-6s %-4s %-5u ERROR: ",
           servo->itf->itf_idx,
-          servo->id);
+          servo->id,
+          dxl_get_area_as_string(var->area),
+          dxl_get_access_as_string(var->access),
+          var->address);
         ret += strlen(ret);
         dxl_get_error_str(ret, retLength, read_status, servo->itf->protocol);
         ret += strlen(ret);
