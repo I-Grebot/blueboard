@@ -16,6 +16,7 @@
 
 #include "main.h"
 
+static const char * const welcomeMessage  = WELCOME_MESSAGE;
 
 /* Local private hardware configuration handlers */
 static USART_InitTypeDef Serial_Config;
@@ -160,3 +161,4 @@ void SERIAL_ISR (void)
 
     }
 }
+

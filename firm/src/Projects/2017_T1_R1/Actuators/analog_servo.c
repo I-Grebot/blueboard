@@ -54,7 +54,7 @@ BaseType_t asv_start(void)
     ASV_Create(&leftArm, BB_ASV_CHANNEL4, 2000, 4000);
     ASV_Create(&rightArm, BB_ASV_CHANNEL2, 2000, 4000);
 
-	return xTaskCreate(OS_ASVTask, "ANALOG SERVO", 350, NULL, OS_TASK_PRIORITY_ASV, NULL );
+	return xTaskCreate(OS_ASVTask, "ANALOG SERVO", OS_TASK_STACK_ASV, NULL, OS_TASK_PRIORITY_ASV, NULL );
 }
 
 static void OS_ASVTask( void *pvParameters )

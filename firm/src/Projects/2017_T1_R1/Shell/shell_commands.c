@@ -645,7 +645,7 @@ static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
                 snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Goto (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
                 pcWriteBuffer += strlen(pcWriteBuffer);
 
-                motion_send_wp(&wp);
+                motion_add_new_wp(&wp);
 
             } // goto
 

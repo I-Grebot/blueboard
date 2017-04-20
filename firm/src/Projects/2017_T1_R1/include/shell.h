@@ -43,19 +43,6 @@ available. */
 /* Delimiter for multiple variables output */
 #define SHELL_VAR_DELIM                  ":"
 
-/* The welcome message display at shell's startup */
-#define SHELL_WELCOME_MESSAGE "\f"\
-    "-----------------------------------------------------------\n\r"\
-    "  IgreBot "YEAR_STR" ~ Command Shell\n\r"\
-    "-----------------------------------------------------------\n\r"\
-    "  Robot : "ROBOT_NAME_STR"\n\r"\
-    "  Build : "BUILD_VERSION_STR"\n\r"\
-    "-----------------------------------------------------------\n\r"\
-    " Type 'help' for the list of available commands\n\r"\
-    "-----------------------------------------------------------\n\r\n\r"\
-    "> "
-
-
 /**
  ********************************************************************************
  **

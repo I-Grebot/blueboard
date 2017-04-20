@@ -83,8 +83,7 @@ void bd_manage_from_speed_cmd(struct blocking_detection * bd,
 		if ((uint32_t)i > bd->i_thres && 
 		    (bd->speed_thres == 0 || ABS(speed) < bd->speed_thres)) {
 			if (bd->cpt == bd->cpt_thres - 1)
-				WARNING(E_BLOCKING_DETECTION_MANAGER, 
-				      "BLOCKING cmd=%ld, speed=%ld i=%ld",
+			  DEBUG_WARNING("BLOCKING cmd=%ld, speed=%ld i=%ld",
 				      cmd, speed, i);
 			if (bd->cpt < bd->cpt_thres)
 				bd->cpt++;
@@ -94,7 +93,7 @@ void bd_manage_from_speed_cmd(struct blocking_detection * bd,
 		}
 #if BD_DEBUG
 		if (bd->debug_cpt++ == BD_DEBUG) {
-			DEBUG(E_BLOCKING_DETECTION_MANAGER, "cmd=%ld, speed=%ld i=%ld",
+		  DEBUG_INFO("cmd=%ld, speed=%ld i=%ld",
 			      cmd, speed, i);
 			bd->debug_cpt = 0;
 		}

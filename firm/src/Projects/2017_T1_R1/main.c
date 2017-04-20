@@ -26,6 +26,9 @@
 ********************************************************************************
 */
 
+/* Main robot structure containing all operational variables */
+RobotTypeDef robot;
+
 /**
 ********************************************************************************
 **
@@ -36,37 +39,43 @@
 
 int main( void )
 {
-    /* BlueBoard Initializations */
-    bb_init();
+  /* Globals initialization */
+  memset(&robot, 0, sizeof(RobotTypeDef));
 
-    /* Application modules Initialization */
-    serial_init();
-    dsv_init();
+  /* BlueBoard Initializations */
+  bb_init();
 
-    /* Apply the Power-Up sequence*/
-    bb_power_up();
+  /* Application modules Initialization */
 
-    /* Start software tasks */
+  // Serial is started first to ensure correct print outs
+  serial_init();
 
-    shell_start();
+  dsv_init();
 
-    motion_start();
-    avoidance_start();
-    asv_start();
-    //dsv_start();
+  /* Apply the Power-Up sequence*/
+  bb_power_up();
 
-    led_start();
+  /* Start software tasks */
+  shell_start();
 
-    strategy_start();
+  motion_cs_start();
+  motion_traj_start();
+  avoidance_start();
+  asv_start();
+  //dsv_start();
+
+  led_start();
+
+  strategy_start();
 
 
-    /* Start FreeRTOS Scheduler */
-    vTaskStartScheduler();
+  /* Start FreeRTOS Scheduler */
+  vTaskStartScheduler();
 
 
-    /* Infinite loop */
-    for( ;; );
+  /* Infinite loop */
+  for( ;; );
 
-    /* Should never reach this line! */
-    return 0;
+  /* Should never reach this line! */
+  return 0;
 }

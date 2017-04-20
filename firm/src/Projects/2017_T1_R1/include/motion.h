@@ -62,6 +62,9 @@ typedef struct {
 // MOTION-CONTROLLER
 // -----------------------------------------------------------------------------
 
+// Waypoints management
+#define MOTION_MAX_WP_IN_QUEUE    5U // Maximum amount of waypoints in the queue
+
 // Flags
 #define MOTION_FLAG_WP_SENT     0x01 // Set when a new WP is sent. Awaits for ACK
 #define MOTION_FLAG_WP_ACKED    0x02 // Set when the WP was ACK'd by Igresive

@@ -163,33 +163,33 @@ int32_t cs_do_process(struct cs* cs, int32_t consign)
     /* save the consign value into the structure */
     cs->consign_value = consign;
 
-    DEBUG("%d %ld ", i++, consign);
+    //DEBUG_INFO("%d %ld ", i++, consign);
 
     /* if the consign filter exist */
     cs->filtered_consign_value = consign = safe_filter(cs->consign_filter, cs->consign_filter_params, consign);
 	
-    DEBUG("%ld ", cs->filtered_consign_value);
+    //DEBUG_INFO("%ld ", cs->filtered_consign_value);
 
     /* read the process out if defined */
     process_out_value = safe_getprocessout(cs->process_out, cs->process_out_params);
 
-    DEBUG("%ld ", process_out_value);
+    //DEBUG_INFO("%ld ", process_out_value);
 
     /* apply the feedback filter if defined */
     process_out_value = safe_filter(cs->feedback_filter, cs->feedback_filter_params, process_out_value);
     cs->filtered_feedback_value = process_out_value;
 
-    DEBUG("%ld ", process_out_value);
+    //DEBUG_INFO("%ld ", process_out_value);
 
     /* substract consign and process out and put it into error */
     cs->error_value = cs->filtered_consign_value - process_out_value ;
     
-    DEBUG("%ld ", cs->error_value);
+    //DEBUG_INFO("%ld ", cs->error_value);
 
     /* apply the correct filter to error_value and put it into out_value */
     cs->out_value = safe_filter(cs->correct_filter, cs->correct_filter_params, cs->error_value);
  
-    DEBUG("%ld\n", cs->out_value);
+    //DEBUG_INFO("%ld\n", cs->out_value);
 
     /* send out_value to process in*/
     safe_setprocessin (cs->process_in, cs->process_in_params, cs->out_value);

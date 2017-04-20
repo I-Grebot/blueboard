@@ -26,6 +26,9 @@
 /* Errors definitions (included in errno.h) */
 #include <sys/errno.h>
 
+/* Debug definitions */
+#include "debug.h"
+
 /* Hardware constants */
 #define F_CPU   SYSCLK_VALUE    /* Unused in the code */
 
@@ -39,17 +42,6 @@
 #define GLOBAL_IRQ_ARE_MASKED() (/* tbu */)
 #define IRQ_LOCK(flags)   do {} while(0)//{ (void) flags; __asm__ volatile ("cpsie i"); }
 #define IRQ_UNLOCK(flags) do {} while(0)//{ (void) flags; __asm__ volatile ("cpsid i"); }
-
-#define EMERG(num, text...)  do {} while(0)
-
-#define ERROR(num, text...)  do {} while(0)
-
-#define WARNING(num, text...)  do {} while(0)
-
-#define NOTICE(num, text...)  do {} while(0)
-
-#define DEBUG(num, text...)  do {} while(0)
-
 
 /* PID Filters configuration:
  * The derivate term can be filtered to remove the noise. This value

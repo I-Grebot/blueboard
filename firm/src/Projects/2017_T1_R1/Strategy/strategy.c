@@ -59,7 +59,7 @@ BaseType_t strategy_start(void)
 
     return pdPASS;
 
-    //return xTaskCreate(OS_StrategyTask, "Strategy", 250, NULL, OS_TASK_PRIORITY_STRATEGY, NULL );
+    //return xTaskCreate(OS_StrategyTask, "STRATEGY", OS_TASK_STACK_STRATEGY, NULL, OS_TASK_PRIORITY_STRATEGY, NULL );
 }
 
 static void OS_StrategyTask( void *pvParameters )

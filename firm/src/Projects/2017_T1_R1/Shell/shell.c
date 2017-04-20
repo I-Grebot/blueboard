@@ -20,9 +20,9 @@
 /* Private functions and variables */
 static void shell_task (void *pvParameters);
 
-static const char * const pcWelcomeMessage 		= SHELL_WELCOME_MESSAGE;
+static const char * const pcWelcomeMessage 		  = WELCOME_MESSAGE;
 static const char * const pcEndOfOutputMessage 	= SHELL_END_OF_OUTPUT_STR;
-static const char * const pcNewLine 			= SHELL_EOL;
+static const char * const pcNewLine 			      = SHELL_EOL;
 
 /* Used to guard access to the UART in case messages are sent to the UART from
 more than one task. */
@@ -52,11 +52,11 @@ BaseType_t shell_start(void)
 
 	/* Create that task that handles the console itself. */
 	xTaskCreate( 	shell_task,				/* The task that implements the command console. */
-					"SHELL",	    			/* Text name assigned to the task.  This is just to assist debugging.  The kernel does not use this name itself. */
-					500,						/* The size of the stack allocated to the task. */
-					NULL,						/* The parameter is not used, so NULL is passed. */
-					OS_TASK_PRIORITY_SHELL,		/* The priority allocated to the task. */
-					NULL );						/* A handle is not required, so just pass NULL. */
+					"SHELL",	    			    /* Text name assigned to the task.  This is just to assist debugging.  The kernel does not use this name itself. */
+					OS_TASK_STACK_SHELL,		/* The size of the stack allocated to the task. */
+					NULL,						        /* The parameter is not used, so NULL is passed. */
+					OS_TASK_PRIORITY_SHELL,	/* The priority allocated to the task. */
+					NULL );						      /* A handle is not required, so just pass NULL. */
 
 	return pdPASS;
 }
@@ -183,15 +183,15 @@ static void shell_task(void *pvParameters)
  * Helpers and other public functions
  * -----------------------------------------------------------------------------
  */
-/*
-void OS_SHL_OutputString( const char * const pcMessage )
+
+void shell_print( const char * const pcMessage )
 {
 	if( xSemaphoreTake( xTxMutex, SHELL_MAX_MUTEX_WAIT ) == pdPASS )
 	{
 	    serial_puts(pcMessage);
 		xSemaphoreGive( xTxMutex );
 	}
-}*/
+}
 
 /*-----------------------------------------------------------*/
 

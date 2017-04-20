@@ -129,13 +129,14 @@ static void delete_event(struct trajectory *traj)
 }
 
 /** schedule the trajectory event */
+// TODO: remove all direct FreeRTOS references from Aversive
 static void schedule_event(struct trajectory *traj)
 {
 	if ( traj->scheduler_task != NULL) {
-		DEBUG(E_TRAJECTORY, "Schedule event, already scheduled");
+	  DEBUG_INFO("Schedule event, already scheduled");
 	}
 	else {
-			xTaskCreate(trajectory_manager_event, "TRAJECTORY", configMINIMAL_STACK_SIZE, traj, OS_TASK_PRIORITY_TRAJ, &traj->scheduler_task );
+			xTaskCreate(trajectory_manager_event, "TRAJECTORY", OS_TASK_STACK_AVS_TRAJ, traj, OS_TASK_PRIORITY_AVS_TRAJ, &traj->scheduler_task );
 	}
 }
 
@@ -223,7 +224,7 @@ void __trajectory_goto_d_a_rel(struct trajectory *traj, double d_mm,
 {
 	int32_t a_consign, d_consign;
 
-	DEBUG(E_TRAJECTORY, "Goto DA/RS rel to d=%f a_rad=%f", d_mm, a_rad);
+	DEBUG_INFO("Goto DA/RS rel to d=%f a_rad=%f", d_mm, a_rad);
 	delete_event(traj);
 	traj->state = state;
 	if (flags & UPDATE_A) {
@@ -294,7 +295,7 @@ void trajectory_turnto_xy(struct trajectory *traj, double x_abs_mm, double y_abs
 	double posy = position_get_y_double(traj->position);
 	double posa = position_get_a_rad_double(traj->position);
 
-	DEBUG(E_TRAJECTORY, "Goto Turn To xy %f %f", x_abs_mm, y_abs_mm);
+	DEBUG_INFO("Goto Turn To xy %f %f", x_abs_mm, y_abs_mm);
 	__trajectory_goto_d_a_rel(traj, 0,
 			simple_modulo_2pi(atan2(y_abs_mm - posy, x_abs_mm - posx) - posa),
 				  RUNNING_A,
@@ -308,7 +309,7 @@ void trajectory_turnto_xy_behind(struct trajectory *traj, double x_abs_mm, doubl
 	double posy = position_get_y_double(traj->position);
 	double posa = position_get_a_rad_double(traj->position);
 
-	DEBUG(E_TRAJECTORY, "Goto Turn To xy %f %f", x_abs_mm, y_abs_mm);
+	DEBUG_INFO("Goto Turn To xy %f %f", x_abs_mm, y_abs_mm);
 	__trajectory_goto_d_a_rel(traj, 0, 
 			modulo_2pi(atan2(y_abs_mm - posy, x_abs_mm - posx) - posa + M_PI),
 				  RUNNING_A,

@@ -7,9 +7,8 @@
 #include <lines.h>
 #include <polygon.h>
 
-#define DEBUG 0
 
-#if DEBUG == 1
+#ifdef DEBUG_LEVEL
 #define debug_printf(args...) printf(args)
 #else
 #define debug_printf(args...)

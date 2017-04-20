@@ -60,6 +60,7 @@
 								<option id="com.atollic.truestudio.gcc.optimization.prep_data.2083528428" name="Prepare dead data removal" superClass="com.atollic.truestudio.gcc.optimization.prep_data" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="com.atollic.truestudio.common_options.target.interwork.1136177953" name="Mix ARM/Thumb" superClass="com.atollic.truestudio.common_options.target.interwork" useByScannerDiscovery="false"/>
 								<option id="com.atollic.truestudio.gcc.misc.otherflags.1352725233" name="Other options" superClass="com.atollic.truestudio.gcc.misc.otherflags" useByScannerDiscovery="false" value="-Wunused-function -Wcomment" valueType="string"/>
+								<option id="com.atollic.truestudio.gcc.cstandard.1490479357" name="C standard" superClass="com.atollic.truestudio.gcc.cstandard" useByScannerDiscovery="false" value="com.atollic.truestudio.gcc.cstandard.gnu1x" valueType="enumerated"/>
 								<inputType id="com.atollic.truestudio.gcc.input.221534610" superClass="com.atollic.truestudio.gcc.input"/>
 							</tool>
 							<tool commandLinePattern="${COMMAND} ${OUTPUT_FLAG} ${OUTPUT} ${INPUTS} ${FLAGS}" id="com.atollic.truestudio.exe.debug.toolchain.ld.619258185" name="C Linker" superClass="com.atollic.truestudio.exe.debug.toolchain.ld">
