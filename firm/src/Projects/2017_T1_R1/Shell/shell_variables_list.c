@@ -24,6 +24,9 @@ extern const uint8_t dsv_nb_channels;
 extern dsv_channel_t dsv_chan1;
 extern dsv_channel_t dsv_chan2;
 
+extern mon_cfg_t mon_config;
+extern mon_values_t mon_values;
+
 /*
  * Variables definition list holder
  * Do not leave "unit" column empty! Leave 'NA' if not applicable
@@ -43,6 +46,17 @@ const OS_SHL_VarItemTypeDef OS_SHL_varList[] = {
 #ifdef CONFIG_MODULE_COMPENSATE_CENTRIFUGAL_FORCE
          ,{"robot.cs.centrifugal"       , TYPE_DOUBLE,  ACC_WR, &robot.cs.rs.centrifugal_coef,                 "NA"}
 #endif
+
+         // Monitoring
+         ,{"mon.cfg.shunt_ibat"         , TYPE_UINT16,  ACC_WR, &mon_config.shunt_ibat_mohm,       "mOhm"}
+         ,{"mon.cfg.shunt_ip1"          , TYPE_UINT16,  ACC_WR, &mon_config.shunt_ip1_mohm,        "mOhm"}
+         ,{"mon.cfg.shunt_ip2"          , TYPE_UINT16,  ACC_WR, &mon_config.shunt_ip2_mohm,        "mOhm"}
+         ,{"mon.cfg.shunt_ip3"          , TYPE_UINT16,  ACC_WR, &mon_config.shunt_ip3_mohm,        "mOhm"}
+         ,{"mon.val.ibat"               , TYPE_UINT32,  ACC_RD, &mon_values.ibat_ma,               "mA"}
+         ,{"mon.val.ip1"                , TYPE_UINT32,  ACC_RD, &mon_values.ip1_ma,                "mA"}
+         ,{"mon.val.ip2"                , TYPE_UINT32,  ACC_RD, &mon_values.ip2_ma,                "mA"}
+         ,{"mon.val.ip3"                , TYPE_UINT32,  ACC_RD, &mon_values.ip3_ma,                "mA"}
+         ,{"mon.val.temp"               , TYPE_INT32,   ACC_RD, &mon_values.temp,                  "degC"}
 
          // Digital Servos Configuration
          ,{"dsv.nb_channels"            , TYPE_UINT8,   ACC_RD, &dsv_nb_channels,            			   "NA"}

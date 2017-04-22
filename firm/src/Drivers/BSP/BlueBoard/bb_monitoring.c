@@ -115,9 +115,9 @@ uint32_t bb_mon_convert_raw_value_to_mv(const uint16_t rawValue)
     return (((uint32_t) rawValue) * 1000) / ADC_STEPS_PER_VOLT;
 }
 
-int32_t bb_mon_convert_temp_value_to_degree(const uint32_t vsense)
+int32_t bb_mon_convert_temp_value_to_degree(const uint32_t vsense_mv)
 {
-    return (((int32_t) vsense) - ADC_TEMPERATURE_V25) / 25 + 25;
+    return 25L + ((((int32_t) vsense_mv) - ADC_TEMPERATURE_V25_MV) * 1000 / ADC_TEMPERATURE_AVG_SLOPE_UV_PER_C);
 }
 
 

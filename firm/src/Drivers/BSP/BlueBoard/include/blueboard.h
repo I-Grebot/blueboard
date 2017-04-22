@@ -114,18 +114,18 @@ typedef enum {
 
 /* List of available monitoring channels */
 typedef enum {
-    BB_MON_CEL1     = 0,
-    BB_MON_CEL2     = 1,
-    BB_MON_CEL3     = 2,
-    BB_MON_CEL4     = 3,
-    BB_MON_IBAT     = 4,
-    BB_MON_IP1      = 5,
-    BB_MON_IP2      = 6,
-    BB_MON_IP3      = 7,
-    BB_MON_IMOT1    = 8,
-    BB_MON_IMOT2    = 9,
-    BB_MON_VTEMP    = 10,
-    BB_MON_VREF     = 11,
+    BB_MON_CEL1     = ADC_CEL1_CHANNEL,
+    BB_MON_CEL2     = ADC_CEL2_CHANNEL,
+    BB_MON_CEL3     = ADC_CEL3_CHANNEL,
+    BB_MON_CEL4     = ADC_CEL4_CHANNEL,
+    BB_MON_IBAT     = ADC_IBAT_CHANNEL,
+    BB_MON_IP1      = ADC_IP1_CHANNEL,
+    BB_MON_IP2      = ADC_IP2_CHANNEL,
+    BB_MON_IP3      = ADC_IP3_CHANNEL,
+    BB_MON_IMOT1    = ADC_IMOT1_CHANNEL,
+    BB_MON_IMOT2    = ADC_IMOT2_CHANNEL,
+    BB_MON_VTEMP    = ADC_TEMP_CHANNEL,
+    BB_MON_VREF     = ADC_VREF_CHANNEL,
 } BB_MON_TypeDef;
 
 /* List of LED colors */
@@ -207,7 +207,7 @@ void bb_dsv_put(uint8_t dsv_chan, uint8_t ch);
 void bb_mon_init(void);
 uint16_t bb_mon_read_channel(uint8_t channel);
 uint32_t bb_mon_convert_raw_value_to_mv(const uint16_t rawValue);
-int32_t bb_mon_convert_temp_value_to_degree(const uint32_t vsense);
+int32_t bb_mon_convert_temp_value_to_degree(const uint32_t vsense_mv);
 
 /* RGB LED */
 void bb_led_init(void);

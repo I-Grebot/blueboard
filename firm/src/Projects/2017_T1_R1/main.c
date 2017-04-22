@@ -64,6 +64,7 @@ int main( void )
   asv_start();
   //dsv_start();
 
+  mon_start();
   led_start();
 
   strategy_start();

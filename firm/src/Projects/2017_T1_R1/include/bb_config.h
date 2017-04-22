@@ -84,11 +84,17 @@
  /* Number of steps per V for a 12 bits conversion */
  #define ADC_STEPS_PER_VOLT          (4096000/ADC_VREF_VALUE)
 
- /* Temperature sensor offset at 25°C in mV */
- #define ADC_TEMPERATURE_V25         760
+ /* Temperature sensor offset and gain (default) */
+#define ADC_TEMPERATURE_V25_MV                 760L
+#define ADC_TEMPERATURE_AVG_SLOPE_UV_PER_C    2400L
 
- /* Temperature sensor slope in mV/C */
- #define ADC_TEMPERATURE_AVG_SLOPE   2500
+
+/* Shunt resistors values (default) for current measurement, in milliohms*/
+#define ADC_SHUNT_IBAT_MOHM   5L
+#define ADC_SHUNT_IP1_MOHM    10L
+#define ADC_SHUNT_IP2_MOHM    10L
+#define ADC_SHUNT_IP3_MOHM    10L
+
 
 /**
  ********************************************************************************

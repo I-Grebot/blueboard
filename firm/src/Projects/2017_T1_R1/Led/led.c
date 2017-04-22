@@ -32,7 +32,7 @@ BaseType_t led_start(void)
 	xLedColorMutex = xSemaphoreCreateMutex();
 	xLedModeMutex = xSemaphoreCreateMutex();
 
-    return xTaskCreate(OS_LedTask, "LED", configMINIMAL_STACK_SIZE, NULL, OS_TASK_PRIORITY_LED, NULL );
+    return xTaskCreate(OS_LedTask, "LED", OS_TASK_STACK_LED, NULL, OS_TASK_PRIORITY_LED, NULL );
 }
 
 static void OS_LedTask( void *pvParameters )

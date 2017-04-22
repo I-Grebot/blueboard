@@ -86,6 +86,7 @@
 #include "motion.h"
 #include "digital_servo.h"
 #include "strategy.h"
+#include "monitoring.h"
 #include "shell.h"
 #include "physics_const.h"
 #include "hardware_const.h"
@@ -124,6 +125,7 @@
  */
 #define OS_TASK_PRIORITY_SHELL        ( tskIDLE_PRIORITY + 1  )
 #define OS_TASK_PRIORITY_LED          ( tskIDLE_PRIORITY + 2  )
+#define OS_TASK_PRIORITY_MONITORING   ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_ASV          ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_DSV          ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_AVS_TRAJ     ( tskIDLE_PRIORITY + 3  )
@@ -137,6 +139,7 @@
  */
 #define OS_TASK_STACK_SHELL             500
 #define OS_TASK_STACK_LED               configMINIMAL_STACK_SIZE
+#define OS_TASK_STACK_MONITORING        configMINIMAL_STACK_SIZE
 #define OS_TASK_STACK_ASV               200
 #define OS_TASK_STACK_AVS_TRAJ          configMINIMAL_STACK_SIZE
 //#define OS_TASK_STACK_DSV               200
@@ -157,6 +160,7 @@
   */
 #define MOTION_CONTROL_PERIOD_MS      50
 #define AVERSIVE_PERIOD_MS            50
+#define MONITORING_PERIOD_MS          100
 
 /**
 ********************************************************************************
