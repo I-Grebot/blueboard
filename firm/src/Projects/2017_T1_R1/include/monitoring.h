@@ -19,8 +19,16 @@
 
 #include <stdint.h>
 
+/**
+********************************************************************************
+**
+**  Enumeration & Types
+**
+********************************************************************************
+*/
 
-typedef struct {
+typedef struct
+{
 
   // TODO: maybe add other parameters (VREF, etc.) -> can be used for calibration
 
@@ -32,7 +40,8 @@ typedef struct {
 
 } mon_cfg_t;
 
-typedef struct {
+typedef struct
+{
 
   uint32_t ibat_ma; // Battery current in mA
   uint32_t ip1_ma;  // VP1 power-supply current in mA

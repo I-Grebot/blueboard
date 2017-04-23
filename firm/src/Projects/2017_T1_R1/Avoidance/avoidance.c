@@ -222,3 +222,93 @@ static void av_mask_sensor_from_wall(int16_t a, int16_t wall_a) {
   }
 
 }
+
+/*
+void do_avoidance(void) {
+
+
+    switch(av.state) {
+
+        case AV_STATE_CLEAR:
+
+            // Clean up IRQs
+            sw_irq &= ~(IRQ_AV_CLEAR);
+
+            // Check to see if there is a valid detection,
+            // then we need to filter it
+            if(av_detection_is_valid()) {
+                av.state = AV_STATE_FILTER;
+            }
+            break;
+
+        case AV_STATE_FILTER:
+
+            // TODO: maybe add a filter
+            // This means to be triggered once, after the end of the filter
+            if(1) {
+
+              // Go to Detect after filtering, setup a timer
+              av.timer_ms = AV_TIMER_STOP_MS;
+              av.state = AV_STATE_DETECT;
+              av.action_done = false;
+
+              // STOP!! and clear motion
+              can_send_motion_cmd(CAN_MOTION_FLAG_HARDSTOP, 0, 0, 0);
+              motion_clear();
+
+              // Calculate the new opponent position
+              // and update PF if it's correct
+              if(av_compute_opponent_position()) {
+                phys_set_opponent_position(1, robot.opp_pos.x, robot.opp_pos.y);
+              }
+
+            }
+
+            break;
+
+        case AV_STATE_DETECT:
+
+            if(av.timer_ms <= 0) {
+
+                av.state = AV_STATE_REROUTE;
+                //av.state = AV_STATE_CLEAR;
+                av.timer_ms = 0;
+                av.action_done = false;
+
+            } else {
+                av.timer_ms -= SCHEDULER_RATE_DO_AVOIDANCE_MS;
+            }
+
+            break;
+
+        case AV_STATE_REROUTE:
+
+            // Awaits for rerouting flag of strategy before starting
+            // the ignore timer
+            if(!av.action_done) {
+                if(sw_irq & IRQ_AV_CLEAR) {
+                    av.timer_ms = AV_TIMER_IGNORE_MS;
+                    av.action_done = true;
+                }
+
+            } else {
+
+                // Ignore timer is over: go back to detection state
+                if(av.timer_ms <= 0) {
+                    av.state = AV_STATE_CLEAR;
+                    av.timer_ms = 0;
+                    av.action_done = false;
+
+                } else {
+                    av.timer_ms -= SCHEDULER_RATE_DO_AVOIDANCE_MS;
+                }
+
+            }
+
+            break;
+
+    }
+
+
+}
+*/

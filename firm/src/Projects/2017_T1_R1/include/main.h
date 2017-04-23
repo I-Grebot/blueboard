@@ -1,11 +1,10 @@
 /* -----------------------------------------------------------------------------
  * BlueBoard
- * I-Grebot 2017
+ * I-Grebot
  * -----------------------------------------------------------------------------
  * @file    main.h
  * @author  Paul
  * @date    2017/01/23
- * @version V1.0
  * -----------------------------------------------------------------------------
  * @brief
  *    This file is the main header of IgreBot's 2017 Team 1 Robot 1 firmware
@@ -70,26 +69,18 @@
 
 /* Middleware: Aversive */
 #include "aversive.h"
-#include "pid.h"
-#include "biquad.h"
-#include "quadramp.h"
-#include "quadramp_derivate.h"
-#include "ramp.h"
-#include "angle_distance.h"
-#include "blocking_detection_manager.h"
-#include "control_system_manager.h"
-#include "position_manager.h"
-#include "robot_system.h"
-#include "trajectory_manager.h"
 
 /* Project files */
-#include "motion.h"
-#include "digital_servo.h"
-#include "strategy.h"
-#include "monitoring.h"
-#include "shell.h"
 #include "physics_const.h"
 #include "hardware_const.h"
+#include "digital_servo.h"
+#include "monitoring.h"
+#include "motion.h"
+#include "shell.h"
+#include "path.h"
+#include "task_mgt.h"
+#include "avoidance.h"
+#include "strategy.h"
 #include "debug.h"
 
  /**
@@ -124,15 +115,22 @@
  * Higher value means higher priority
  */
 #define OS_TASK_PRIORITY_SHELL        ( tskIDLE_PRIORITY + 1  )
+
 #define OS_TASK_PRIORITY_LED          ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_MONITORING   ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_ASV          ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_DSV          ( tskIDLE_PRIORITY + 2  )
-#define OS_TASK_PRIORITY_AVS_TRAJ     ( tskIDLE_PRIORITY + 3  )
+
 #define OS_TASK_PRIORITY_STRATEGY     ( tskIDLE_PRIORITY + 3  )
-#define OS_TASK_PRIORITY_MOTION_TRAJ  ( tskIDLE_PRIORITY + 3  )
-#define OS_TASK_PRIORITY_AVOIDANCE    ( tskIDLE_PRIORITY + 4  )
-#define OS_TASK_PRIORITY_MOTION_CS    ( tskIDLE_PRIORITY + 4  )
+#define OS_TASK_PRIORITY_AI_TASKS     ( tskIDLE_PRIORITY + 3  )
+
+#define OS_TASK_PRIORITY_MOTION_TRAJ  ( tskIDLE_PRIORITY + 4  )
+#define OS_TASK_PRIORITY_AVS_TRAJ     ( tskIDLE_PRIORITY + 4  )
+
+#define OS_TASK_PRIORITY_MOTION_CS    ( tskIDLE_PRIORITY + 5  )
+
+#define OS_TASK_PRIORITY_AVOIDANCE    ( tskIDLE_PRIORITY + 6  )
+
 
 /*
  * OS Tasks Stacks sizes, in bytes
@@ -146,6 +144,7 @@
 #define OS_TASK_STACK_STRATEGY          500
 #define OS_TASK_STACK_MOTION_CS         300
 #define OS_TASK_STACK_MOTION_TRAJ       200
+#define OS_TASK_STACK_AI_TASKS          200
 
  /* NVIC Priorities. Lower value means higher priority.
   * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY
@@ -161,6 +160,33 @@
 #define MOTION_CONTROL_PERIOD_MS      50
 #define AVERSIVE_PERIOD_MS            50
 #define MONITORING_PERIOD_MS          100
+#define STRATEGY_PERIOD_MS            100
+
+/**
+********************************************************************************
+**
+**  Useful constants & macros
+**
+********************************************************************************
+*/
+
+
+#ifndef PI
+#define PI 3.141592653589
+#endif
+
+// Min, max and abs macros for 2 values
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+// Min, Max and abs macros for 3 values
+#define MAX3(x, y, z) (MAX(MAX(x, y), z))
+#define MIN3(x, y, z) (MIN(MIN(x, y), z))
+
+// Degrees to Radians and vice-versa
+#define DEG_TO_RAD(a) (((double) (a)) * PI / 180.0)
+#define RAD_TO_DEG(a) (((double) (a)) * 180.0 / PI)
+
 
 /**
 ********************************************************************************
@@ -170,66 +196,52 @@
 ********************************************************************************
 */
 
-/*
- * -----------------------------------------------------------------------------
- * Core & Middlewares
- * -----------------------------------------------------------------------------
- */
+// -----------------------------------------------------------------------------
+// FreeRTOS
+// -----------------------------------------------------------------------------
 
-/* FreeRTOS prototypes for the standard FreeRTOS callback/hook functions */
 void vApplicationMallocFailedHook( void );
 void vApplicationIdleHook( void );
 void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName );
 void vApplicationTickHook( void );
 
-/* OS handlers */
 void sys_get_run_time_stats(char *pcWriteBuffer);
 
-/*
- * -----------------------------------------------------------------------------
- * Hardware Management
- * -----------------------------------------------------------------------------
- */
+// -----------------------------------------------------------------------------
+// Analog Servos
+// -----------------------------------------------------------------------------
 
-/* Analog Servos */
 BaseType_t asv_start(void);
 
-/* Digital Servos */
+// -----------------------------------------------------------------------------
+// Digital Servos
+// -----------------------------------------------------------------------------
+
+BaseType_t dsv_start(void);
 void dsv_init(void);
 void dsv_update_config(void);
 uint8_t dsv_put(uint8_t chan_idx, uint8_t tx_data);
 uint8_t dsv_get(uint8_t chan_idx, const uint8_t* data);
 uint8_t dsv_flush(uint8_t chan_idx);
-
-BaseType_t dsv_start(void);
-
-void dsv_test_pos(uint8_t id, uint16_t pos); // TEMP
-
 BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength);
 
-/* RGB LED */
-BaseType_t led_start(void);
-void led_set_mode(BB_LED_ModeTypeDef mode);
-void led_set_color(BB_LED_ColorTypeDef color);
+// -----------------------------------------------------------------------------
+// Monitoring
+// -----------------------------------------------------------------------------
 
-/* Serial Interface */
-BaseType_t serial_init(void);
-BaseType_t serial_put(char ch);
-BaseType_t serial_puts(const char* str);
-BaseType_t serial_get(const char* str);
-int serial_printf(const char * restrict format, ... );
+BaseType_t monitoring_start(void);
 
-/* Avoidance */
+// -----------------------------------------------------------------------------
+// Avoidance
+// -----------------------------------------------------------------------------
+
 void avoidance_start(void);
 bool avoidance_detection_is_valid(void);
 
-/*
- * -----------------------------------------------------------------------------
- * Sub-Systems
- * -----------------------------------------------------------------------------
- */
+// -----------------------------------------------------------------------------
+// Motion Control System
+// -----------------------------------------------------------------------------
 
-/* Motion Control System */
 BaseType_t motion_cs_start(void);
 void motion_set_x(int16_t pos_x);
 void motion_set_y(int16_t pos_y);
@@ -250,7 +262,10 @@ void vUnlockAngleConsign(void);
 void vUnlockDistanceConsign(void);
 void vUnlockRobotPosition(void);
 
-/* Motion Trajectory */
+// -----------------------------------------------------------------------------
+// Motion Trajectory
+// -----------------------------------------------------------------------------
+
 BaseType_t motion_traj_start(void);
 bool motion_is_traj_near(void);
 bool motion_is_traj_finished(void);
@@ -275,12 +290,111 @@ BaseType_t motion_add_new_wp(wp_t *waypoint);
 bool motion_is_traj_done(wp_t *waypoint);
 void motion_execute_wp(wp_t *waypoint);
 
+// -----------------------------------------------------------------------------
+// Strategy
+// -----------------------------------------------------------------------------
 
-
-/* Strategy */
 BaseType_t strategy_start(void);
+void strategy_init(void);
+void do_match(void);
 
-/* Shell */
+// -----------------------------------------------------------------------------
+// Task manager
+// -----------------------------------------------------------------------------
+
+void task_init(void);
+bool task_is_valid(task_t* task);
+task_t* task_get_next(void);
+void task_add_dep(task_t* task, task_t* dep);
+void task_remove_dep(task_t* task, task_t* dep);
+void task_remove_dep_from_all(task_t* dep);
+task_elt_t* task_new_elt(task_t* task);
+void task_add_elt(task_t* task, task_elt_t* elt);
+void do_task(task_t* task);
+
+// -----------------------------------------------------------------------------
+// Physical engine
+// -----------------------------------------------------------------------------
+
+void phys_init(void);
+uint8_t phys_is_north_left(void);
+void phys_update_with_color(poi_t* poi);
+void phys_update_with_color_xya(int16_t* x, int16_t* y, int16_t* a);
+void phys_update_with_color_xy(int16_t* x, int16_t* y);
+void phys_apply_offset(poi_t* src, poi_t* dest, const poi_t* offset);
+void phys_apply_polar_offset(int16_t* x, int16_t* y, int16_t d, int16_t a_deg);
+void phys_set_obstacle_positions(void);
+void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y);
+
+// -----------------------------------------------------------------------------
+// AI
+// -----------------------------------------------------------------------------
+
+void ai_task_def(void);
+BaseType_t ai_task_launch(task_t* task);
+void ai_compute_task_priorities(void);
+void ai_on_suspend_policy(task_t* task);
+void ai_on_failure_policy(task_t* task);
+
+// AI tasks
+void ai_task_start(void *params);
+
+// -----------------------------------------------------------------------------
+// Path-finder
+// -----------------------------------------------------------------------------
+
+// Initializer
+void path_init(void);
+
+// Inputs definitions
+void path_set_objective(int32_t src_x, int32_t src_y, int32_t dst_x, int32_t dst_y);
+path_poly_t* path_add_new_poly(uint8_t nb_points);
+void path_poly_set_points(path_poly_t* poly, uint8_t idx, int32_t x, int32_t y);
+
+// Core functions
+void path_point_to_line(const path_proc_pt_t* p1, const path_proc_pt_t* p2, path_line_t* l);
+path_line_cross_e path_interesect_line(const path_line_t* l1,
+                                       const path_line_t* l2,
+                                        path_proc_pt_t* p);
+path_seg_cross_e path_intersect_segment(path_proc_pt_t* s1, path_proc_pt_t* s2,
+                                        path_proc_pt_t* t1, path_proc_pt_t* t2,
+                                        path_proc_pt_t* p);
+path_pt_in_poly_e path_pt_is_in_poly(const path_proc_pt_t* p, const path_poly_t* poly);
+path_seg_cross_poly_e path_seg_is_crossing_poly(path_proc_pt_t p1,
+                                                path_proc_pt_t p2,
+                                                const path_poly_t* poly);
+
+// Main processing functions
+uint16_t path_compute_rays(path_poly_t* polys, uint8_t n_polys, uint8_t* rays);
+void path_compute_rays_weight(const path_poly_t* polys, const uint8_t* rays, uint16_t ray_n, uint16_t* weight);
+void path_compute_dijkstra(uint8_t start_poly, uint8_t start_pt);
+int8_t path_get_result(path_poly_t* polys, uint8_t* rays);
+int8_t path_process(void);
+
+// TODO: result
+
+// -----------------------------------------------------------------------------
+// RGB LED
+// -----------------------------------------------------------------------------
+
+BaseType_t led_start(void);
+void led_set_mode(BB_LED_ModeTypeDef mode);
+void led_set_color(BB_LED_ColorTypeDef color);
+
+// -----------------------------------------------------------------------------
+// Serial Interface
+// -----------------------------------------------------------------------------
+
+BaseType_t serial_init(void);
+BaseType_t serial_put(char ch);
+BaseType_t serial_puts(const char* str);
+BaseType_t serial_get(const char* str);
+int serial_printf(const char * restrict format, ... );
+
+// -----------------------------------------------------------------------------
+// Shell
+// -----------------------------------------------------------------------------
+
 void shell_register_commands(void);
 BaseType_t shell_start(void);
 void shell_print( const char * const pcMessage );

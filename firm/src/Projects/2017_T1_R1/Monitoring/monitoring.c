@@ -24,7 +24,7 @@ static void mon_task(void *pvParameters);
 mon_cfg_t mon_config;
 mon_values_t mon_values;
 
-BaseType_t mon_start(void)
+BaseType_t monitoring_start(void)
 {
   BaseType_t ret;
 

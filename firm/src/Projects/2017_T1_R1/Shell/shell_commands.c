@@ -36,7 +36,6 @@ static BaseType_t OS_SHL_StoCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 static BaseType_t OS_SHL_PowCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Power
 static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Motors
 static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Digital Servos
-static BaseType_t OS_SHL_DsdCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Digital Servos Dump
 static BaseType_t OS_SHL_AsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Analog Servos
 static BaseType_t OS_SHL_MonCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Monitoring
 static BaseType_t OS_SHL_DioCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Digital I/Os
@@ -169,20 +168,6 @@ static const CLI_Command_Definition_t xDsv =
     "  - [set_led] [id] [led value]"SHELL_EOL*/
     ,OS_SHL_DsvCmd,
     -1 // Variable
-};
-
-// Digital Servos dump
-static const CLI_Command_Definition_t xDsd =
-{
-    "led",
-    SHELL_EOL
-    "led [mode] [color]: Set the LED state"SHELL_EOL
-    "  [mode]  : STATIC|BLINK_SLOW|BLINK_FAST"SHELL_EOL
-    "  [color] : OFF  | WHITE   |"SHELL_EOL
-    "            RED  | GREEN   | BLUE |"SHELL_EOL
-    "            CYAN | MAGENTA | YELLOW ]"SHELL_EOL
-    ,OS_SHL_LedCmd,
-    2
 };
 
 // Analog Servos commands

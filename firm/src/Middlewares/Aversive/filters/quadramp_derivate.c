@@ -117,11 +117,11 @@ int32_t quadramp_derivate_do_filter(void * data, int32_t in_position)
 	    and also the peak created when the position_consign changes */
 	if (speed >=0) {
 		if(q->var_1st_ord_pos)
-			MAX(speed , (q->var_1st_ord_pos * q-> divisor) ); // divisor reequilibrates the value.
+			MAX_SAT(speed , (q->var_1st_ord_pos * q-> divisor) ); // divisor reequilibrates the value.
 	}
 	else {
 		if(q->var_1st_ord_neg)
-			MIN(speed , (-(q->var_1st_ord_neg* q-> divisor)) ); // divisor reequilibrates the value.
+			MIN_SAT(speed , (-(q->var_1st_ord_neg* q-> divisor)) ); // divisor reequilibrates the value.
 	}
 	
   
@@ -177,11 +177,11 @@ int32_t quadramp_derivate_do_filter(void * data, int32_t in_position)
 
 	if (speed_consign >=0) {
 		if(q->var_1st_ord_pos)
-			MAX(speed_consign , q->var_1st_ord_pos);
+		  MAX_SAT(speed_consign , q->var_1st_ord_pos);
 	}
 	else {
 		if(q->var_1st_ord_neg)
-			MIN(speed_consign , -q->var_1st_ord_neg);
+			MIN_SAT(speed_consign , -q->var_1st_ord_neg);
 	}
 	
 	

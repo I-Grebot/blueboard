@@ -74,7 +74,7 @@ do {                                     \
 /**
  *   simple maximum
  */
-#define MAX(to_saturate, value_max)      \
+#define MAX_SAT(to_saturate, value_max)      \
 do {                                     \
    if (to_saturate > value_max)          \
      to_saturate = value_max;            \
@@ -83,7 +83,7 @@ do {                                     \
 /**
  *  simple minimum
  */
-#define MIN(to_saturate, value_min)      \
+#define MIN_SAT(to_saturate, value_min)      \
 do {                                     \
    if (to_saturate < value_min)          \
      to_saturate = value_min;            \

@@ -27,7 +27,7 @@
 */
 
 /* Main robot structure containing all operational variables */
-RobotTypeDef robot;
+robot_t robot;
 
 /**
 ********************************************************************************
@@ -40,7 +40,7 @@ RobotTypeDef robot;
 int main( void )
 {
   /* Globals initialization */
-  memset(&robot, 0, sizeof(RobotTypeDef));
+  memset(&robot, 0, sizeof(robot_t));
 
   /* BlueBoard Initializations */
   bb_init();
@@ -64,7 +64,7 @@ int main( void )
   asv_start();
   //dsv_start();
 
-  mon_start();
+  monitoring_start();
   led_start();
 
   strategy_start();

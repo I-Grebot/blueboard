@@ -17,7 +17,7 @@
 #include "main.h"
 
 /* Global functions */
-extern RobotTypeDef robot;
+extern robot_t robot;
 
 /* Local definitions */
 #define AVERSIVE_PERIOD_TICKS         (AVERSIVE_PERIOD_MS / portTICK_PERIOD_MS)

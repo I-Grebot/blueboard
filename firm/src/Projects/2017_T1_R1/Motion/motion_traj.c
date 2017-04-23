@@ -17,7 +17,7 @@
 #include "main.h"
 
 /* Global functions */
-extern RobotTypeDef robot;
+extern robot_t robot;
 
 static double traj_near_window_d = TRAJECTORY_NEAR_WINDOW_D;
 static double traj_near_window_a = TRAJECTORY_NEAR_WINDOW_A;

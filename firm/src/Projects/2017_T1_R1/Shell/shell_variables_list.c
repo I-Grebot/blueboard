@@ -18,7 +18,7 @@
 
 /* External variables; for setting and probing */
 extern OS_SHL_ConfigTypeDef OS_SHL_Config;
-extern RobotTypeDef robot;
+extern robot_t robot;
 
 extern const uint8_t dsv_nb_channels;
 extern dsv_channel_t dsv_chan1;

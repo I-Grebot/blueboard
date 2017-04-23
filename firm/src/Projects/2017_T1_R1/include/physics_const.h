@@ -119,4 +119,59 @@
 ********************************************************************************
 */
 
+// Playground size, in mm
+#define TABLE_X_MIN     0
+#define TABLE_X_MAX  3000
+#define TABLE_LENGTH (TABLE_X_MAX - TABLE_X_MIN)
+
+#define TABLE_Y_MIN     0
+#define TABLE_Y_MAX  2000
+#define TABLE_HEIGHT (TABLE_Y_MAX - TABLE_Y_MIN)
+
+// Playground elements
+#define ROCK_GREEN_X_MAX        2750
+#define ROCK_PURPLE_X_MAX       250
+#define ROCK_GREEN_Y_MIN        1750
+#define ROCK_PURPLE_Y_MIN       1750
+#define CONSTRUCTION_AREA_X_MIN 900
+#define CONSTRUCTION_AREA_X_MAX 2100
+#define CONSTRUCTION_AREA_MIDDLE_X    1500
+#define CONSTRUCTION_AREA_Y_MIN 750
+#define CONSTRUCTION_AREA_Y_MAX 1350
+#define SAND_DUNE_X_MIN         800
+#define SAND_DUNE_X_MAX         2200
+#define SAND_DUNE_Y_MAX         200
+
+// Robot dimensions in mm
+#define ROBOT_FRONT_TO_CENTER   85 // Distance from the ball bearing to the center
+#define ROBOT_LENGTH            130 // Distance from the front to the back
+#define ROBOT_BACK_TO_CENTER  (ROBOT_LENGTH - ROBOT_FRONT_TO_CENTER)
+#define ROBOT_BASE_WIDTH        250 // Distance between the two encoder wheels
+#define ROBOT_LOW_WIDTH         230 // Distance from the two arm in idle position
+#define ROBOT_HIGH_WIDTH        290 // Distance from the two arm when moving
+#define ROBOT_RADIUS            130 // In Idle position the robot can fit in a cylinder of this radius.
+#define ROBOT_RADIUS_W_CUBE     260 // With Cube the robot can fit in a cylinder of this radius.
+
+#define TRAJECTORY_NEAR_WINDOW_D  200
+#define TRAJECTORY_NEAR_WINDOW_A  10
+
+#define OPPONENT_POS_INIT_X     6000 // Out of table
+#define OPPONENT_POS_INIT_Y     4000
+
+/**
+********************************************************************************
+**
+**  Opponent robots constants
+**
+********************************************************************************
+*/
+
+// Sizes for opponent robots
+// Lengths of one small segment of the octogon.
+// The larger length is equal to ~1.41 x small length
+#define OPPONENT1_SIZE  300
+#define OPPONENT2_SIZE  100
+
+
+
 #endif /* PHYSICS_CONST_H_ */

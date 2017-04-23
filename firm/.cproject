@@ -50,6 +50,7 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Middlewares/FreeRTOS-Plus/FreeRTOS-Plus-CLI}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Middlewares/Aversive/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Projects/2017_T1_R1/include}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Projects/2017_T1_R1/include/config}"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.1069994411" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.761286335" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F746VG" valueType="enumerated"/>
@@ -152,7 +153,7 @@
 							<option id="com.atollic.truestudio.toolchain_options.mcu.815960808" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu" value="STM32F746VG" valueType="string"/>
 							<option id="com.atollic.truestudio.toolchain_options.vendor.2035956971" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor" value="STMicroelectronics" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.release.toolchain.platform.1970812939" isAbstract="false" name="release platform" superClass="com.atollic.truestudio.exe.release.toolchain.platform"/>
-							<builder buildPath="${workspace_loc:/BlueBoard}/Release" customBuilderProperties="toolChainpathString=C:/Program Files (x86)/Atollic/TrueSTUDIO for ARM 6.0.0/ARMTools/bin|toolChainpathType=1|com.atollic.truestudio.common_options.target.vendor=STMicroelectronics|com.atollic.truestudio.common_options.target.mcu=STM32F746VG|" id="com.atollic.truestudio.mbs.builder1.377670083" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="com.atollic.truestudio.mbs.builder1"/>
+							<builder buildPath="${workspace_loc:/BlueBoard}/Release" customBuilderProperties="toolChainpathString=G:\\TrueSTUDIO for ARM 7.1.2\\ARMTools\\bin|toolChainpathType=1|com.atollic.truestudio.common_options.target.vendor=STMicroelectronics|com.atollic.truestudio.common_options.target.mcu=STM32F746VG|" id="com.atollic.truestudio.mbs.builder1.377670083" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="com.atollic.truestudio.mbs.builder1"/>
 							<tool id="com.atollic.truestudio.exe.release.toolchain.as.1990940881" name="Assembler" superClass="com.atollic.truestudio.exe.release.toolchain.as">
 								<option id="com.atollic.truestudio.common_options.target.endianess.657669396" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.957885163" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" value="STM32F746VG" valueType="enumerated"/>
@@ -181,6 +182,7 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Middlewares/FreeRTOS-Plus/FreeRTOS-Plus-CLI}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Middlewares/Aversive/include}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Projects/2017_T1_R1/include}"/>
+									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/src/Projects/2017_T1_R1/include/config}"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.1886288720" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.732107166" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" value="STM32F746VG" valueType="enumerated"/>
