@@ -676,9 +676,6 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     extern dsv_channel_t dsv_chan1;
     extern dsv_channel_t dsv_chan2;
 
-    extern const dxl_servo_model_t dxl_servo_models[];
-
-
     // Nothing to display by default
     memset( pcWriteBuffer, 0x00, xWriteBufferLen );
 

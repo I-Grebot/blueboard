@@ -161,6 +161,7 @@
 #define AVERSIVE_PERIOD_MS            50
 #define MONITORING_PERIOD_MS          100
 #define STRATEGY_PERIOD_MS            100
+#define AI_TASKS_PERIOD_MS            100
 
 /**
 ********************************************************************************
@@ -302,7 +303,7 @@ void do_match(void);
 // Task manager
 // -----------------------------------------------------------------------------
 
-void task_init(void);
+void tasks_init(void);
 bool task_is_valid(task_t* task);
 task_t* task_get_next(void);
 void task_add_dep(task_t* task, task_t* dep);
@@ -330,13 +331,14 @@ void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y);
 // AI
 // -----------------------------------------------------------------------------
 
-void ai_task_def(void);
+void ai_tasks_def(void);
 BaseType_t ai_task_launch(task_t* task);
 void ai_compute_task_priorities(void);
 void ai_on_suspend_policy(task_t* task);
 void ai_on_failure_policy(task_t* task);
 
 // AI tasks
+void ai_task_idle(void *params);
 void ai_task_start(void *params);
 
 // -----------------------------------------------------------------------------

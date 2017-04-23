@@ -53,7 +53,7 @@ void dxl_init_itf(dxl_interface_t* itf, uint8_t itf_idx)
 /* Initialize a servo, by model name attach it to a DXL Interface */
 void dxl_init_servo(dxl_servo_t* servo, dxl_interface_t* itf, const char* model_name)
 {
-    servo->model = dxl_find_servo_model_by_name(model_name);
+    servo->model = (dxl_servo_model_t*) dxl_find_servo_model_by_name(model_name);
 /*
     // Check that model exists
     if(servo->model == NULL)

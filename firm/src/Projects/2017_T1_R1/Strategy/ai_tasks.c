@@ -34,13 +34,48 @@ extern path_t pf;
 /**
 ********************************************************************************
 **
+**  Common and useful functions for the tasks
+**    Warning: This functions must absolutely be reentrant!!
+**
+********************************************************************************
+*/
+
+// TBD
+
+/**
+********************************************************************************
+**
 **  AI Tasks
 **
 ********************************************************************************
 */
 
 // -----------------------------------------------------------------------------
-// Start task
+// IDLE task
+//   Description: This task must be left and is used when there is nothing to do.
+//                Also, it does nothing, but waiting!
+//                It is always running.
+// -----------------------------------------------------------------------------
+
+void ai_task_idle(void *params)
+{
+  // A pointer to corresponding task-structure (self) is passed
+  const task_t* self = (task_t*) params;
+
+  // Tick timer
+  TickType_t new_wake_time = xTaskGetTickCount();
+
+  for(;;)
+  {
+
+    // Block until next iteration
+    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(AI_TASKS_PERIOD_MS));
+  }
+
+}
+
+// -----------------------------------------------------------------------------
+// START task
 //   Description: called once at the beginning of the match, exit the starting
 //                area and do nothing more.
 // -----------------------------------------------------------------------------
@@ -48,15 +83,17 @@ extern path_t pf;
 
 void ai_task_start(void *params)
 {
-
-  task_t* self;
-
   // A pointer to corresponding task-structure (self) is passed
-  self = (task_t*) params;
+  const task_t* self = (task_t*) params;
+
+  // Tick timer
+  TickType_t new_wake_time = xTaskGetTickCount();
 
   for(;;)
   {
 
+    // Block until next iteration
+    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(AI_TASKS_PERIOD_MS));
   }
 
 }

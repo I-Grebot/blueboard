@@ -252,7 +252,7 @@ BaseType_t shell_get_variable(OS_SHL_VarItemTypeDef const* var, char* ret, size_
     if((value = malloc(size)) == NULL){} // FIXME: Apparently always returns NULL...
         //return pdFALSE; // Malloc Error
 
-    memcpy(value, var->var, size);
+    memcpy(value, (const void*) var->var, size);
 
     // Depends on the type
     switch(var->type)

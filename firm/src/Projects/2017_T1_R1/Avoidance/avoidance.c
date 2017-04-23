@@ -17,14 +17,14 @@
 /* Inclusion */
 #include "main.h"
 
-/* Local Variable Mutex */
+/* TODO: Local Variable Mutex */
 av_t av;	// Avoidance handler
 
 /* Local, Private functions */
-static void OS_AvoidanceTask(void *pvParameters);
-static void av_init(void);
+static void avoidance_task(void *pvParameters);
+static void avd_init(void);
 
-static void av_mask_sensor_from_wall(int16_t a, int16_t wall_a);
+static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a);
 //bool av_compute_opponent_position(void);
 //void do_avoidance(void);
 
@@ -32,14 +32,14 @@ static void av_mask_sensor_from_wall(int16_t a, int16_t wall_a);
 void avoidance_start(void)
 {
 
-    xTaskCreate(OS_AvoidanceTask, "AVOIDANCE", 250, NULL, OS_TASK_PRIORITY_AVOIDANCE, NULL );
+    xTaskCreate(avoidance_task, "AVOIDANCE", 250, NULL, OS_TASK_PRIORITY_AVOIDANCE, NULL );
 }
 
-static void OS_AvoidanceTask( void *pvParameters )
+static void avoidance_task( void *pvParameters )
 {
     TickType_t xNextWakeTime;
 
-    av_init();
+    avd_init();
 
     /* Initialise xNextWakeTime - this only needs to be done once. */
     xNextWakeTime = xTaskGetTickCount();
@@ -70,7 +70,8 @@ static void OS_AvoidanceTask( void *pvParameters )
     }
 }
 
-static void av_init(void) {
+static void avd_init(void)
+{
     av.state = AV_STATE_CLEAR;
     av.action_done = 0;
     av.timer_ms = 0;
@@ -110,13 +111,13 @@ bool avoidance_detection_is_valid(void) {
   // Table walls
 
   if(x < TABLE_X_MIN + ROBOT_RADIUS + AV_TABLE_MARGIN)
-    av_mask_sensor_from_wall(a, AV_ANGLE_WEST_WALL);
+    avd_mask_sensor_from_wall(a, AV_ANGLE_WEST_WALL);
   if(x > TABLE_X_MAX - ROBOT_RADIUS - AV_TABLE_MARGIN)
-    av_mask_sensor_from_wall(a, AV_ANGLE_EAST_WALL);
+    avd_mask_sensor_from_wall(a, AV_ANGLE_EAST_WALL);
   if(y < TABLE_Y_MIN + ROBOT_RADIUS + AV_TABLE_MARGIN)
-    av_mask_sensor_from_wall(a, AV_ANGLE_NORTH_WALL);
+    avd_mask_sensor_from_wall(a, AV_ANGLE_NORTH_WALL);
   if(y > TABLE_Y_MAX - ROBOT_RADIUS - AV_TABLE_MARGIN)
-    av_mask_sensor_from_wall(a, AV_ANGLE_SOUTH_WALL);
+    avd_mask_sensor_from_wall(a, AV_ANGLE_SOUTH_WALL);
 
   // Construction area walls
 
@@ -125,14 +126,14 @@ bool avoidance_detection_is_valid(void) {
       && (x >= CONSTRUCTION_AREA_MIDDLE_X - ROBOT_RADIUS - AV_CONSTRUCTION_AREA_MARGIN)
       && (y >= CONSTRUCTION_AREA_Y_MIN - ROBOT_RADIUS - AV_CONSTRUCTION_AREA_MARGIN)
       && (y <=  CONSTRUCTION_AREA_Y_MAX + ROBOT_RADIUS + AV_CONSTRUCTION_AREA_MARGIN))
-      av_mask_sensor_from_wall(a, AV_ANGLE_EAST_WALL);
+      avd_mask_sensor_from_wall(a, AV_ANGLE_EAST_WALL);
 
   // East side of the construction area
   if(    (x >=  CONSTRUCTION_AREA_MIDDLE_X)
       && (x <= CONSTRUCTION_AREA_MIDDLE_X + ROBOT_RADIUS + AV_CONSTRUCTION_AREA_MARGIN)
       && (y >= CONSTRUCTION_AREA_Y_MIN - ROBOT_RADIUS - AV_CONSTRUCTION_AREA_MARGIN)
       && (y <=  CONSTRUCTION_AREA_Y_MAX + ROBOT_RADIUS + AV_CONSTRUCTION_AREA_MARGIN))
-      av_mask_sensor_from_wall(a, AV_ANGLE_WEST_WALL);
+      avd_mask_sensor_from_wall(a, AV_ANGLE_WEST_WALL);
 
 // We also take into account static elements as:
   // - Starting zone (the opponent cannot be present in here)
@@ -161,7 +162,7 @@ bool avoidance_detection_is_valid(void) {
 
 // and a robot with an orientation = 0 (looking to the est).
 // For
-static void av_mask_sensor_from_wall(int16_t a, int16_t wall_a) {
+static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a) {
 
   // Offset the robot position with the wall orientation
   a += wall_a;

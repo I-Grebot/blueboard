@@ -35,160 +35,83 @@ extern wp_t checkpoints[20]; // TEMP
 /**
 ********************************************************************************
 **
-**  AI Management helpers
+**  AI Management functions
 **
 ********************************************************************************
 */
 
+// Handles the start or restart of a task
 BaseType_t ai_task_launch(task_t* task)
 {
   BaseType_t ret;
 
-  // Create the task, pass its own containing pointer
-  ret = xTaskCreate(task->function,
-                    task->name,
-                    OS_TASK_STACK_AI_TASKS,
-                    (void*) task,
-                    OS_TASK_PRIORITY_AI_TASKS,
-                    task->handle);
-
-  if(ret != pdPASS)
+  switch(task->state)
   {
-    DEBUG_CRITICAL("Could not start AI task %s"DEBUG_EOL, task->name);
+    // Cases considered for starting (again) the task
+    case TASK_STATE_INACTIVE:
+    case TASK_STATE_SUSPENDED:
+    case TASK_STATE_FAILED:
 
-  } else {
-    DEBUG_INFO("Starting AI task %s"DEBUG_EOL, task->name);
+      // Create the task, pass its own containing pointer
+      ret = xTaskCreate(task->function,
+                        task->name,
+                        OS_TASK_STACK_AI_TASKS,
+                        (void*) task,
+                        OS_TASK_PRIORITY_AI_TASKS,
+                        task->handle);
+
+      if(ret != pdPASS)
+      {
+        DEBUG_CRITICAL("Could not start AI task %s"DEBUG_EOL, task->name);
+
+      } else {
+        DEBUG_INFO("Starting AI task %s"DEBUG_EOL, task->name);
+        task->trials++;
+        task->state = TASK_STATE_RUNNING;
+      }
+
+      break;
+
+    // If the task is already running or finished,
+    // prevent a new start
+    case TASK_STATE_RUNNING:
+    case TASK_STATE_SUCCESS:
+      DEBUG_ERROR("AI task %s already running or finished!"DEBUG_EOL, task->name);
+      ret = pdFAIL;
+      break;
   }
 
   return ret;
 }
 
+/**
+********************************************************************************
+**
+**  AI Tasks definitions
+**
+********************************************************************************
+*/
 
-// Main holder for inits
-void ai_task_def(void)
+// Define all the tasks
+void ai_tasks_def(void)
 {
+  uint8_t id;
 
-/*
-  task_elt_t* elt;
-  uint8_t task_id;
-
-  // Initialize the Start task (entry point)
-  // ---------------------------------------------------------------------------
-  task_id = TASK_ID_START;
-  tasks[task_id].id = task_id;
-  tasks[task_id].value = TASK_INIT_VALUE_START;
-  tasks[task_id].state = TASK_STATE_START; // unique! only to be used with this task
-
-  // Grab the north spot-builder bulb and wait because
-  // the secondary robot is still on the way
-  elt = task_new_elt(&tasks[task_id]);
-  elt->action = TASK_ACTUATOR;
-  elt->params.act.flags = ACT_SEND_SPOTS_CMD;
-  elt->params.act.spots.bull_bar = CAN_SPOTS_CMD_BULL_IN;
-  elt->params.act.spots.north_builder = CAN_SPOTS_CMD_NONE;
-  elt->params.act.spots.south_builder = CAN_SPOTS_CMD_GRAB_BULB;
-  elt->timeout_ms = TASK_NO_TIMEOUT;
-  elt->timer_ms = WAIT_BEFORE_START_MSEC;
-
-  */
-    checkpoints[STRAT_EXIT].coord.abs.x = phys.exit_start.x;
-    checkpoints[STRAT_EXIT].coord.abs.y = phys.exit_start.y;
-    checkpoints[STRAT_EXIT].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_EXIT].trajectory_must_finish=true;
-    checkpoints[STRAT_EXIT].type=WP_GOTO_AUTO;
-
-    checkpoints[STRAT_TURN_TO_CUBE1].coord.abs.x = phys.cube[PHYS_ID_CUBE_1].x;
-    checkpoints[STRAT_TURN_TO_CUBE1].coord.abs.y = phys.cube[PHYS_ID_CUBE_1].y;
-    checkpoints[STRAT_TURN_TO_CUBE1].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_TURN_TO_CUBE1].trajectory_must_finish = true;
-    checkpoints[STRAT_TURN_TO_CUBE1].type = WP_ORIENT_FRONT;
-
-    checkpoints[STRAT_PUSH_CUBE1].coord.abs.x = phys.drop.x;
-    checkpoints[STRAT_PUSH_CUBE1].coord.abs.y = phys.drop.y;
-    checkpoints[STRAT_PUSH_CUBE1].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_PUSH_CUBE1].trajectory_must_finish=true;
-    checkpoints[STRAT_PUSH_CUBE1].type = WP_GOTO_AUTO;
-
-    checkpoints[STRAT_RETURN_HUT_2].coord.abs.x = phys.huts[PHYS_ID_HUT_2].x;
-    checkpoints[STRAT_RETURN_HUT_2].coord.abs.y = phys.cube[PHYS_ID_CUBE_1].y;
-    checkpoints[STRAT_RETURN_HUT_2].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_RETURN_HUT_2].trajectory_must_finish=true;
-    checkpoints[STRAT_RETURN_HUT_2].type=WP_GOTO_BWD;
-
-    checkpoints[STRAT_TURN_TO_HUT_2].coord.abs.x = phys.huts[PHYS_ID_HUT_2].x;
-    checkpoints[STRAT_TURN_TO_HUT_2].coord.abs.y = phys.huts[PHYS_ID_HUT_2].y;
-    checkpoints[STRAT_TURN_TO_HUT_2].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_TURN_TO_HUT_2].trajectory_must_finish=true;
-    checkpoints[STRAT_TURN_TO_HUT_2].type = WP_ORIENT_FRONT;
-
-    checkpoints[STRAT_CLOSE_HUT_2].coord.abs.x = phys.huts[PHYS_ID_HUT_2].x;
-    checkpoints[STRAT_CLOSE_HUT_2].coord.abs.y = phys.huts[PHYS_ID_HUT_2].y;
-    checkpoints[STRAT_CLOSE_HUT_2].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_CLOSE_HUT_2].trajectory_must_finish=true;
-    checkpoints[STRAT_CLOSE_HUT_2].type = WP_GOTO_FWD;
-
-    checkpoints[STRAT_RETURN_HUT_1].coord.abs.x = phys.huts[PHYS_ID_HUT_1].x;
-    checkpoints[STRAT_RETURN_HUT_1].coord.abs.y = 500;
-    checkpoints[STRAT_RETURN_HUT_1].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_RETURN_HUT_1].trajectory_must_finish=true;
-    checkpoints[STRAT_RETURN_HUT_1].type=WP_GOTO_BWD;
-
-    checkpoints[STRAT_TURN_TO_HUT_1].coord.abs.x = phys.huts[PHYS_ID_HUT_1].x;
-    checkpoints[STRAT_TURN_TO_HUT_1].coord.abs.y = phys.huts[PHYS_ID_HUT_1].y;
-    checkpoints[STRAT_TURN_TO_HUT_1].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_TURN_TO_HUT_1].trajectory_must_finish=true;
-    checkpoints[STRAT_TURN_TO_HUT_1].type = WP_ORIENT_FRONT;
-
-    checkpoints[STRAT_CLOSE_HUT_1].coord.abs.x = phys.huts[PHYS_ID_HUT_1].x;
-    checkpoints[STRAT_CLOSE_HUT_1].coord.abs.y = phys.huts[PHYS_ID_HUT_1].y;
-    checkpoints[STRAT_CLOSE_HUT_1].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_CLOSE_HUT_1].trajectory_must_finish=true;
-    checkpoints[STRAT_CLOSE_HUT_1].type=WP_GOTO_AUTO;
-
-    checkpoints[STRAT_CLOSE_HUT_1].coord.abs.x = phys.huts[PHYS_ID_HUT_1].x;
-    checkpoints[STRAT_CLOSE_HUT_1].coord.abs.y = phys.huts[PHYS_ID_HUT_1].y;
-    checkpoints[STRAT_CLOSE_HUT_1].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_CLOSE_HUT_1].trajectory_must_finish=true;
-    checkpoints[STRAT_CLOSE_HUT_1].type=WP_GOTO_AUTO;
-
-    checkpoints[STRAT_PREPARE_TO_CUBE2].coord.abs.x = phys.huts[PHYS_ID_HUT_1].x;
-    checkpoints[STRAT_PREPARE_TO_CUBE2].coord.abs.y = 500;
-    checkpoints[STRAT_PREPARE_TO_CUBE2].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_PREPARE_TO_CUBE2].trajectory_must_finish=true;
-    checkpoints[STRAT_PREPARE_TO_CUBE2].type=WP_GOTO_BWD;
-
-    checkpoints[STRAT_TURN_TO_FACE_SHELLS].coord.abs.x = phys.shells[PHYS_ID_SHELL_SW].x;
-    checkpoints[STRAT_TURN_TO_FACE_SHELLS].coord.abs.y = phys.shells[PHYS_ID_SHELL_SW].y;
-    checkpoints[STRAT_TURN_TO_FACE_SHELLS].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_TURN_TO_FACE_SHELLS].trajectory_must_finish=true;
-    checkpoints[STRAT_TURN_TO_FACE_SHELLS].type=WP_ORIENT_FRONT;
-
-    checkpoints[STRAT_GOTO_SHELL_SW].coord.abs.x = phys.shells[PHYS_ID_SHELL_SW].x;
-    checkpoints[STRAT_GOTO_SHELL_SW].coord.abs.y = phys.shells[PHYS_ID_SHELL_SW].y;
-    checkpoints[STRAT_GOTO_SHELL_SW].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_GOTO_SHELL_SW].trajectory_must_finish=true;
-    checkpoints[STRAT_GOTO_SHELL_SW].type=WP_GOTO_FWD;
-
-    checkpoints[STRAT_GOTO_SHELL_SE].coord.abs.x = phys.shells[PHYS_ID_SHELL_SE].x;
-    checkpoints[STRAT_GOTO_SHELL_SE].coord.abs.y = phys.shells[PHYS_ID_SHELL_SE].y;
-    checkpoints[STRAT_GOTO_SHELL_SE].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_GOTO_SHELL_SE].trajectory_must_finish=true;
-    checkpoints[STRAT_GOTO_SHELL_SE].type=WP_GOTO_FWD;
-
-    checkpoints[STRAT_GOTO_SHELL_NE].coord.abs.x = phys.shells[PHYS_ID_SHELL_NE].x;
-    checkpoints[STRAT_GOTO_SHELL_NE].coord.abs.y = phys.shells[PHYS_ID_SHELL_NE].y;
-    checkpoints[STRAT_GOTO_SHELL_NE].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_GOTO_SHELL_NE].trajectory_must_finish=true;
-    checkpoints[STRAT_GOTO_SHELL_NE].type=WP_GOTO_FWD;
-
-    checkpoints[STRAT_GOTO_START].coord.abs.x = 300;
-    checkpoints[STRAT_GOTO_START].coord.abs.y = TABLE_Y_MAX/2;
-    checkpoints[STRAT_GOTO_START].speed = WP_SPEED_SLOW;
-    checkpoints[STRAT_GOTO_START].trajectory_must_finish=true;
-    checkpoints[STRAT_GOTO_START].type=WP_GOTO_FWD;
+  // START Task
+  id = TASK_ID_START;
+  tasks[id].name = "AI_START";
+  tasks[id].function = ai_task_start;
+  tasks[id].value = TASK_INIT_VALUE_START;
 
 }
 
+/**
+********************************************************************************
+**
+**  AI Tasks Priorities
+**
+********************************************************************************
+*/
 
 // Compute a task priority.
 // This function is one of the core of the decision algorithm.
@@ -260,18 +183,20 @@ void ai_compute_task_priorities(void)
 
     // Task is not valid
     } else {
-      task->priority = PRIORITY_MIN;
+      task->priority = TASK_PRIORITY_MIN;
     }
 
   }
 
 }
 
-
-
-// -----------------------------------------------------------------------------
-// TASKS POLICIES
-// -----------------------------------------------------------------------------
+/**
+********************************************************************************
+**
+**  AI Tasks Policies
+**
+********************************************************************************
+*/
 
 // Apply a specific policy for the task after it became suspended.
 // We need to handle it and decide if we do something else or simply

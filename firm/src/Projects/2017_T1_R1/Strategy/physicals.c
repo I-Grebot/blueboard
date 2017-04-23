@@ -266,17 +266,19 @@ void phys_set_obstacle_positions(void) {
 // Redefine the path-finder polygon associated with the opponent's robot
 void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y) {
 
-  // The opponent's robot model is an octogon:
-  //
-  //      (0)_________(1)
-  //        /         \
-  //    (7)/           \(2)
-  //      |             |
-  //      |    (x,y)    |
-  //   (6)|             |(3)
-  //       \           /
-  //     (5)\_________/(4)
+  /*
+     The opponent's robot model is an octogon:
 
+          (0)_________(1)
+            /         \
+        (7)/           \(2)
+          |             |
+          |    (x,y)    |
+       (6)|             |(3)
+           \           /
+         (5)\_________/(4)
+
+*/
   // Secondary robot: smaller lengths
 //  if(robot_idx >= 2) {
 //    path_poly_set_points(phys.pf_opponent2, 0, x -   OPPONENT2_SIZE/2,  y - 3*OPPONENT2_SIZE/2);

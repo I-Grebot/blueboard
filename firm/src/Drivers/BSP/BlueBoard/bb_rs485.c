@@ -45,4 +45,4 @@ void bb_rs485_init(USART_InitTypeDef * USART_InitStruct)
 
 }
 
-#endif BB_USE_RS485_DSV_CHAN2
+#endif // BB_USE_RS485_DSV_CHAN2

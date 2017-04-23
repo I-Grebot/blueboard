@@ -25,7 +25,6 @@
 
 #include "motion.h"
 
-
 /**
 ********************************************************************************
 **
@@ -33,10 +32,6 @@
 **
 ********************************************************************************
 */
-
-
-// Total Number of tasks
-#define TASKS_NB  3
 
 // IDs of the different tasks
 // --------------------------
@@ -48,6 +43,8 @@
 // Sea tasks
 #define TASK_ID_SEA              2   // Go to the sea and catch fish
 
+// Total Number of tasks
+#define TASKS_NB                3U
 
 // Initial values of the different tasks
 // -------------------------------------
@@ -56,8 +53,9 @@
 #define TASK_INIT_VALUE_SEA     20000
 
 // Priorities
-#define PRIORITY_MIN    0
-#define PRIORITY_MAX    0xFFFF
+#define TASK_PRIORITY_MIN        0x00
+#define TASK_PRIORITY_DEFAULT    0x10
+#define TASK_PRIORITY_MAX        0xFF
 
 // Maximum amount of dependencies that a given task can have.
 // Dependences are inherited from dependant tasks.
@@ -103,7 +101,6 @@ typedef struct task_elt task_elt_t; // Forward declaration
 typedef enum
 {
   TASK_STATE_INACTIVE  = 0xFF, // Task is not active
-  TASK_STATE_START     = 0x10, // Task has just started (nothing was executed yet)
   TASK_STATE_RUNNING   = 0x11, // Task is running, elements are being executed
   TASK_STATE_SUSPENDED = 0x20, // The last task element could not finished
   TASK_STATE_FAILED    = 0x21, // The task stopped due to an error
@@ -122,17 +119,19 @@ struct task
   uint8_t nb_dependencies;                        // Number of dependencies
   task_t* dependencies[TASK_MAX_DEPENDENCIES];    // Array of pointers on dependencies
   uint16_t value;     // Value given to a task so it'll affect its priority
-  uint16_t priority;  // Task priority calculated after the current task is finished
+  uint8_t priority;  // Task priority calculated after the current task is finished
   uint8_t trials;     // Counter to measure the number of attempts for a task
 
   // TBC: probablye not useful anymore
-  uint8_t nb_elt;        // Number of elements in the chain
+  /*uint8_t nb_elt;        // Number of elements in the chain
   uint8_t nb_elt_done;   // Number of elements already performed
   task_elt_t* first_elt; // Pointer to the 1st element in the chain
   task_elt_t* last_elt;  // Pointer to the last element in the chain
   task_elt_t* current_elt;    // Current task element being executed
+  */
 
 };
+
 
 // Defines the various actions that a task element can launch
 typedef enum {

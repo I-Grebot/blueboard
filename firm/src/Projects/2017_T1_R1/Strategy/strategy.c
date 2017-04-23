@@ -41,6 +41,8 @@ static void strategy_task(void *pvParameters);
 
 BaseType_t strategy_start(void)
 {
+  BaseType_t ret;
+
   poi_t reset_pos;
 
   strategy_init();
@@ -56,11 +58,19 @@ BaseType_t strategy_start(void)
   motion_power_enable();
 
   robot.init_done = 1;
-  led_set_color(BB_LED_BLUE);
 
-  return pdPASS;
+  // Start main strategy task
+  ret = xTaskCreate(strategy_task, "STRATEGY", OS_TASK_STACK_STRATEGY, NULL, OS_TASK_PRIORITY_STRATEGY, NULL );
 
-  //return xTaskCreate(strategy_task, "STRATEGY", OS_TASK_STACK_STRATEGY, NULL, OS_TASK_PRIORITY_STRATEGY, NULL );
+  if(ret != pdPASS)
+  {
+    DEBUG_CRITICAL("Could not start STRATEGY task!"DEBUG_EOL);
+  } else {
+    DEBUG_INFO("Starting STRATEGY task"DEBUG_EOL);
+  }
+
+  return ret;
+
 }
 
 void strategy_init(void)
@@ -75,15 +85,8 @@ void strategy_init(void)
   phys_init();
 
   // Initialize all checkpoint
-  ai_task_def();
+  tasks_init();
 
-  // Initialize the robot content fields
-  robot.av_back_left = false;
-  robot.av_back_right = false;
-  robot.av_front_center = false;
-  robot.av_front_left = false;
-  robot.av_front_right = false;
-  robot.init_done = 0;
 }
 
 void strategy_task( void *pvParameters )
@@ -95,7 +98,6 @@ void strategy_task( void *pvParameters )
   strategy_init();
 
   uint32_t tick_cnt = 0;
-  char str[64];
 
   /* Remove compiler warning about unused parameter. */
   ( void ) pvParameters;
@@ -103,13 +105,14 @@ void strategy_task( void *pvParameters )
   /* Initialise xNextWakeTime - this only needs to be done once. */
   xNextWakeTime = xTaskGetTickCount();
 
-  led_set_color(BB_LED_BLUE);
-  //OS_DebugTaskPrint("Starting!\n");
+  led_set_mode(BB_LED_OFF);
+
+  // Launch IDLE task
+  ai_task_launch(&tasks[TASK_ID_IDLE]);
 
   // TEMP
   while(1) {
-    sprintf(str, "Tick %lu\n", tick_cnt++);
-    serial_puts(str);
+    DEBUG_INFO("Tick %lu"DEBUG_EOL, tick_cnt++);
     vTaskDelayUntil( &xNextWakeTime, 1000);
   }
 
@@ -134,12 +137,12 @@ void strategy_task( void *pvParameters )
       // --------------------
     case MATCH_STATE_READY:
       // --------------------
-      LedSetColor(BB_LED_WHITE);
+      led_set_color(BB_LED_WHITE);
       // Awaits for user input to start the INIT procedure
       if(START_JACK==PRESENT)
       {
         match.state = MATCH_STATE_INIT;
-        ASV_MoveIndex(UP);
+        //ASV_MoveIndex(UP);
       }
       break;
       // --------------------
@@ -148,7 +151,7 @@ void strategy_task( void *pvParameters )
       if(!robot.init_done)
       {
         // Default speed
-        OS_MotionSetSpeed(SPEED_VERY_SLOW_D, SPEED_VERY_SLOW_A);
+        motion_set_speed(SPEED_VERY_SLOW_D, SPEED_VERY_SLOW_A);
         //can_send_motion_set_near_window(200, 10);		TODO
 
         // Set the flag so INIT commands are sent only once
@@ -156,7 +159,7 @@ void strategy_task( void *pvParameters )
 
         // Init commands are done but we want to wait some time
         // Before being sensitive to the match start
-        OS_MotionPowerEnable();
+        motion_power_enable();
       }
       else
       {
@@ -176,19 +179,19 @@ void strategy_task( void *pvParameters )
         if(match.timer_msec>=START_DEBOUNCING_DELAY_MSEC/portTICK_RATE_MS)
         {
           match.state = MATCH_STATE_RUN;
-          LedSetMode(BB_LED_BLINK_SLOW);
+          led_set_mode(BB_LED_BLINK_SLOW);
           match.timer_msec = 0;
           match.scored_points = 0;
 
           // Sample the color
           if(COLOR==MATCH_COLOR_PURPLE)
           {
-            LedSetColor(BB_LED_MAGENTA);
+            led_set_color(BB_LED_MAGENTA);
             match.color = MATCH_COLOR_PURPLE;
           }
           else
           {
-            LedSetColor(BB_LED_GREEN);
+            led_set_color(BB_LED_GREEN);
             match.color = MATCH_COLOR_GREEN;
           }
           // Update all variables that depends on the color choice
@@ -214,9 +217,9 @@ void strategy_task( void *pvParameters )
           //    phys_set_opponent_position(1, robot.opp_pos.x, robot.opp_pos.y);
 
           // Reset motion position and enable motor power
-          OS_MotionSetX(reset_pos.x);
-          OS_MotionSetY(reset_pos.y);
-          OS_MotionSetA(reset_pos.a);
+          motion_set_x(reset_pos.x);
+          motion_set_y(reset_pos.y);
+          motion_set_a(reset_pos.a);
 
 
           phys_update_with_color(&phys.exit_start);
@@ -234,12 +237,12 @@ void strategy_task( void *pvParameters )
         // Sample the color
         if(COLOR==MATCH_COLOR_PURPLE)
         {
-          LedSetColor(BB_LED_MAGENTA);
+          led_set_color(BB_LED_MAGENTA);
           match.color = MATCH_COLOR_PURPLE;
         }
         else
         {
-          LedSetColor(BB_LED_GREEN);
+          led_set_color(BB_LED_GREEN);
           match.color = MATCH_COLOR_GREEN;
         }
         match.timer_msec = 0;
@@ -251,12 +254,13 @@ void strategy_task( void *pvParameters )
       // Count the time and execute the match strategy
       if(match.timer_msec >= MATCH_DURATION_MSEC)
       {
-        OS_MotionTrajectoryHardStop();
-        OS_MotionPowerDisable();
+        motion_traj_hard_stop();
+        motion_power_disable();
+        bb_power_down();
         //       motion_clear();
         match.state = MATCH_STATE_STOPPED;
-        LedSetColor(BB_LED_RED);
-        LedSetMode(BB_LED_STATIC);
+        led_set_color(BB_LED_RED);
+        led_set_mode(BB_LED_STATIC);
       }
       else
       {
@@ -267,7 +271,6 @@ void strategy_task( void *pvParameters )
       // ------------------
     case MATCH_STATE_STOPPED:
       // ------------------
-      ASV_DeployParasol(1500);
       break;
     default:
       break;

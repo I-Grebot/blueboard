@@ -57,10 +57,6 @@
 /* Uncomment to activate the centrifugal force compensation */
 //#define CONFIG_MODULE_COMPENSATE_CENTRIFUGAL_FORCE
 
-
-
-
-
 /* tbu */
 #define DO_CS     1  /* control system */
 #define DO_RS     2  /* robot system (angle/distance) */
@@ -70,5 +66,16 @@
 
 #define DO_STATUS 64 /* status events*/
 
+// Mutexes handlers
+extern void vLockEncoderAngle(void);
+extern void vLockEncoderDistance(void);
+extern void vLockAngleConsign(void);
+extern void vLockDistanceConsign(void);
+extern void vLockRobotPosition(void);
+extern void vUnlockEncoderAngle(void);
+extern void vUnlockEncoderDistance(void);
+extern void vUnlockAngleConsign(void);
+extern void vUnlockDistanceConsign(void);
+extern void vUnlockRobotPosition(void);
 
 #endif /* AVERSIVE_CONFIG_H_ */

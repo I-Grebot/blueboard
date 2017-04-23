@@ -465,7 +465,7 @@ uint16_t path_compute_rays(path_poly_t* polys, uint8_t n_polys, uint8_t* rays) {
   uint8_t pt1;
   uint8_t pt2;
 
-  // /!\ First poly is the starting point /!\
+  // Warning: First poly is the starting point
 
   // Pass #1
   // Compute the inner polygon rays:

@@ -20,7 +20,7 @@
 // GLOBALS
 // -----------------------------------------------------------------------------
 
-// Array containing the different tasks
+// Container for all the tasks
 task_t tasks[TASKS_NB];
 
 // External definitions
@@ -33,32 +33,30 @@ extern path_t pf;
 // -----------------------------------------------------------------------------
 
 // Initialize all the available tasks
-void task_init(void) {
-
-  uint8_t idx_task;
-  uint8_t task_id;
+void tasks_init(void)
+{
+  uint8_t id;
 
   // Initialize default values for each task
-  for(idx_task = 0; idx_task < TASKS_NB; idx_task++) {
-    tasks[idx_task].priority = 0;
-    tasks[idx_task].value = 0;
-    tasks[idx_task].state = TASK_STATE_INACTIVE;
-    tasks[idx_task].nb_elt = 0;
-    tasks[idx_task].nb_elt_done = 0;
-    tasks[idx_task].first_elt = NULL;
-    tasks[idx_task].last_elt = NULL;
-    tasks[idx_task].current_elt = NULL;
-    tasks[idx_task].nb_dependencies = 0;
-    tasks[idx_task].trials = 0;
+  for(id = 0; id < TASKS_NB; id++) {
+    tasks[id].id = id;
+    tasks[id].handle = NULL;
+    tasks[id].function = NULL;
+    tasks[id].priority = TASK_PRIORITY_DEFAULT;
+    tasks[id].value = 0;
+    tasks[id].state = TASK_STATE_INACTIVE;
+    tasks[id].nb_dependencies = 0;
+    tasks[id].trials = 0;
   }
 
-  // Initialize the Idle task
-  task_id = TASK_ID_IDLE;
-  tasks[task_id].id = task_id;
-  tasks[task_id].value = TASK_INIT_VALUE_IDLE;
+  // Initialize the Idle task, special task: do not remove
+  id = TASK_ID_IDLE;
+  tasks[id].name = "AI_IDLE";
+  tasks[id].function = ai_task_idle;
+  tasks[id].value = TASK_INIT_VALUE_IDLE;
 
-  // Call the main AI task definition
-  ai_task_def();
+  // Define all other tasks
+  ai_tasks_def();
 
 }
 
@@ -72,7 +70,8 @@ void task_init(void) {
 // Even if a dependency failed, it will be considered as "done" so the given task
 // can be performed. The main strategy handler is responsible for affecting
 // correct priorities if the task then become unrelevant.
-bool task_is_valid(task_t* task) {
+bool task_is_valid(task_t* task)
+{
 
   uint8_t idx;
 
@@ -200,7 +199,7 @@ void task_remove_dep_from_all(task_t* dep) {
 // -----------------------------------------------------------------------------
 
 // Create a new default element and attach it to the task
-task_elt_t* task_new_elt(task_t* task) {
+/*task_elt_t* task_new_elt(task_t* task) {
   task_elt_t* elt = malloc(sizeof(task_elt_t));
   //elt->launched = false;
   elt->timeout_ms = TASK_NO_TIMEOUT;
@@ -208,10 +207,10 @@ task_elt_t* task_new_elt(task_t* task) {
   elt->next = NULL;
   task_add_elt(task, elt);
   return elt;
-}
+}*/
 
 // Add a task element to the given task's list
-void task_add_elt(task_t* task, task_elt_t* elt) {
+/*void task_add_elt(task_t* task, task_elt_t* elt) {
 
   // This is the first element, so it's now both start and end!
   if(task->nb_elt == 0) {
@@ -232,7 +231,7 @@ void task_add_elt(task_t* task, task_elt_t* elt) {
   elt->parent = task;
 
 }
-
+*/
 
 // -----------------------------------------------------------------------------
 // TASKS MAIN MANAGER

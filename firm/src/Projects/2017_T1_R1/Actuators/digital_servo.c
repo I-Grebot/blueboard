@@ -399,7 +399,6 @@ void dsv_reset(uint8_t id)
 uint8_t dsv_read(uint8_t itf_idx, uint8_t id, uint8_t address) {
 
     uint8_t data;
-    char str[8];
 
     servo1.id = id;
     dxl_read(&servo1, address, &data, 1); // size temp

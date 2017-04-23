@@ -162,7 +162,7 @@ typedef struct {
 } match_t;
 
 // Define a robot structure
-// TODO: move me
+// TODO: update me
 typedef struct
 {
   // Aversive control system
@@ -171,15 +171,9 @@ typedef struct
   // Opponent position
   poi_t opp_pos;
 
-  // Avoidance feedbacks (fed by CAN status)
-  bool av_front_left;
-  bool av_front_center;
-  bool av_front_right;
-  bool av_back_left;
-  bool av_back_right;
-
   // Some execution flags & traces
-  uint8_t init_done;
+  // TODO: update/remove
+  bool init_done;
 
 } robot_t;
 
