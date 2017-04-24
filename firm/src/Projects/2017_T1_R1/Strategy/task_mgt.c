@@ -23,6 +23,9 @@
 // Container for all the tasks
 task_t tasks[TASKS_NB];
 
+// Task manager handler
+task_mgt_t task_mgt;
+
 // External definitions
 extern robot_t robot;
 extern phys_t phys;
@@ -57,6 +60,9 @@ void tasks_init(void)
 
   // Define all other tasks
   ai_tasks_def();
+
+  // Initialize the task manager handler
+  task_mgt.active_task = &tasks[TASK_ID_IDLE];
 
 }
 

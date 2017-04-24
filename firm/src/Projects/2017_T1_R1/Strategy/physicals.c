@@ -125,7 +125,7 @@ void phys_init(void) {
 
 // Returns true whenever the north side is the left side (i.e. Yellow color)
 uint8_t phys_is_north_left(void) {
-  return match.color == MATCH_COLOR_PURPLE;
+  return match.color == MATCH_COLOR_BLUE;
 }
 
 // Update a POI's position depending on the match color

@@ -52,9 +52,6 @@ int main( void )
 
   dsv_init();
 
-  /* Apply the Power-Up sequence*/
-  bb_power_up();
-
   /* Start software tasks */
   shell_start();
 
@@ -72,7 +69,6 @@ int main( void )
 
   /* Start FreeRTOS Scheduler */
   vTaskStartScheduler();
-
 
   /* Infinite loop */
   for( ;; );

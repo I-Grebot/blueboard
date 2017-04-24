@@ -97,8 +97,6 @@ typedef struct {
 // MAIN ROBOT & MATCH DEFINITIONS
 // -----------------------------------------------------------------------------
 
-#define START_JACK	SW2_VALUE
-#define COLOR		SW1_VALUE
 
 // Define a match state enumeration
 typedef enum {
@@ -106,51 +104,25 @@ typedef enum {
   MATCH_STATE_READY,        // System is ready (boot is finished),
   // awaits for user input for starting the INIT procedure
   MATCH_STATE_INIT,         // Initialization are running
-  MATCH_STATE_WAIT_START,   // Initialization finished,
+  MATCH_STATE_SELF_CHECK,   // Self-check procedure
+  MATCH_STATE_WAIT_START,   // Initialization + self-check finished,
   // awaits for user input for starting the match!
   MATCH_STATE_RUN,          // Match is running, do some stuff...
   MATCH_STATE_STOPPED       // End of the match
 } match_state_e;
 
-typedef enum {
-  STRAT_EXIT = 0,
-  STRAT_TURN_TO_CUBE1 = 1,
-  STRAT_PUSH_CUBE1 = 2,
-  STRAT_RETURN_HUT_2 = 3,
-  STRAT_TURN_TO_HUT_2 = 4,
-  STRAT_CLOSE_HUT_2 = 5,
-  STRAT_RETURN_HUT_1 = 6,
-  STRAT_TURN_TO_HUT_1 = 7,
-  STRAT_CLOSE_HUT_1 = 8,
-  STRAT_PREPARE_TO_CUBE2 = 9,
-  STRAT_TURN_TO_FACE_SHELLS = 10,
-  STRAT_GOTO_SHELL_SW = 11,
-  STRAT_GOTO_SHELL_SE = 12,
-  STRAT_GOTO_SHELL_NE = 13,
-  STRAT_GOTO_START = 14,
-  STRAT_FINISHED = 15
-  /*	STRAT_GO_TO_CUBE2 = 10,
-	STRAT_TURN_TO_CUBE2 = 11,
-	STRAT_TOUCH_CUBE2 = 12,
-	STRAT_PULL_CUBE2 = 13,
-	STRAT_RETURN_TO_START = 14,
-	STRAT_TURN_TO_PUSH_CUBE2 = 15,
-	STRAT_PUSH_CUBE2 = 16,*/
-
-} strategy_state_e;
-
 // Define the possible match colors
 typedef enum {
   MATCH_COLOR_UNKNOWN, // To be used when we don't know (yet)
-  MATCH_COLOR_GREEN = 0,
-  MATCH_COLOR_PURPLE = 1,
+  MATCH_COLOR_BLUE   = SW_COLOR_TEAM1,
+  MATCH_COLOR_YELLOW = SW_COLOR_TEAM2,
 } match_color_e;
 
 // Define the possible start jack position
 typedef enum {
-  PRESENT = 1, // To be used when we don't know (yet)
-  ABSENT = 0,
-} jack_status_e;
+  MATCH_START_INSERTED = SW_START_INSERTED,
+  MATCH_START_REMOVED  = SW_START_REMOVED
+} match_start_e;
 
 // Define a match structure containing the various match parameters
 typedef struct {
@@ -170,10 +142,6 @@ typedef struct
 
   // Opponent position
   poi_t opp_pos;
-
-  // Some execution flags & traces
-  // TODO: update/remove
-  bool init_done;
 
 } robot_t;
 

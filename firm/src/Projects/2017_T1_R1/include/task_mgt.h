@@ -132,6 +132,23 @@ struct task
 
 };
 
+/*
+ * Task management structure: used to store all necessary informations for
+ * the tasks execution handling. Only one object is used and managed by the
+ * top-level strategy and AI algorithms.
+ */
+
+typedef struct {
+
+  // Current task being executed
+  // This must be valid. In case nothing interesting is performed, this
+  // points on the IDLE task
+  task_t* active_task;
+
+
+
+} task_mgt_t;
+
 
 // Defines the various actions that a task element can launch
 typedef enum {
