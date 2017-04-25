@@ -193,7 +193,7 @@ void strategy_task( void *pvParameters )
       bb_power_up();
       motion_power_enable();
 
-      match.state = MATCH_STATE_WAIT_START;
+      match.state = MATCH_STATE_SELF_CHECK;
 
       strategy_print_match();
       led_set_mode(BB_LED_BLINK_FAST);
@@ -291,13 +291,24 @@ void strategy_task( void *pvParameters )
          (notified && (sw_notification & OS_NOTIFY_MATCH_ABORT)))   // Software stop (abort)
       {
         match.state = MATCH_STATE_STOPPED;
+
+        strategy_print_match();
         led_set_color(BB_LED_RED);
         led_set_mode(BB_LED_STATIC);
       }
       else
       {
         do_match(notified, sw_notification);
-        match.timer_msec += OS_STRATEGY_PERIOD_MS;
+
+        if(!match.paused) {
+          match.timer_msec += OS_STRATEGY_PERIOD_MS;
+        }
+
+        // Print match status every sec
+        if(!(match.timer_msec % 1000)) {
+          strategy_print_match();
+        }
+
       }
       break;
 
@@ -448,7 +459,7 @@ void strategy_color_sample(void)
 // Print current match state
 void strategy_print_match(void)
 {
-  DEBUG_INFO("[MATCH] %16s %8s %-03u %-05u",
+  DEBUG_INFO("[MATCH] %-16s %-8s %-03u %-05u"DEBUG_EOL,
       match_state_to_str(match.state),
       match_color_to_str(match.color),
       match.timer_msec/1000,

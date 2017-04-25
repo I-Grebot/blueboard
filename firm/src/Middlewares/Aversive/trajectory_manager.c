@@ -224,7 +224,7 @@ void __trajectory_goto_d_a_rel(struct trajectory *traj, double d_mm,
 {
 	int32_t a_consign, d_consign;
 
-	DEBUG_INFO("Goto DA/RS rel to d=%f a_rad=%f", d_mm, a_rad);
+	//DEBUG_INFO("Goto DA/RS rel to d=%f a_rad=%f", d_mm, a_rad);
 	delete_event(traj);
 	traj->state = state;
 	if (flags & UPDATE_A) {

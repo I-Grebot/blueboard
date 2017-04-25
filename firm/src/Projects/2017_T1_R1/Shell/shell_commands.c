@@ -627,7 +627,7 @@ static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
             // Goto
             if((!strcasecmp(command, "goto")) && (lParameterNumber == 4)) {
-                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Goto (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_MOT_PFX"Goto (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
                 pcWriteBuffer += strlen(pcWriteBuffer);
 
                 motion_add_new_wp(&wp);
@@ -1151,9 +1151,98 @@ static BaseType_t OS_SHL_AvdCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
     return pdFALSE;
 }
 
+// str [cmd] [val1] [val2]
 static BaseType_t OS_SHL_StrCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
-    return pdFALSE;
+  char* pcParameter;
+  BaseType_t lParameterStringLength;
+  BaseType_t xReturn;
+  static BaseType_t lParameterNumber = 0;
+
+  static char* command;
+  static BaseType_t command_str_length;
+
+  // Currently limited to 2 parameters per command
+  static uint32_t value1;
+  static uint32_t value2;
+
+  // Handle on the strategy task
+  extern TaskHandle_t handle_task_strategy;
+
+  // Nothing to display by default
+  memset( pcWriteBuffer, 0x00, xWriteBufferLen );
+
+  // Command start
+  if(lParameterNumber == 0)
+  {
+    lParameterNumber = 1;
+    xReturn = pdPASS;
+
+  } else {
+
+    // Get the parameter as a string
+    pcParameter = (char*) FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength );
+
+    // Parameter is fetched
+    if(pcParameter != NULL) {
+
+      switch(lParameterNumber) {
+      case 1:
+        command = pcParameter;
+        command_str_length = lParameterStringLength;
+        break;
+
+      case 2: value1 = strtol(pcParameter, NULL, 10); break;
+      case 3: value2 = strtol(pcParameter, NULL, 10); break;
+      default: break;
+      }
+
+      // Ensure we keep going for the next parameter
+      xReturn = pdTRUE;
+      lParameterNumber++;
+
+      // End of decoding, launch the command
+    } else {
+
+      // Terminate the command string. Can be done only after all parameters are fetched
+      command[command_str_length] = 0;
+
+      // Decode the command
+      // ------------------
+
+      // Software init
+      if((!strcasecmp(command, "init")) && (lParameterNumber == 2)) {
+        xTaskNotify(handle_task_strategy, OS_NOTIFY_INIT_START, eSetBits);
+      }
+
+      else if((!strcasecmp(command, "start")) && (lParameterNumber == 2)) {
+        xTaskNotify(handle_task_strategy, OS_NOTIFY_MATCH_START, eSetBits);
+      }
+
+      else if((!strcasecmp(command, "pause")) && (lParameterNumber == 2)) {
+        xTaskNotify(handle_task_strategy, OS_NOTIFY_MATCH_PAUSE, eSetBits);
+      }
+
+      else if((!strcasecmp(command, "resume")) && (lParameterNumber == 2)) {
+        xTaskNotify(handle_task_strategy, OS_NOTIFY_MATCH_RESUME, eSetBits);
+      }
+
+      else if((!strcasecmp(command, "abort")) && (lParameterNumber == 2)) {
+        xTaskNotify(handle_task_strategy, OS_NOTIFY_MATCH_ABORT, eSetBits);
+      }
+
+      else {
+        snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unrecognized command '%s' or parameters error"SHELL_EOL, command);
+      }
+
+      // Ensure the function can start again
+      lParameterNumber = 0;
+      xReturn = pdFALSE;
+    }
+
+  }
+
+  return xReturn;
 }
 
 
