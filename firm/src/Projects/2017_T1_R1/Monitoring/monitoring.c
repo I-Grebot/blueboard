@@ -71,7 +71,7 @@ static void mon_task( void *pvParameters )
     mon_values.ip3_ma = mon_config.shunt_ip3_mohm * bb_mon_convert_raw_value_to_mv(bb_mon_read_channel(BB_MON_IP3))  / 1000;
     mon_values.temp = bb_mon_convert_temp_value_to_degree(bb_mon_convert_raw_value_to_mv(bb_mon_read_channel(BB_MON_VTEMP)));
 
-    vTaskDelayUntil( &xNextWakeTime, pdMS_TO_TICKS(MONITORING_PERIOD_MS));
+    vTaskDelayUntil( &xNextWakeTime, pdMS_TO_TICKS(OS_MONITORING_PERIOD_MS));
 
   } // infinite loop
 

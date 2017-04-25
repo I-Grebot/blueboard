@@ -113,9 +113,9 @@ typedef enum {
 
 // Define the possible match colors
 typedef enum {
-  MATCH_COLOR_UNKNOWN, // To be used when we don't know (yet)
   MATCH_COLOR_BLUE   = SW_COLOR_TEAM1,
   MATCH_COLOR_YELLOW = SW_COLOR_TEAM2,
+  MATCH_COLOR_UNKNOWN // To be used when we don't know (yet)
 } match_color_e;
 
 // Define the possible start jack position
@@ -127,6 +127,7 @@ typedef enum {
 // Define a match structure containing the various match parameters
 typedef struct {
   match_state_e state;        // Current match state
+  bool paused;                // Paused flag (only used with remote debug)
   match_color_e color;        // Selected color (sampled at the end of INIT)
   uint32_t timer_msec;        // Match time in milliseconds used for match time
   uint16_t scored_points;     // Calculated number of scored points

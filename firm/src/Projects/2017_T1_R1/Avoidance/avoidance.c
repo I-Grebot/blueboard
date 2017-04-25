@@ -28,61 +28,80 @@ static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a);
 //bool av_compute_opponent_position(void);
 //void do_avoidance(void);
 
+TaskHandle_t handle_task_avoidance;
+
+// Handle on the strategy task
+extern TaskHandle_t handle_task_strategy;
 
 void avoidance_start(void)
 {
+  BaseType_t ret;
 
-    xTaskCreate(avoidance_task, "AVOIDANCE", 250, NULL, OS_TASK_PRIORITY_AVOIDANCE, NULL );
+  // Start main strategy task
+  ret = xTaskCreate(avoidance_task, "AVOIDANCE", OS_TASK_STACK_AVOIDANCE, NULL, OS_TASK_PRIORITY_AVOIDANCE, &handle_task_avoidance );
+
+  if(ret != pdPASS)
+  {
+    DEBUG_CRITICAL("Could not start AVOIDANCE task!"DEBUG_EOL);
+  } else {
+    DEBUG_INFO("Starting AVOIDANCE task"DEBUG_EOL);
+  }
+
+  return ret;
 }
 
 static void avoidance_task( void *pvParameters )
 {
-    TickType_t xNextWakeTime;
+  TickType_t xNextWakeTime;
+  BaseType_t xHigherPriorityTaskWoken = pdTRUE;
 
-    avd_init();
+  avd_init();
 
-    /* Initialise xNextWakeTime - this only needs to be done once. */
-    xNextWakeTime = xTaskGetTickCount();
+  /* Initialise xNextWakeTime - this only needs to be done once. */
+  xNextWakeTime = xTaskGetTickCount();
 
-    /* Remove compiler warning about unused parameter. */
-    ( void ) pvParameters;
+  static uint32_t i = 0;
 
-    for( ;; )
-    {
-    	av.det_front_left = IND4_VALUE;
-    	av.det_front_center = IND7_VALUE;
-    	av.det_front_right = IND6_VALUE;
-    	av.det_back_left = IND1_VALUE;
-    	av.det_back_center = IND2_VALUE;
-    	av.det_back_right = IND3_VALUE;
+  /* Remove compiler warning about unused parameter. */
+  ( void ) pvParameters;
 
- /*   	if(av_detection_is_valid())
-    		LedSetColor(HW_LED_BLUE);
-    	else
-    	{
-    		LedSetColor(HW_LED_OFF);
-    	}*/
+  for( ;; )
+  {
+    av.det_front_left = IND4_VALUE;
+    av.det_front_center = IND7_VALUE;
+    av.det_front_right = IND6_VALUE;
+    av.det_back_left = IND1_VALUE;
+    av.det_back_center = IND2_VALUE;
+    av.det_back_right = IND3_VALUE;
 
+    //    	do_avoidance();
 
-//    	do_avoidance();
+    // Test notify every sec strategy
+    if(!(++i % 100)) {
 
-    	vTaskDelayUntil( &xNextWakeTime, IND_SCAN_PERIOD_TICK);
+      if(i < 1000) {
+        xTaskNotify(handle_task_strategy, 0x01, eSetBits);
+      }
+
     }
+
+    vTaskDelayUntil( &xNextWakeTime, OS_AVOIDANCE_PERIOD_MS);
+  }
 }
 
 static void avd_init(void)
 {
-    av.state = AV_STATE_CLEAR;
-    av.action_done = 0;
-    av.timer_ms = 0;
-    av.timer_opp_validity_ms = 0;
+  av.state = AV_STATE_CLEAR;
+  av.action_done = 0;
+  av.timer_ms = 0;
+  av.timer_opp_validity_ms = 0;
 
-    av.mask_front_left = true;
-    av.mask_front_center = true;
-    av.mask_front_right = true;
-    av.mask_back_left = true;
-    av.mask_back_center = true;
-    av.mask_back_right = true;
+  av.mask_front_left = true;
+  av.mask_front_center = true;
+  av.mask_front_right = true;
+  av.mask_back_left = true;
+  av.mask_back_center = true;
+  av.mask_back_right = true;
 }
 
 // From the sensor values, the robot current position/orientation,

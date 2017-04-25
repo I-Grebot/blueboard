@@ -19,9 +19,6 @@
 /* Global functions */
 extern robot_t robot;
 
-/* Local definitions */
-#define AVERSIVE_PERIOD_TICKS         (AVERSIVE_PERIOD_MS / portTICK_PERIOD_MS)
-
 /* Local Mutex for Aversive */
 static xSemaphoreHandle xEncoderAngleMutex;
 static xSemaphoreHandle xEncoderDistanceMutex;
@@ -210,7 +207,7 @@ void motion_cs_task(void *pvParameters)
     /* trajectory_hardstop(pRobot.traj);*/
 
     /* Wakes-up when required */
-    vTaskDelayUntil( &xNextWakeTime, AVERSIVE_PERIOD_TICKS);
+    vTaskDelayUntil( &xNextWakeTime, pdMS_TO_TICKS(OS_AVERSIVE_PERIOD_MS));
   }
 }
 

@@ -69,7 +69,7 @@ void ai_task_idle(void *params)
   {
 
     // Block until next iteration
-    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(AI_TASKS_PERIOD_MS));
+    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
   }
 
 }
@@ -93,7 +93,7 @@ void ai_task_start(void *params)
   {
 
     // Block until next iteration
-    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(AI_TASKS_PERIOD_MS));
+    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
   }
 
 }

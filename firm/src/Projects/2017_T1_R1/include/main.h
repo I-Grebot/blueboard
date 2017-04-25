@@ -131,7 +131,6 @@
 
 #define OS_TASK_PRIORITY_AVOIDANCE    ( tskIDLE_PRIORITY + 6  )
 
-
 /*
  * OS Tasks Stacks sizes, in bytes
  */
@@ -145,6 +144,7 @@
 #define OS_TASK_STACK_MOTION_CS         300
 #define OS_TASK_STACK_MOTION_TRAJ       200
 #define OS_TASK_STACK_AI_TASKS          200
+#define OS_TASK_STACK_AVOIDANCE         200
 
  /* NVIC Priorities. Lower value means higher priority.
   * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY
@@ -157,11 +157,24 @@
  /*
   * Events periodicity
   */
-#define MOTION_CONTROL_PERIOD_MS      50
-#define AVERSIVE_PERIOD_MS            50
-#define MONITORING_PERIOD_MS          100
-#define STRATEGY_PERIOD_MS            100
-#define AI_TASKS_PERIOD_MS            100
+#define OS_MOTION_CONTROL_PERIOD_MS       50U
+#define OS_AVERSIVE_PERIOD_MS             50U
+#define OS_MONITORING_PERIOD_MS          100U
+#define OS_STRATEGY_PERIOD_MS            100U
+#define OS_AI_TASKS_PERIOD_MS            100U
+#define OS_AVOIDANCE_PERIOD_MS            10U
+
+/*
+ * Software task 32 bits notifiers
+ */
+
+#define OS_NOTIFY_AVOIDANCE_EVT       0x0001    // Avoidance event: must be assess quickly
+// ...
+#define OS_NOTIFY_INIT_START          0x0100    // Software start of the initialization phase
+#define OS_NOTIFY_MATCH_START         0x0200    // Software start of the match notification
+#define OS_NOTIFY_MATCH_PAUSE         0x0400    // Software pause of the match (freeze everything)
+#define OS_NOTIFY_MATCH_RESUME        0x0800    // Software resume of the match (continues)
+#define OS_NOTIFY_MATCH_ABORT         0x1000    // Software abort of the match (clean end, no reset)
 
 /**
 ********************************************************************************
@@ -170,7 +183,6 @@
 **
 ********************************************************************************
 */
-
 
 #ifndef PI
 #define PI 3.141592653589
@@ -297,7 +309,10 @@ void motion_execute_wp(wp_t *waypoint);
 
 BaseType_t strategy_start(void);
 void strategy_init(void);
-void do_match(void);
+void do_match(bool notified, uint32_t sw_notification);
+void strategy_print_match(void);
+const char* match_state_to_str(match_state_e state);
+const char* match_color_to_str(match_color_e color);
 
 // -----------------------------------------------------------------------------
 // Task manager
@@ -311,7 +326,6 @@ void task_remove_dep(task_t* task, task_t* dep);
 void task_remove_dep_from_all(task_t* dep);
 task_elt_t* task_new_elt(task_t* task);
 void task_add_elt(task_t* task, task_elt_t* elt);
-void do_task(task_t* task);
 
 // -----------------------------------------------------------------------------
 // Physical engine

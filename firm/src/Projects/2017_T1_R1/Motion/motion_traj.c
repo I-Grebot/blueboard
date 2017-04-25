@@ -92,7 +92,7 @@ static void motion_traj_task( void *pvParameters )
 
     while(!motion_is_traj_done(&current_waypoint))
     {
-      vTaskDelay(pdMS_TO_TICKS(MOTION_CONTROL_PERIOD_MS));
+      vTaskDelay(pdMS_TO_TICKS(OS_MOTION_CONTROL_PERIOD_MS));
     }
 
     av.mask_back_left = false;
