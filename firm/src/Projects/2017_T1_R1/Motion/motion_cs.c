@@ -37,22 +37,11 @@ static void motion_cs_task(void *pvParameters);
 
 BaseType_t motion_cs_start(void)
 {
-  BaseType_t ret;
-
   /* Initialize global variables */
   motion_cs_init();
 
   // Start the motion control task
-  ret = xTaskCreate(motion_cs_task, "MOTION_CS", OS_TASK_STACK_MOTION_CS, NULL, OS_TASK_PRIORITY_MOTION_CS, NULL );
-  if(ret != pdPASS) {
-    DEBUG_CRITICAL("Could not start motion control-system task!"DEBUG_EOL);
-
-  } else {
-    DEBUG_INFO("Starting MOTION_CS task"DEBUG_EOL);
-  }
-
-  return ret;
-
+  return sys_create_task(motion_cs_task, "MOTION_CS", OS_TASK_STACK_MOTION_CS, NULL, OS_TASK_PRIORITY_MOTION_CS, NULL );
 }
 
 void motion_cs_init(void)

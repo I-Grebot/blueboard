@@ -35,19 +35,9 @@ extern TaskHandle_t handle_task_sequencer;
 
 void avoidance_start(void)
 {
-  BaseType_t ret;
 
   // Start main strategy task
-  ret = xTaskCreate(avoidance_task, "AVOIDANCE", OS_TASK_STACK_AVOIDANCE, NULL, OS_TASK_PRIORITY_AVOIDANCE, &handle_task_avoidance );
-
-  if(ret != pdPASS)
-  {
-    DEBUG_CRITICAL("Could not start AVOIDANCE task!"DEBUG_EOL);
-  } else {
-    DEBUG_INFO("Starting AVOIDANCE task"DEBUG_EOL);
-  }
-
-  return ret;
+  return sys_create_task(avoidance_task, "AVOIDANCE", OS_TASK_STACK_AVOIDANCE, NULL, OS_TASK_PRIORITY_AVOIDANCE, &handle_task_avoidance );
 }
 
 static void avoidance_task( void *pvParameters )
@@ -77,13 +67,13 @@ static void avoidance_task( void *pvParameters )
     //    	do_avoidance();
 
     // Test notify every sec strategy
-    if(!(++i % 100)) {
+    /*if(!(++i % 100)) {
 
       if(i < 1000) {
         xTaskNotify(handle_task_sequencer, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
       }
 
-    }
+    }*/
 
     vTaskDelayUntil( &xNextWakeTime, OS_AVOIDANCE_PERIOD_MS);
   }

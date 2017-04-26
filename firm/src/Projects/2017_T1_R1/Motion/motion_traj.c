@@ -49,15 +49,7 @@ BaseType_t motion_traj_start(void)
 
   // Create the motion trajectory task
   } else {
-
-    ret = xTaskCreate(motion_traj_task, "MOTION_TRAJ", OS_TASK_STACK_MOTION_TRAJ, NULL, OS_TASK_PRIORITY_MOTION_TRAJ, NULL);
-    if(ret != pdPASS) {
-      DEBUG_CRITICAL("Could not start motion trajectory task!"DEBUG_EOL);
-
-    } else {
-      DEBUG_INFO("Starting MOTION_TRAJ task"DEBUG_EOL);
-    }
-
+    ret = sys_create_task(motion_traj_task, "MOTION_TRAJ", OS_TASK_STACK_MOTION_TRAJ, NULL, OS_TASK_PRIORITY_MOTION_TRAJ, NULL);
   }
 
   return ret;

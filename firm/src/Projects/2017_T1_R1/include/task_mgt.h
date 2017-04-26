@@ -40,11 +40,8 @@
 #define TASK_ID_IDLE             0   // Special task used when there is nothing to do
 #define TASK_ID_START            1   // Special task used after init
 
-// Sea tasks
-#define TASK_ID_SEA              2   // Go to the sea and catch fish
-
 // Total Number of tasks
-#define TASKS_NB                3U
+#define TASKS_NB                2U
 
 // Initial values of the different tasks
 // -------------------------------------
@@ -73,8 +70,8 @@
 // Default timer value
 #define TASK_DEFAULT_TIMER_MS   1000
 
-// Number of characters for task String-ID
-#define TASK_STRING_ID_NB_CHAR  64
+// Number of characters for task name
+#define TASK_NAME_LENGTH  20U
 
 
 /**
@@ -110,7 +107,7 @@ typedef enum
 struct task
 {
   uint8_t id;            // Unique ID of the task (value affected from TASK_ID_xxx)
-  const char* name;      // Name of the task (unique)
+  char name[TASK_NAME_LENGTH];      // Name of the task (unique)
 
   task_state_e state;       // Current state of the task
   TaskFunction_t function;  // FreeRTOS Task function

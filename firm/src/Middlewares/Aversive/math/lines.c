@@ -30,7 +30,7 @@ intersect_line(const line_t *l1, const line_t *l2, point_t *p)
 {	
 	double tmp1, tmp2;
 
-	DEBUG_INFO("l1:%2.2f,%2.2f,%2.2f l2:%2.2f,%2.2f,%2.2f\n",
+	DEBUG_TRACE("l1:%2.2f,%2.2f,%2.2f l2:%2.2f,%2.2f,%2.2f\n",
 		     l1->a, l1->b, l1->c, l2->a, l2->b, l2->c);
 	/* if dummy lines */
 	if ((l1->a == 0 && l1->b == 0) || (l2->a == 0 && l2->b == 0))

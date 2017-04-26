@@ -133,7 +133,7 @@ static void delete_event(struct trajectory *traj)
 static void schedule_event(struct trajectory *traj)
 {
 	if ( traj->scheduler_task != NULL) {
-	  DEBUG_INFO("Schedule event, already scheduled");
+	  DEBUG_WARNING("Schedule event, already scheduled");
 	}
 	else {
 			xTaskCreate(trajectory_manager_event, "TRAJECTORY", OS_TASK_STACK_AVS_TRAJ, traj, OS_TASK_PRIORITY_AVS_TRAJ, &traj->scheduler_task );
@@ -295,7 +295,7 @@ void trajectory_turnto_xy(struct trajectory *traj, double x_abs_mm, double y_abs
 	double posy = position_get_y_double(traj->position);
 	double posa = position_get_a_rad_double(traj->position);
 
-	DEBUG_INFO("Goto Turn To xy %f %f", x_abs_mm, y_abs_mm);
+	DEBUG_TRACE("Goto Turn To xy %f %f", x_abs_mm, y_abs_mm);
 	__trajectory_goto_d_a_rel(traj, 0,
 			simple_modulo_2pi(atan2(y_abs_mm - posy, x_abs_mm - posx) - posa),
 				  RUNNING_A,
@@ -309,7 +309,7 @@ void trajectory_turnto_xy_behind(struct trajectory *traj, double x_abs_mm, doubl
 	double posy = position_get_y_double(traj->position);
 	double posa = position_get_a_rad_double(traj->position);
 
-	DEBUG_INFO("Goto Turn To xy %f %f", x_abs_mm, y_abs_mm);
+	DEBUG_TRACE("Goto Turn To xy %f %f", x_abs_mm, y_abs_mm);
 	__trajectory_goto_d_a_rel(traj, 0, 
 			modulo_2pi(atan2(y_abs_mm - posy, x_abs_mm - posx) - posa + M_PI),
 				  RUNNING_A,

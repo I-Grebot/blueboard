@@ -51,14 +51,12 @@ BaseType_t shell_start(void)
 	OS_SHL_Config.echo = true;
 
 	/* Create that task that handles the console itself. */
-	xTaskCreate( 	shell_task,				/* The task that implements the command console. */
-					"SHELL",	    			    /* Text name assigned to the task.  This is just to assist debugging.  The kernel does not use this name itself. */
-					OS_TASK_STACK_SHELL,		/* The size of the stack allocated to the task. */
-					NULL,						        /* The parameter is not used, so NULL is passed. */
-					OS_TASK_PRIORITY_SHELL,	/* The priority allocated to the task. */
-					NULL );						      /* A handle is not required, so just pass NULL. */
-
-	return pdPASS;
+	return xTaskCreate(shell_task,				/* The task that implements the command console. */
+                     "SHELL",	    			    /* Text name assigned to the task.  This is just to assist debugging.  The kernel does not use this name itself. */
+                     OS_TASK_STACK_SHELL,		/* The size of the stack allocated to the task. */
+                     NULL,						        /* The parameter is not used, so NULL is passed. */
+                     OS_TASK_PRIORITY_SHELL,	/* The priority allocated to the task. */
+                     NULL );						      /* A handle is not required, so just pass NULL. */
 }
 
 /* -----------------------------------------------------------------------------
@@ -184,12 +182,22 @@ static void shell_task(void *pvParameters)
  * -----------------------------------------------------------------------------
  */
 
-void shell_print( const char * const pcMessage )
+BaseType_t shell_sem_take(void)
 {
-	if( xSemaphoreTake( xTxMutex, SHELL_MAX_MUTEX_WAIT ) == pdPASS )
+  return xSemaphoreTake( xTxMutex, SHELL_MAX_MUTEX_WAIT );
+}
+
+void shell_sem_give(void)
+{
+  xSemaphoreGive( xTxMutex );
+}
+
+void shell_print(const char * const pcMessage )
+{
+	if(shell_sem_take() == pdPASS )
 	{
-	    serial_puts(pcMessage);
-		xSemaphoreGive( xTxMutex );
+    serial_puts(pcMessage);
+		shell_sem_give();
 	}
 }
 

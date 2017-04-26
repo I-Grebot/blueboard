@@ -21,17 +21,6 @@
 /**
 ********************************************************************************
 **
-**  Global Variables
-**
-********************************************************************************
-*/
-
-/* Main robot structure containing all operational variables */
-robot_t robot;
-
-/**
-********************************************************************************
-**
 **  Main Program
 **
 ********************************************************************************
@@ -39,40 +28,27 @@ robot_t robot;
 
 int main( void )
 {
-  /* Globals initialization */
-  memset(&robot, 0, sizeof(robot_t));
-
-  /* BlueBoard Initializations */
+  // BlueBoard Initialization
   bb_init();
 
-  /* Application modules Initialization */
-
-  // Serial is started first to ensure correct print outs
+  // Serial and shell are started first, so that errors can be displayed
   serial_init();
 
-  dsv_init();
+  if(shell_start() != pdPASS)
+  {
+    LEDR_WRITE(LEDx_ON); // Indicate error
+    while(true);
+  }
 
-  /* Start software tasks */
-  shell_start();
-
-  motion_cs_start();
-  motion_traj_start();
-  avoidance_start();
-  asv_start();
-  //dsv_start();
-
-  monitoring_start();
-  led_start();
-
+  // Main sequencer start
   sequencer_start();
 
-
-  /* Start FreeRTOS Scheduler */
+  // Start FreeRTOS Scheduler
   vTaskStartScheduler();
 
-  /* Infinite loop */
-  for( ;; );
+  // Infinite loop
+  while(true);
 
-  /* Should never reach this line! */
+  // Should never reach this line!
   return 0;
 }

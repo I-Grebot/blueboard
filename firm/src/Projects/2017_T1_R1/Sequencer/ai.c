@@ -77,7 +77,11 @@ void ai_init(void)
   phys_update_with_color(&phys.huts[PHYS_ID_HUT_2]);
 
   // Launch IDLE task
-  ai_task_launch(&tasks[TASK_ID_IDLE]);
+  //ai_task_launch(&tasks[TASK_ID_IDLE]);
+  ai_task_launch(&tasks[TASK_ID_START]);
+
+  // ... but also setup the 1st task to be executed
+  task_mgt.active_task = &tasks[TASK_ID_START];
 
 }
 
@@ -158,11 +162,20 @@ void ai_manage(bool notified, uint32_t sw_notification)
 
     // Everything went fine, no specific policy to be applied,
     case TASK_STATE_SUCCESS:
+      task_print(task_mgt.active_task);
+      DEBUG_INFO("[TASK] Removing task %s (SUCCESS)"DEBUG_EOL, task_mgt.active_task->name);
+      vTaskDelete(task_mgt.active_task->handle);
       break;
 
-      // All the cases that should not happen!
+    // Task is not active, we simply need to start it
+      // TODO:  temporary -- to be checked
+    case TASK_STATE_INACTIVE:
+      ai_task_launch(task_mgt.active_task);
+      task_print(task_mgt.active_task);
+      DEBUG_INFO("[TASK] Launching new task %s"DEBUG_EOL, task_mgt.active_task->name);
+      break;
+
     default:
-    case TASK_STATE_INACTIVE: // Simply because the current task cannot be inactive
       break;
 
   } // switch active task
@@ -172,10 +185,6 @@ void ai_manage(bool notified, uint32_t sw_notification)
      (task_mgt.active_task->state == TASK_STATE_SUCCESS)   ||
      (task_mgt.active_task->state == TASK_STATE_FAILED))
   {
-
-    // First we need to stop the current FreeRTOS task.
-    // When it'll be restarted, it'll start from the beginning
-    vTaskDelete(task_mgt.active_task->handle);
 
     // Retrieve a new task. This function can have mainly 3 different issues:
     // - Next task is INACTIVE (fresh), simply start execution
@@ -190,6 +199,8 @@ void ai_manage(bool notified, uint32_t sw_notification)
 
     // Start FreeRTOS task, state will also change to RUNNING
     ai_task_launch(task_mgt.active_task);
+    task_print(task_mgt.active_task);
+    DEBUG_INFO("[TASK] Launching new task %s"DEBUG_EOL, task_mgt.active_task->name);
 
   }
 
@@ -251,7 +262,7 @@ void ai_tasks_def(void)
 
   // START Task
   id = TASK_ID_START;
-  tasks[id].name = "AI_START";
+  snprintf(tasks[id].name, TASK_NAME_LENGTH, "AI_START");
   tasks[id].function = ai_task_start;
   tasks[id].value = TASK_INIT_VALUE_START;
 
@@ -434,4 +445,8 @@ void ai_on_failure_policy(task_t* task)
   task_remove_dep_from_all(task);
 
 }
+
+
+
+
 

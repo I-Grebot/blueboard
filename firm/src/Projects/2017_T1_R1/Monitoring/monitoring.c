@@ -26,11 +26,6 @@ mon_values_t mon_values;
 
 BaseType_t monitoring_start(void)
 {
-  BaseType_t ret;
-
-  // Initialize hardware
-  bb_mon_init();
-
   // Configuration settings
   mon_config.shunt_ibat_mohm = ADC_SHUNT_IBAT_MOHM;
   mon_config.shunt_ip1_mohm  = ADC_SHUNT_IP1_MOHM;
@@ -38,17 +33,7 @@ BaseType_t monitoring_start(void)
   mon_config.shunt_ip3_mohm  = ADC_SHUNT_IP3_MOHM;
 
   // Create monitoring task
-  ret = xTaskCreate(mon_task, "MONITORING", OS_TASK_STACK_MONITORING, NULL, OS_TASK_PRIORITY_MONITORING, NULL );
-
-  if(ret != pdPASS)
-  {
-    DEBUG_CRITICAL("Could not start MONITORING task!"DEBUG_EOL);
-  } else {
-    DEBUG_INFO("Starting MONITORING task"DEBUG_EOL);
-  }
-
-  return ret;
-
+  return sys_create_task(mon_task, "MONITORING", OS_TASK_STACK_MONITORING, NULL, OS_TASK_PRIORITY_MONITORING, NULL );
 }
 
 static void mon_task( void *pvParameters )

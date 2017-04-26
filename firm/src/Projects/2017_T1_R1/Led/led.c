@@ -24,7 +24,7 @@ static BB_LED_ColorTypeDef LedColor=BB_LED_OFF;
 static BB_LED_ModeTypeDef LedMode=BB_LED_STATIC;
 
 /* Local, Private functions */
-static void OS_LedTask(void *pvParameters);
+static void led_task(void *pvParameters);
 
 
 BaseType_t led_start(void)
@@ -32,10 +32,10 @@ BaseType_t led_start(void)
 	xLedColorMutex = xSemaphoreCreateMutex();
 	xLedModeMutex = xSemaphoreCreateMutex();
 
-    return xTaskCreate(OS_LedTask, "LED", OS_TASK_STACK_LED, NULL, OS_TASK_PRIORITY_LED, NULL );
+  return sys_create_task(led_task, "LED", OS_TASK_STACK_LED, NULL, OS_TASK_PRIORITY_LED, NULL );
 }
 
-static void OS_LedTask( void *pvParameters )
+static void led_task( void *pvParameters )
 {
     TickType_t xNextWakeTime;
 

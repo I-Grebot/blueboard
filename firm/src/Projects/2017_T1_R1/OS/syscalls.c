@@ -19,12 +19,22 @@
 #include "main.h"
 
 int _write(int file, char *ptr, int len)
+// _write_r to be considered!
 {
     int DataIdx;
 
-    for (DataIdx = 0; DataIdx < len; DataIdx++)
-    {
+    // Ensure not conflict with the shell
+    // TODO: move mutex into serial module
+    if(shell_sem_take() == pdPASS) {
+      for (DataIdx = 0; DataIdx < len; DataIdx++)
+      {
         serial_put((*ptr++));
+      }
+      shell_sem_give();
+      return len;
+
+    } else {
+      return -1;
     }
-    return len;
+
 }

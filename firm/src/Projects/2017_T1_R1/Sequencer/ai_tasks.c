@@ -60,7 +60,7 @@ extern path_t pf;
 void ai_task_idle(void *params)
 {
   // A pointer to corresponding task-structure (self) is passed
-  const task_t* self = (task_t*) params;
+  task_t* self = (task_t*) params;
 
   // Tick timer
   TickType_t new_wake_time = xTaskGetTickCount();
@@ -84,13 +84,18 @@ void ai_task_idle(void *params)
 void ai_task_start(void *params)
 {
   // A pointer to corresponding task-structure (self) is passed
-  const task_t* self = (task_t*) params;
+  task_t* self = (task_t*) params;
 
   // Tick timer
   TickType_t new_wake_time = xTaskGetTickCount();
 
   for(;;)
   {
+
+    // Test
+    if(match.timer_msec >= 10000) {
+      self->state = TASK_STATE_SUCCESS;
+    }
 
     // Block until next iteration
     vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));

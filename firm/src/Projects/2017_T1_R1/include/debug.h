@@ -31,13 +31,15 @@
 #define DEBUG_LEVEL_CRITICAL  10  // Critical and emergency errors (show-stopper errors)
 #define DEBUG_LEVEL_ERROR     20  // Errors
 #define DEBUG_LEVEL_WARNING   30  // Warnings
-#define DEBUG_LEVEL_INFO      40  // Fully verbose, informations
+#define DEBUG_LEVEL_INFO      40  // Informations
+#define DEBUG_LEVEL_TRACE    100  // Reserved for debug (fully verbose, full spam ahead)
 
 /* Messages prefix */
 #define DEBUG_CRITICAL_PFX   "CRITICAL: "
 #define DEBUG_ERROR_PFX      "ERROR: "
 #define DEBUG_WARNING_PFX    "WARNING: "
 #define DEBUG_INFO_PFX       "INFO: "
+#define DEBUG_TRACE_PFX      "TRACE: "
 
 /* End Of Line */
 #define DEBUG_EOL   "\n\r"
@@ -79,5 +81,6 @@
 #define DEBUG_ERROR(...)     { if(DEBUG_LEVEL <= DEBUG_LEVEL_ERROR)    { DEBUG_PRINTF(DEBUG_ERROR_PFX    __VA_ARGS__); } }
 #define DEBUG_WARNING(...)   { if(DEBUG_LEVEL <= DEBUG_LEVEL_WARNING)  { DEBUG_PRINTF(DEBUG_WARNING_PFX  __VA_ARGS__); } }
 #define DEBUG_INFO(...)      { if(DEBUG_LEVEL <= DEBUG_LEVEL_INFO)     { DEBUG_PRINTF(DEBUG_INFO_PFX     __VA_ARGS__); } }
+#define DEBUG_TRACE(...)     { if(DEBUG_LEVEL <= DEBUG_LEVEL_TRACE)    { DEBUG_PRINTF(DEBUG_TRACE_PFX    __VA_ARGS__); } }
 
 #endif /* __DEBUG_H */

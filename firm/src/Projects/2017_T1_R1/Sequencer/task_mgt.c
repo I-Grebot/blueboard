@@ -54,15 +54,12 @@ void tasks_init(void)
 
   // Initialize the Idle task, special task: do not remove
   id = TASK_ID_IDLE;
-  tasks[id].name = "AI_IDLE";
+  snprintf(tasks[id].name, TASK_NAME_LENGTH, "AI_IDLE");
   tasks[id].function = ai_task_idle;
   tasks[id].value = TASK_INIT_VALUE_IDLE;
 
   // Define all other tasks
   ai_tasks_def();
-
-  // Initialize the task manager handler
-  task_mgt.active_task = &tasks[TASK_ID_IDLE];
 
 }
 
@@ -200,6 +197,88 @@ void task_remove_dep_from_all(task_t* dep) {
 
 }
 
+/**
+********************************************************************************
+**
+**  Helpers
+**
+********************************************************************************
+*/
+
+// Display a single task
+void task_print(task_t* task)
+{
+  char str[100];
+  task_to_str(task, str, sizeof(str)/sizeof(char));
+  DEBUG_INFO("%s", str);
+}
+
+// Display all the task within the list
+BaseType_t task_print_list(char* ret, size_t retLength)
+{
+
+  const char* header = "       Id   Name             State      Dep. Tri. Prio. Value"SHELL_EOL;
+  const char* line   = "       -------------------------------------------------------"SHELL_EOL;
+
+  static uint8_t idx = 0;
+  static task_t* task = NULL;
+
+  // Print header
+  if(task == NULL)
+  {
+    task = tasks;
+    idx = 0;
+
+    strcpy(ret, header);
+    ret += strlen(ret);
+    strcpy(ret, line);
+    ret += strlen(ret);
+  }
+
+  // Print the task
+  task_to_str(task, ret, retLength);
+
+
+  // There are still items to print
+  idx++;
+  if(idx < TASKS_NB)
+  {
+    task++;
+    return pdTRUE;
+
+  // We have finished
+  } else {
+    task = NULL;
+    idx = 0;
+    return pdFALSE;
+  }
+
+}
+
+void task_to_str(task_t* task, char* ret, size_t retLength)
+{
+  snprintf(ret, retLength, "[TASK] %-4u %-16s %-10s %-4u %-5u %-5u %-5u"DEBUG_EOL,
+       task->id,
+       task->name,
+       task_state_to_str(task->state),
+       task->nb_dependencies,
+       task->trials,
+       task->priority,
+       task->value);
+}
+
+const char* task_state_to_str(task_state_e state)
+{
+  switch(state)
+  {
+    case TASK_STATE_INACTIVE:   return "INACTIVE"; break;
+    case TASK_STATE_RUNNING:    return "RUNNING"; break;
+    case TASK_STATE_SUSPENDED:  return "SUSPENDED"; break;
+    case TASK_STATE_FAILED:     return "FAILED"; break;
+    case TASK_STATE_SUCCESS:    return "SUCCESS"; break;
+    default:                    return "NC"; break;
+  }
+}
 // -----------------------------------------------------------------------------
 // TASKS ELEMENTS MANIPULATION
 // -----------------------------------------------------------------------------

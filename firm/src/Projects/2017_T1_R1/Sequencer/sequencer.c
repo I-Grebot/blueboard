@@ -27,10 +27,12 @@
 // Strategy task handle
 TaskHandle_t handle_task_sequencer;
 
-// Match
+// Main structures
+robot_t robot;
 match_t match;
 
 // Local, Private functions
+static void sequencer_init(void);
 static void sequencer_task(void *pvParameters);
 static void sequencer_color_sample(void);
 
@@ -45,15 +47,15 @@ static void sequencer_color_sample(void);
 
 BaseType_t sequencer_start(void)
 {
-  // Main inits
-  sequencer_init();
-
   // Start main sequencer task
   return sys_create_task(sequencer_task, "SEQUENCER", OS_TASK_STACK_SEQUENCER, NULL, OS_TASK_PRIORITY_SEQUENCER, &handle_task_sequencer);
 }
 
 void sequencer_init(void)
 {
+  // Initialize the robot structure
+  memset(&robot, 0, sizeof(robot_t));
+
   // Initialize the match content fields
   match.color = MATCH_COLOR_UNKNOWN;
   match.state = MATCH_STATE_RESET;
@@ -83,7 +85,6 @@ void sequencer_init(void)
 void sequencer_task( void *pvParameters )
 {
   TickType_t next_wake_time = xTaskGetTickCount();;
-  poi_t reset_pos;
 
   BaseType_t notified;
   uint32_t sw_notification;
@@ -92,32 +93,23 @@ void sequencer_task( void *pvParameters )
 
   bool start_sw_debounced;
 
-  /* Remove compiler warning about unused parameter. */
+  // Remove compiler warning about unused parameter.
   ( void ) pvParameters;
 
-  led_set_mode(BB_LED_OFF);
+  // Ensure shell is up, so that we can display init messages
+  vTaskDelayUntil(&next_wake_time, pdMS_TO_TICKS(OS_SHELL_BOOT_WAIT_MS));
 
+  // Start modules initialization
+  dsv_init(); //--> dsv_start();
+  asv_start();
+  motion_cs_start();
+  motion_traj_start();
+  avoidance_start();
+  monitoring_start();
+  led_start();
+  sequencer_init();
 
-  // TEMP
-  /*while(1) {
-    DEBUG_INFO("Tick %lu"DEBUG_EOL, tick_cnt+=5);
-    // Check for software notifiers from other tasks
-    if(notified == pdTRUE)
-    {
-      if(sw_notification & 0x01)
-      {
-        DEBUG_INFO("Notification from avoidance!"DEBUG_EOL);
-
-      }
-
-    }
-  }*/
-
-  // TODO: add software triggers
-  //        - color selection
-  //        - jack on/off
-  //        - abort/stop/reset (ok with sys reset)
-
+  // Sequencer main loop
   for( ;; )
   {
     // Wait for potential new notification, block for the strategy evaluation period

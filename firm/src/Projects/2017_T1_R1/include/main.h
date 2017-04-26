@@ -154,6 +154,11 @@
 #define OS_ISR_PRIORITY_SER             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 )
 #define OS_ISR_PRIORITY_DSV             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 2 )
 
+/*
+ * Static durations
+ */
+#define OS_SHELL_BOOT_WAIT_MS            500U  // Time waited after shell is up before starting other inits
+
  /*
   * Events periodicity
   */
@@ -316,7 +321,6 @@ void motion_execute_wp(wp_t *waypoint);
 // -----------------------------------------------------------------------------
 
 BaseType_t sequencer_start(void);
-void sequencer_init(void);
 void sequencer_print_match(void);
 const char* match_state_to_str(match_state_e state);
 const char* match_color_to_str(match_color_e color);
@@ -329,6 +333,10 @@ void tasks_init(void);
 bool task_is_valid(task_t* task);
 task_t* task_get_next(void);
 void task_add_dep(task_t* task, task_t* dep);
+void task_print(task_t* task);
+BaseType_t task_print_list(char* ret, size_t retLength);
+void task_to_str(task_t* task, char* ret, size_t retLength);
+const char* task_state_to_str(task_state_e state);
 void task_remove_dep(task_t* task, task_t* dep);
 void task_remove_dep_from_all(task_t* dep);
 task_elt_t* task_new_elt(task_t* task);
@@ -423,6 +431,9 @@ int serial_printf(const char * restrict format, ... );
 
 void shell_register_commands(void);
 BaseType_t shell_start(void);
+
+BaseType_t shell_sem_take(void);
+void shell_sem_give(void);
 void shell_print( const char * const pcMessage );
 
 const char* shell_get_type_as_string(const OS_SHL_VarTypeEnum type);

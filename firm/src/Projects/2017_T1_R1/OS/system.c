@@ -31,9 +31,9 @@ BaseType_t sys_create_task(TaskFunction_t pxTaskCode,
 
   if(xReturn != pdPASS)
   {
-    DEBUG_CRITICAL("Could not start %s task!"DEBUG_EOL);
+    DEBUG_CRITICAL("[TASK] Could not start %s task!"DEBUG_EOL, pcName);
   } else {
-    DEBUG_INFO("Starting %s task"DEBUG_EOL);
+    DEBUG_INFO("[TASK] Starting %s task"DEBUG_EOL, pcName);
   }
 
   return xReturn;

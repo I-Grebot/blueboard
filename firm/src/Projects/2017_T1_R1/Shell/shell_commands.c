@@ -45,7 +45,7 @@ static BaseType_t OS_SHL_HmiCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 static BaseType_t OS_SHL_LedCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Led
 static BaseType_t OS_SHL_AvsCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Aversive
 static BaseType_t OS_SHL_AvdCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Avoidance
-static BaseType_t OS_SHL_StrCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Strategy
+static BaseType_t OS_SHL_SeqCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Sequencer
 
 
 /* -----------------------------------------------------------------------------
@@ -256,15 +256,15 @@ static const CLI_Command_Definition_t xAvd =
     -1 // Variable
 };
 
-// Strategy commands
-static const CLI_Command_Definition_t xStr =
+// Sequencer commands
+static const CLI_Command_Definition_t xSeq =
 {
-    "str",
+    "seq",
     SHELL_EOL
-    "str [command] [value1]... [valueN]: Run a Strategy command."SHELL_EOL
+    "seq [command] [value1]... [valueN]: Run a Sequencer command."SHELL_EOL
     " List of available commands:"SHELL_EOL
     "  - [cmd1] [value1] [value2]"SHELL_EOL
-    ,OS_SHL_StrCmd,
+    ,OS_SHL_SeqCmd,
     -1 // Variable
 };
 
@@ -302,7 +302,7 @@ void shell_register_commands(void)
     FreeRTOS_CLIRegisterCommand( &xLed );
     FreeRTOS_CLIRegisterCommand( &xAvs );
     FreeRTOS_CLIRegisterCommand( &xAvd );
-    FreeRTOS_CLIRegisterCommand( &xStr );
+    FreeRTOS_CLIRegisterCommand( &xSeq );
 }
 
 /* -----------------------------------------------------------------------------
@@ -1152,7 +1152,7 @@ static BaseType_t OS_SHL_AvdCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 }
 
 // str [cmd] [val1] [val2]
-static BaseType_t OS_SHL_StrCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
+static BaseType_t OS_SHL_SeqCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
 {
   char* pcParameter;
   BaseType_t lParameterStringLength;
@@ -1165,6 +1165,7 @@ static BaseType_t OS_SHL_StrCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
   // Currently limited to 2 parameters per command
   static uint32_t value1;
   static uint32_t value2;
+
 
   // Handle on the strategy task
   extern TaskHandle_t handle_task_sequencer;
@@ -1229,6 +1230,19 @@ static BaseType_t OS_SHL_StrCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
       else if((!strcasecmp(command, "abort")) && (lParameterNumber == 2)) {
         xTaskNotify(handle_task_sequencer, OS_NOTIFY_MATCH_ABORT, eSetBits);
+      }
+
+      // Some reporting
+      else if((!strcasecmp(command, "tasks")) && (lParameterNumber == 2)) {
+
+        xReturn = task_print_list(pcWriteBuffer, xWriteBufferLen);
+
+        // Cleanup when finished
+        if(xReturn == pdFALSE) {
+          lParameterNumber = 0;
+        }
+        return xReturn;
+
       }
 
       else {

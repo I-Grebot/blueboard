@@ -93,7 +93,7 @@ void bd_manage_from_speed_cmd(struct blocking_detection * bd,
 		}
 #if BD_DEBUG
 		if (bd->debug_cpt++ == BD_DEBUG) {
-		  DEBUG_INFO("cmd=%ld, speed=%ld i=%ld",
+		  DEBUG_TRACE("cmd=%ld, speed=%ld i=%ld",
 			      cmd, speed, i);
 			bd->debug_cpt = 0;
 		}
