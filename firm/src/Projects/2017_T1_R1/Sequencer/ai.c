@@ -25,12 +25,15 @@
 */
 // External definitions
 extern task_t tasks[TASKS_NB];
+extern task_mgt_t task_mgt;
 extern match_t match;
 extern robot_t robot;
 extern phys_t phys;
 extern path_t pf;
+extern av_t av;
 
-extern wp_t checkpoints[20]; // TEMP
+
+extern TaskHandle_t handle_task_avoidance;
 
 /**
 ********************************************************************************
@@ -39,6 +42,159 @@ extern wp_t checkpoints[20]; // TEMP
 **
 ********************************************************************************
 */
+
+// AI Initialization, called at the beginning of the match
+// Color selection is already done and stored in the match structure.
+void ai_init(void)
+{
+  poi_t reset_pos;
+
+  // Update all variables that depends on the color choice
+
+  // Initialize robot position with correct color
+  reset_pos = phys.reset;
+  phys_update_with_color(&reset_pos);
+  motion_set_x(reset_pos.x);
+  motion_set_y(reset_pos.y);
+  motion_set_a(reset_pos.a);
+
+  // Define static obstacles positions
+  //     phys_set_obstacle_positions();
+
+  // Opponent position: probably in starting zone but we don't know
+  robot.opp_pos.x = OPPONENT_POS_INIT_X;
+  robot.opp_pos.y = OPPONENT_POS_INIT_Y;
+  robot.opp_pos.a = 0;
+  // phys_update_with_color(&robot.opp_pos);
+  //    phys_set_opponent_position(1, robot.opp_pos.x, robot.opp_pos.y);
+
+  // Reset motion position and enable motor power
+
+  phys_update_with_color(&phys.exit_start);
+  phys_update_with_color(&phys.drop);
+  phys_update_with_color(&phys.cube[PHYS_ID_CUBE_1]);
+  phys_update_with_color(&phys.huts[PHYS_ID_HUT_1]);
+  phys_update_with_color(&phys.huts[PHYS_ID_HUT_2]);
+
+  // Launch IDLE task
+  ai_task_launch(&tasks[TASK_ID_IDLE]);
+
+}
+
+// Called at the end of the match
+void ai_stop(void)
+{
+  motion_traj_hard_stop();
+  motion_power_disable();
+  bb_power_down();
+}
+
+// Main manager, called from the sequencer during match execution
+void ai_manage(bool notified, uint32_t sw_notification)
+{
+
+  // Manage task notifications
+  if(notified)
+  {
+    // Match management
+    // -----------------------------------------------
+    if(sw_notification & OS_NOTIFY_MATCH_PAUSE)
+    {
+      match.paused = true;
+      led_set_mode(BB_LED_STATIC);
+    }
+
+    else if(sw_notification & OS_NOTIFY_MATCH_RESUME)
+    {
+      match.paused = false;
+      led_set_mode(BB_LED_BLINK_SLOW);
+    }
+
+    // Hardware events
+    // -----------------------------------------------
+
+    // An avoidance event has occurred
+    if(sw_notification & OS_NOTIFY_AVOIDANCE_EVT)
+    {
+      // Check the avoidance state
+      // After a detection occurs, the strategy needs to handle the following things:
+      // - Switch the current task to the SUSPENDED state
+      // - Increase the task's trials count.
+      // - Apply the A.I. "on_suspend" policy, which can contain failure conditions
+      //   or other dependencies freeing conditions
+      if(av.state == AV_STATE_DETECT) {
+        task_mgt.active_task->state = TASK_STATE_SUSPENDED;
+      }
+
+    }
+
+    // Notify the current AI task with the same notifications (forward)
+    xTaskNotify(task_mgt.active_task->handle, sw_notification, eSetBits);
+
+  }
+
+  // Clear avoidance state, so another detection can be triggered
+  if(av.state == AV_STATE_REROUTE)
+  {
+    xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+  }
+
+  // Depending on the state of the task we need to do different things
+  switch(task_mgt.active_task->state)
+  {
+
+    // On-going task, do nothing except for idle task
+    case TASK_STATE_RUNNING:
+      break;
+
+    // Apply the dedicated policies
+    case TASK_STATE_SUSPENDED:
+      ai_on_suspend_policy(task_mgt.active_task);
+      break;
+
+    case TASK_STATE_FAILED:
+      ai_on_failure_policy(task_mgt.active_task);
+      break;
+
+    // Everything went fine, no specific policy to be applied,
+    case TASK_STATE_SUCCESS:
+      break;
+
+      // All the cases that should not happen!
+    default:
+    case TASK_STATE_INACTIVE: // Simply because the current task cannot be inactive
+      break;
+
+  } // switch active task
+
+  // States after which we need to find a new task and start it
+  if((task_mgt.active_task->state == TASK_STATE_SUSPENDED) ||
+     (task_mgt.active_task->state == TASK_STATE_SUCCESS)   ||
+     (task_mgt.active_task->state == TASK_STATE_FAILED))
+  {
+
+    // First we need to stop the current FreeRTOS task.
+    // When it'll be restarted, it'll start from the beginning
+    vTaskDelete(task_mgt.active_task->handle);
+
+    // Retrieve a new task. This function can have mainly 3 different issues:
+    // - Next task is INACTIVE (fresh), simply start execution
+    // - Next task was SUSPENDED, we need to clean up before starting it again
+    // - No correct task was found and the IDLE task is returned (do nothing special)
+    task_mgt.active_task = task_get_next();
+
+    // Cleanup flags & previous execution traces
+    if(task_mgt.active_task->state == TASK_STATE_SUSPENDED) {
+      // TBD
+    }
+
+    // Start FreeRTOS task, state will also change to RUNNING
+    ai_task_launch(task_mgt.active_task);
+
+  }
+
+} // ai_manage()
+
 
 // Handles the start or restart of a task
 BaseType_t ai_task_launch(task_t* task)
@@ -53,19 +209,15 @@ BaseType_t ai_task_launch(task_t* task)
     case TASK_STATE_FAILED:
 
       // Create the task, pass its own containing pointer
-      ret = xTaskCreate(task->function,
-                        task->name,
-                        OS_TASK_STACK_AI_TASKS,
-                        (void*) task,
-                        OS_TASK_PRIORITY_AI_TASKS,
-                        task->handle);
+      ret = sys_create_task(task->function,
+                            task->name,
+                            OS_TASK_STACK_AI_TASKS,
+                            (void*) task,
+                            OS_TASK_PRIORITY_AI_TASKS,
+                            task->handle);
 
-      if(ret != pdPASS)
+      if(ret == pdPASS)
       {
-        DEBUG_CRITICAL("Could not start AI task %s"DEBUG_EOL, task->name);
-
-      } else {
-        DEBUG_INFO("Starting AI task %s"DEBUG_EOL, task->name);
         task->trials++;
         task->state = TASK_STATE_RUNNING;
       }

@@ -101,7 +101,7 @@ typedef struct task_elt task_elt_t; // Forward declaration
 typedef enum
 {
   TASK_STATE_INACTIVE  = 0xFF, // Task is not active
-  TASK_STATE_RUNNING   = 0x11, // Task is running, elements are being executed
+  TASK_STATE_RUNNING   = 0x10, // Task is running, elements are being executed
   TASK_STATE_SUSPENDED = 0x20, // The last task element could not finished
   TASK_STATE_FAILED    = 0x21, // The task stopped due to an error
   TASK_STATE_SUCCESS   = 0x30  // Task finished with no error

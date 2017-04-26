@@ -17,6 +17,28 @@
 
 #include "main.h"
 
+/* Overload of baseline FreeRTOS task creation function */
+BaseType_t sys_create_task(TaskFunction_t pxTaskCode,
+                           const char * const pcName,
+                           const uint16_t usStackDepth,
+                           void * const pvParameters,
+                           UBaseType_t uxPriority,
+                           TaskHandle_t * const pxCreatedTask)
+{
+  BaseType_t xReturn;
+
+  xReturn = xTaskCreate(pxTaskCode, pcName, usStackDepth, pvParameters, uxPriority, pxCreatedTask);
+
+  if(xReturn != pdPASS)
+  {
+    DEBUG_CRITICAL("Could not start %s task!"DEBUG_EOL);
+  } else {
+    DEBUG_INFO("Starting %s task"DEBUG_EOL);
+  }
+
+  return xReturn;
+
+}
 
 /* This example demonstrates how a human readable table of run time stats
 information is generated from raw data provided by uxTaskGetSystemState().

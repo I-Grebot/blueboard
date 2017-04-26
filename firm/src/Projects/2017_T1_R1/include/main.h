@@ -121,7 +121,7 @@
 #define OS_TASK_PRIORITY_ASV          ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_DSV          ( tskIDLE_PRIORITY + 2  )
 
-#define OS_TASK_PRIORITY_STRATEGY     ( tskIDLE_PRIORITY + 3  )
+#define OS_TASK_PRIORITY_SEQUENCER    ( tskIDLE_PRIORITY + 3  )
 #define OS_TASK_PRIORITY_AI_TASKS     ( tskIDLE_PRIORITY + 3  )
 
 #define OS_TASK_PRIORITY_MOTION_TRAJ  ( tskIDLE_PRIORITY + 4  )
@@ -140,7 +140,7 @@
 #define OS_TASK_STACK_ASV               200
 #define OS_TASK_STACK_AVS_TRAJ          configMINIMAL_STACK_SIZE
 //#define OS_TASK_STACK_DSV               200
-#define OS_TASK_STACK_STRATEGY          500
+#define OS_TASK_STACK_SEQUENCER         500
 #define OS_TASK_STACK_MOTION_CS         300
 #define OS_TASK_STACK_MOTION_TRAJ       200
 #define OS_TASK_STACK_AI_TASKS          200
@@ -160,7 +160,7 @@
 #define OS_MOTION_CONTROL_PERIOD_MS       50U
 #define OS_AVERSIVE_PERIOD_MS             50U
 #define OS_MONITORING_PERIOD_MS          100U
-#define OS_STRATEGY_PERIOD_MS            100U
+#define OS_SEQUENCER_PERIOD_MS           100U
 #define OS_AI_TASKS_PERIOD_MS            100U
 #define OS_AVOIDANCE_PERIOD_MS            10U
 
@@ -169,6 +169,7 @@
  */
 
 #define OS_NOTIFY_AVOIDANCE_EVT       0x0001    // Avoidance event: must be assess quickly
+#define OS_NOTIFY_AVOIDANCE_CLR       0x0002    // Avoidance clear flag
 // ...
 #define OS_NOTIFY_INIT_START          0x0100    // Software start of the initialization phase
 #define OS_NOTIFY_MATCH_START         0x0200    // Software start of the match notification
@@ -217,6 +218,13 @@ void vApplicationMallocFailedHook( void );
 void vApplicationIdleHook( void );
 void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName );
 void vApplicationTickHook( void );
+
+BaseType_t sys_create_task(TaskFunction_t pxTaskCode,
+                           const char * const pcName,
+                           const uint16_t usStackDepth,
+                           void * const pvParameters,
+                           UBaseType_t uxPriority,
+                           TaskHandle_t * const pxCreatedTask);
 
 void sys_get_run_time_stats(char *pcWriteBuffer);
 
@@ -304,13 +312,12 @@ bool motion_is_traj_done(wp_t *waypoint);
 void motion_execute_wp(wp_t *waypoint);
 
 // -----------------------------------------------------------------------------
-// Strategy
+// Sequencer
 // -----------------------------------------------------------------------------
 
-BaseType_t strategy_start(void);
-void strategy_init(void);
-void do_match(bool notified, uint32_t sw_notification);
-void strategy_print_match(void);
+BaseType_t sequencer_start(void);
+void sequencer_init(void);
+void sequencer_print_match(void);
 const char* match_state_to_str(match_state_e state);
 const char* match_color_to_str(match_color_e color);
 
@@ -345,6 +352,9 @@ void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y);
 // AI
 // -----------------------------------------------------------------------------
 
+void ai_init(void);
+void ai_stop(void);
+void ai_manage(bool notified, uint32_t sw_notification);
 void ai_tasks_def(void);
 BaseType_t ai_task_launch(task_t* task);
 void ai_compute_task_priorities(void);

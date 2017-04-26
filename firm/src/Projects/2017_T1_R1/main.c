@@ -64,7 +64,7 @@ int main( void )
   monitoring_start();
   led_start();
 
-  strategy_start();
+  sequencer_start();
 
 
   /* Start FreeRTOS Scheduler */

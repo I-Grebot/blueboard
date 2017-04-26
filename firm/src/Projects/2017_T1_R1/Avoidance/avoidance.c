@@ -31,7 +31,7 @@ static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a);
 TaskHandle_t handle_task_avoidance;
 
 // Handle on the strategy task
-extern TaskHandle_t handle_task_strategy;
+extern TaskHandle_t handle_task_sequencer;
 
 void avoidance_start(void)
 {
@@ -80,7 +80,7 @@ static void avoidance_task( void *pvParameters )
     if(!(++i % 100)) {
 
       if(i < 1000) {
-        xTaskNotify(handle_task_strategy, 0x01, eSetBits);
+        xTaskNotify(handle_task_sequencer, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
       }
 
     }

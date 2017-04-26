@@ -1167,7 +1167,7 @@ static BaseType_t OS_SHL_StrCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
   static uint32_t value2;
 
   // Handle on the strategy task
-  extern TaskHandle_t handle_task_strategy;
+  extern TaskHandle_t handle_task_sequencer;
 
   // Nothing to display by default
   memset( pcWriteBuffer, 0x00, xWriteBufferLen );
@@ -1212,23 +1212,23 @@ static BaseType_t OS_SHL_StrCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
       // Software init
       if((!strcasecmp(command, "init")) && (lParameterNumber == 2)) {
-        xTaskNotify(handle_task_strategy, OS_NOTIFY_INIT_START, eSetBits);
+        xTaskNotify(handle_task_sequencer, OS_NOTIFY_INIT_START, eSetBits);
       }
 
       else if((!strcasecmp(command, "start")) && (lParameterNumber == 2)) {
-        xTaskNotify(handle_task_strategy, OS_NOTIFY_MATCH_START, eSetBits);
+        xTaskNotify(handle_task_sequencer, OS_NOTIFY_MATCH_START, eSetBits);
       }
 
       else if((!strcasecmp(command, "pause")) && (lParameterNumber == 2)) {
-        xTaskNotify(handle_task_strategy, OS_NOTIFY_MATCH_PAUSE, eSetBits);
+        xTaskNotify(handle_task_sequencer, OS_NOTIFY_MATCH_PAUSE, eSetBits);
       }
 
       else if((!strcasecmp(command, "resume")) && (lParameterNumber == 2)) {
-        xTaskNotify(handle_task_strategy, OS_NOTIFY_MATCH_RESUME, eSetBits);
+        xTaskNotify(handle_task_sequencer, OS_NOTIFY_MATCH_RESUME, eSetBits);
       }
 
       else if((!strcasecmp(command, "abort")) && (lParameterNumber == 2)) {
-        xTaskNotify(handle_task_strategy, OS_NOTIFY_MATCH_ABORT, eSetBits);
+        xTaskNotify(handle_task_sequencer, OS_NOTIFY_MATCH_ABORT, eSetBits);
       }
 
       else {
