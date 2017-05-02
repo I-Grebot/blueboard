@@ -103,4 +103,40 @@ void ai_task_start(void *params)
 
 }
 
+// GET_ORES_SMALL_1A
+// GET_ORES_SMALL_1B
+// GET_ORES_BIG_1
 
+// THROW_ORES
+
+// GET_MODULES_MONO_SHIP
+// GET_MODULES_MONO_TABLE_A
+// GET_MODULES_MONO_TABLE_B
+// GET_MODULES_MONO_TABLE_C
+
+
+// BUILD_MODULES_SIDE
+// BUILD_MODULES_CENTRAL
+
+// -----------------------------------------------------------------------------
+// FUNNY task
+//   Description: called once at the end, triggers the funny-action
+// -----------------------------------------------------------------------------
+
+
+// -----------------------------------------------------------------------------
+// FUNNY task
+//   Description: called once at the end, triggers the funny-action
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+// WON'T DO List
+
+// GET_MODULES_POLY_SHIP
+// GET_MODULES_POLY_TABLE_A/B/C
+
+// GET_ORES_SMALL_2A
+// GET_ORES_SMALL_2B
+// GET_ORES_BIG_2

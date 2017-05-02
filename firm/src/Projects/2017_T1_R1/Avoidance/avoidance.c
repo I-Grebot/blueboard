@@ -36,7 +36,7 @@ extern TaskHandle_t handle_task_sequencer;
 void avoidance_start(void)
 {
 
-  // Start main strategy task
+  // Start avoidance task
   return sys_create_task(avoidance_task, "AVOIDANCE", OS_TASK_STACK_AVOIDANCE, NULL, OS_TASK_PRIORITY_AVOIDANCE, &handle_task_avoidance );
 }
 

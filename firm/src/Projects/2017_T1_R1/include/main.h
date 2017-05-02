@@ -80,6 +80,7 @@
 #include "path.h"
 #include "task_mgt.h"
 #include "avoidance.h"
+#include "beacons.h"
 #include "strategy.h"
 #include "debug.h"
 
@@ -123,6 +124,7 @@
 
 #define OS_TASK_PRIORITY_SEQUENCER    ( tskIDLE_PRIORITY + 3  )
 #define OS_TASK_PRIORITY_AI_TASKS     ( tskIDLE_PRIORITY + 3  )
+#define OS_TASK_PRIORITY_BEACONS      ( tskIDLE_PRIORITY + 3  )
 
 #define OS_TASK_PRIORITY_MOTION_TRAJ  ( tskIDLE_PRIORITY + 4  )
 #define OS_TASK_PRIORITY_AVS_TRAJ     ( tskIDLE_PRIORITY + 4  )
@@ -145,6 +147,7 @@
 #define OS_TASK_STACK_MOTION_TRAJ       200
 #define OS_TASK_STACK_AI_TASKS          200
 #define OS_TASK_STACK_AVOIDANCE         200
+#define OS_TASK_STACK_BEACONS           200
 
  /* NVIC Priorities. Lower value means higher priority.
   * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY
@@ -167,6 +170,7 @@
 #define OS_MONITORING_PERIOD_MS          100U
 #define OS_SEQUENCER_PERIOD_MS           100U
 #define OS_AI_TASKS_PERIOD_MS            100U
+#define OS_BEACONS_PERIOD_MS             100U
 #define OS_AVOIDANCE_PERIOD_MS            10U
 
 /*
@@ -263,6 +267,12 @@ BaseType_t monitoring_start(void);
 
 void avoidance_start(void);
 bool avoidance_detection_is_valid(void);
+
+// -----------------------------------------------------------------------------
+// Beacons
+// -----------------------------------------------------------------------------
+
+BaseType_t beacons_start(void);
 
 // -----------------------------------------------------------------------------
 // Motion Control System
