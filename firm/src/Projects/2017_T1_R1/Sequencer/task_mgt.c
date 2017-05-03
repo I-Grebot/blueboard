@@ -54,7 +54,7 @@ void tasks_init(void)
 
   // Initialize the Idle task, special task: do not remove
   id = TASK_ID_IDLE;
-  snprintf(tasks[id].name, TASK_NAME_LENGTH, "AI_IDLE");
+  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_IDLE");
   tasks[id].function = ai_task_idle;
   tasks[id].value = TASK_INIT_VALUE_IDLE;
 

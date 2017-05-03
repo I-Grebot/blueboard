@@ -136,18 +136,18 @@
 /*
  * OS Tasks Stacks sizes, in bytes
  */
-#define OS_TASK_STACK_SHELL             500
+#define OS_TASK_STACK_SHELL             400
 #define OS_TASK_STACK_LED               configMINIMAL_STACK_SIZE
 #define OS_TASK_STACK_MONITORING        configMINIMAL_STACK_SIZE
-#define OS_TASK_STACK_ASV               200
+#define OS_TASK_STACK_ASV               configMINIMAL_STACK_SIZE
 #define OS_TASK_STACK_AVS_TRAJ          configMINIMAL_STACK_SIZE
 //#define OS_TASK_STACK_DSV               200
-#define OS_TASK_STACK_SEQUENCER         500
+#define OS_TASK_STACK_SEQUENCER         300
 #define OS_TASK_STACK_MOTION_CS         300
 #define OS_TASK_STACK_MOTION_TRAJ       200
-#define OS_TASK_STACK_AI_TASKS          200
+#define OS_TASK_STACK_AI_TASKS          configMINIMAL_STACK_SIZE
 #define OS_TASK_STACK_AVOIDANCE         200
-#define OS_TASK_STACK_BEACONS           200
+#define OS_TASK_STACK_BEACONS           configMINIMAL_STACK_SIZE
 
  /* NVIC Priorities. Lower value means higher priority.
   * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY

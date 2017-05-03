@@ -68,8 +68,9 @@ void ai_task_idle(void *params)
   for(;;)
   {
 
+    //DEBUG_INFO("Alive!"DEBUG_EOL);
     // Block until next iteration
-    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(1000)); // OS_AI_TASKS_PERIOD_MS
   }
 
 }

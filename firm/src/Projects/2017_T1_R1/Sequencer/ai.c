@@ -70,17 +70,17 @@ void ai_init(void)
 
   // Reset motion position and enable motor power
 
-  phys_update_with_color(&phys.exit_start);
-  phys_update_with_color(&phys.drop);
-  phys_update_with_color(&phys.cube[PHYS_ID_CUBE_1]);
-  phys_update_with_color(&phys.huts[PHYS_ID_HUT_1]);
-  phys_update_with_color(&phys.huts[PHYS_ID_HUT_2]);
+  //phys_update_with_color(&phys.exit_start);
+  //phys_update_with_color(&phys.drop);
+  //phys_update_with_color(&phys.cube[PHYS_ID_CUBE_1]);
+  //phys_update_with_color(&phys.huts[PHYS_ID_HUT_1]);
+  //phys_update_with_color(&phys.huts[PHYS_ID_HUT_2]);
 
   // Launch IDLE task
-  //ai_task_launch(&tasks[TASK_ID_IDLE]);
-  ai_task_launch(&tasks[TASK_ID_START]);
+  ai_task_launch(&tasks[TASK_ID_IDLE]);
 
   // ... but also setup the 1st task to be executed
+  ai_task_launch(&tasks[TASK_ID_START]);
   task_mgt.active_task = &tasks[TASK_ID_START];
 
 }
@@ -225,7 +225,7 @@ BaseType_t ai_task_launch(task_t* task)
                             OS_TASK_STACK_AI_TASKS,
                             (void*) task,
                             OS_TASK_PRIORITY_AI_TASKS,
-                            task->handle);
+                            &task->handle);
 
       if(ret == pdPASS)
       {
@@ -262,7 +262,7 @@ void ai_tasks_def(void)
 
   // START Task
   id = TASK_ID_START;
-  snprintf(tasks[id].name, TASK_NAME_LENGTH, "AI_START");
+  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_START");
   tasks[id].function = ai_task_start;
   tasks[id].value = TASK_INIT_VALUE_START;
 

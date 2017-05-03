@@ -102,7 +102,7 @@ void sequencer_task( void *pvParameters )
   // Start modules initialization
   dsv_init(); //--> dsv_start();
   asv_start();
-  beacons_start();
+  //beacons_start();
   motion_cs_start();
   motion_traj_start();
   avoidance_start();
