@@ -31,6 +31,8 @@ TaskHandle_t handle_task_sequencer;
 robot_t robot;
 match_t match;
 
+extern task_mgt_t task_mgt;
+
 // Local, Private functions
 static void sequencer_init(void);
 static void sequencer_task(void *pvParameters);
@@ -292,9 +294,10 @@ void sequencer_color_sample(void)
 // Print current match state
 void sequencer_print_match(void)
 {
-  DEBUG_INFO("[MATCH] %-16s %-8s %-03u %-05u"DEBUG_EOL,
+  DEBUG_INFO("[MATCH] %-16s %-8s %-16s %-03u %-05u"DEBUG_EOL,
       match_state_to_str(match.state),
       match_color_to_str(match.color),
+      task_mgt.active_task == NULL ? "IDLE" : task_mgt.active_task->name,
       match.timer_msec/1000,
       match.scored_points
       )

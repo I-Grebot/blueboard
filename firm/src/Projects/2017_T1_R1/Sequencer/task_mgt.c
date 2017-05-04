@@ -52,14 +52,11 @@ void tasks_init(void)
     tasks[id].trials = 0;
   }
 
-  // Initialize the Idle task, special task: do not remove
-  id = TASK_ID_IDLE;
-  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_IDLE");
-  tasks[id].function = ai_task_idle;
-  tasks[id].value = TASK_INIT_VALUE_IDLE;
-
-  // Define all other tasks
+  // Define AI Tasks
   ai_tasks_def();
+
+  // Initialize task manager
+  task_mgt.active_task = NULL; // Default: no task
 
 }
 
@@ -113,7 +110,7 @@ task_t* task_get_next(void) {
   max_priority = 0;
 
   // Next task is initialized to the "idle" task, just in case nothing is found.
-  next_task = &tasks[TASK_ID_IDLE];
+  next_task = NULL;
 
   // Compute the task priorities
   ai_compute_task_priorities();

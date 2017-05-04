@@ -76,13 +76,6 @@ void ai_init(void)
   //phys_update_with_color(&phys.huts[PHYS_ID_HUT_1]);
   //phys_update_with_color(&phys.huts[PHYS_ID_HUT_2]);
 
-  // Launch IDLE task
-  ai_task_launch(&tasks[TASK_ID_IDLE]);
-
-  // ... but also setup the 1st task to be executed
-  ai_task_launch(&tasks[TASK_ID_START]);
-  task_mgt.active_task = &tasks[TASK_ID_START];
-
 }
 
 // Called at the end of the match
@@ -143,64 +136,83 @@ void ai_manage(bool notified, uint32_t sw_notification)
     xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
   }
 
-  // Depending on the state of the task we need to do different things
-  switch(task_mgt.active_task->state)
+  // Check to see if active task is valid
+  if(task_mgt.active_task != NULL)
   {
 
-    // On-going task, do nothing except for idle task
-    case TASK_STATE_RUNNING:
-      break;
+    // Depending on the state of the task we need to do different things
+    switch(task_mgt.active_task->state)
+    {
 
-    // Apply the dedicated policies
-    case TASK_STATE_SUSPENDED:
-      ai_on_suspend_policy(task_mgt.active_task);
-      break;
+      // On-going task, do nothing except for idle task
+      case TASK_STATE_RUNNING:
+        break;
 
-    case TASK_STATE_FAILED:
-      ai_on_failure_policy(task_mgt.active_task);
-      break;
+      // Apply the dedicated policies
+      case TASK_STATE_SUSPENDED:
+        ai_on_suspend_policy(task_mgt.active_task);
+        break;
 
-    // Everything went fine, no specific policy to be applied,
-    case TASK_STATE_SUCCESS:
-      task_print(task_mgt.active_task);
-      DEBUG_INFO("[TASK] Removing task %s (SUCCESS)"DEBUG_EOL, task_mgt.active_task->name);
-      vTaskDelete(task_mgt.active_task->handle);
-      break;
+      case TASK_STATE_FAILED:
+        ai_on_failure_policy(task_mgt.active_task);
+        break;
 
-    // Task is not active, we simply need to start it
-      // TODO:  temporary -- to be checked
-    case TASK_STATE_INACTIVE:
-      ai_task_launch(task_mgt.active_task);
-      task_print(task_mgt.active_task);
-      DEBUG_INFO("[TASK] Launching new task %s"DEBUG_EOL, task_mgt.active_task->name);
-      break;
+      // Everything went fine, no specific policy to be applied,
+      case TASK_STATE_SUCCESS:
+        task_print(task_mgt.active_task);
+        DEBUG_INFO("[TASK] Removing task %s (SUCCESS)"DEBUG_EOL, task_mgt.active_task->name);
+        vTaskDelete(task_mgt.active_task->handle);
+        break;
 
-    default:
-      break;
+      // Task is not active, we simply need to start it
+        // TODO:  temporary -- to be checked
+      case TASK_STATE_INACTIVE:
+        ai_task_launch(task_mgt.active_task);
+        task_print(task_mgt.active_task);
+        DEBUG_INFO("[TASK] Launching new task %s"DEBUG_EOL, task_mgt.active_task->name);
+        break;
 
-  } // switch active task
+      default:
+        break;
 
-  // States after which we need to find a new task and start it
-  if((task_mgt.active_task->state == TASK_STATE_SUSPENDED) ||
-     (task_mgt.active_task->state == TASK_STATE_SUCCESS)   ||
-     (task_mgt.active_task->state == TASK_STATE_FAILED))
-  {
+    } // switch active task
 
-    // Retrieve a new task. This function can have mainly 3 different issues:
-    // - Next task is INACTIVE (fresh), simply start execution
-    // - Next task was SUSPENDED, we need to clean up before starting it again
-    // - No correct task was found and the IDLE task is returned (do nothing special)
-    task_mgt.active_task = task_get_next();
+    // States after which we need to find a new task and start it
+    if((task_mgt.active_task->state == TASK_STATE_SUSPENDED) ||
+       (task_mgt.active_task->state == TASK_STATE_SUCCESS)   ||
+       (task_mgt.active_task->state == TASK_STATE_FAILED))
+    {
 
-    // Cleanup flags & previous execution traces
-    if(task_mgt.active_task->state == TASK_STATE_SUSPENDED) {
-      // TBD
+      // Retrieve a new task. This function can have mainly 3 different issues:
+      // - Next task is INACTIVE (fresh), simply start execution
+      // - Next task was SUSPENDED, we need to clean up before starting it again
+      // - No correct task was found and the IDLE task is returned (do nothing special)
+      task_mgt.active_task = task_get_next();
+
+      // Check to see if found task is valid
+      if(task_mgt.active_task != NULL)
+      {
+
+        // Cleanup flags & previous execution traces
+        if(task_mgt.active_task->state == TASK_STATE_SUSPENDED) {
+          // TBD
+        }
+
+        // Start FreeRTOS task, state will also change to RUNNING
+        ai_task_launch(task_mgt.active_task);
+        task_print(task_mgt.active_task);
+        DEBUG_INFO("[TASK] Launching new task %s"DEBUG_EOL, task_mgt.active_task->name);
+
+      }
+
     }
 
-    // Start FreeRTOS task, state will also change to RUNNING
-    ai_task_launch(task_mgt.active_task);
-    task_print(task_mgt.active_task);
-    DEBUG_INFO("[TASK] Launching new task %s"DEBUG_EOL, task_mgt.active_task->name);
+  // Active task is not valid
+  } else {
+
+    // Launch a new task if we can find one that is OK
+    // (will be managed at next ai_manage() call)
+    task_mgt.active_task = task_get_next();
 
   }
 

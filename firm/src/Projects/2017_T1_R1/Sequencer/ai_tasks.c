@@ -57,7 +57,7 @@ extern path_t pf;
 //                It is always running.
 // -----------------------------------------------------------------------------
 
-void ai_task_idle(void *params)
+/*void ai_task_idle(void *params)
 {
   // A pointer to corresponding task-structure (self) is passed
   task_t* self = (task_t*) params;
@@ -73,7 +73,7 @@ void ai_task_idle(void *params)
     vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(1000)); // OS_AI_TASKS_PERIOD_MS
   }
 
-}
+}*/
 
 // -----------------------------------------------------------------------------
 // START task
@@ -104,20 +104,20 @@ void ai_task_start(void *params)
 
 }
 
-// GET_ORES_SMALL_1A
-// GET_ORES_SMALL_1B
-// GET_ORES_BIG_1
+// GET_ORES_S_1A
+// GET_ORES_S_1B
+// GET_ORES_B_1
 
 // THROW_ORES
 
-// GET_MODULES_MONO_SHIP
-// GET_MODULES_MONO_TABLE_A
-// GET_MODULES_MONO_TABLE_B
-// GET_MODULES_MONO_TABLE_C
+// GET_MODS_M_S
+// GET_MODS_M_TA
+// GET_MODS_M_TB
+// GET_MODS_M_TC
 
 
-// BUILD_MODULES_SIDE
-// BUILD_MODULES_CENTRAL
+// BUILD_MODS_S
+// BUILD_MODS_C
 
 // -----------------------------------------------------------------------------
 // FUNNY task
@@ -135,9 +135,9 @@ void ai_task_start(void *params)
 // -----------------------------------------------------------------------------
 // WON'T DO List
 
-// GET_MODULES_POLY_SHIP
-// GET_MODULES_POLY_TABLE_A/B/C
+// GET_MODS_P_S
+// GET_MODS_P_TA/B/C
 
-// GET_ORES_SMALL_2A
-// GET_ORES_SMALL_2B
-// GET_ORES_BIG_2
+// GET_ORES_S_2A
+// GET_ORES_S_2B
+// GET_ORES_B_2

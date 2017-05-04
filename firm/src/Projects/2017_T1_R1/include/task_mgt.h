@@ -37,17 +37,15 @@
 // --------------------------
 
 // Special tasks
-#define TASK_ID_IDLE             0   // Special task used when there is nothing to do
-#define TASK_ID_START            1   // Special task used after init
+#define TASK_ID_START            0   // Exit starting area
 
 // Total Number of tasks
-#define TASKS_NB                 2   // Must equal exactly the number of tasks!
+#define TASKS_NB                 1   // Must equal exactly the number of tasks!
 
 // Initial values of the different tasks
 // -------------------------------------
-#define TASK_INIT_VALUE_IDLE        1 // Lowest but non-zero value
+
 #define TASK_INIT_VALUE_START   50000
-#define TASK_INIT_VALUE_SEA     20000
 
 // Priorities
 #define TASK_PRIORITY_MIN        0x00
