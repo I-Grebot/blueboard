@@ -1,25 +1,16 @@
 /* -----------------------------------------------------------------------------
- * Igrebrain
- * I-Grebot strategy board
+ * BlueBoard
+ * I-Grebot
  * -----------------------------------------------------------------------------
- * File        : physicals.c
- * Language    : C
- * Author      : Paul M.
- * Date        : 2015-03-20
+ * @file       physicals.c
+ * @author     Paul
+ * @date       2017/05/05
  * -----------------------------------------------------------------------------
- * Description
- *   See main module file
+ * @brief
+ *   Management of physicals elements
  * -----------------------------------------------------------------------------
  * Versionning informations
- * Repository: http://svn2.assembla.com/svn/paranoid_android/
- * -----------------------------------------------------------------------------
- * $Rev:: 1382                                                                 $
- * $LastChangedBy:: Paul.M                                                     $
- * $LastChangedDate:: 2015-05-19 22:25:29 +0200 (mar., 19 mai 2015)            $
- * -----------------------------------------------------------------------------
- * Version     Comment                                   Author       Date
- * 1.0         Creation                                  Paul M.      2015-03-20
- * 1.1         Adaptation to 2016 rules                  Pierrick B.  2016-04-17
+ * Repository: https://github.com/I-Grebot/blueboard.git
  * -----------------------------------------------------------------------------
  */
 
@@ -34,56 +25,112 @@ phys_t phys;
 
 // Externs
 extern match_t match;
-//extern path_t pf;
+extern path_t pf; // temp
 
 // -----------------------------------------------------------------------------
 // INITIALIZE GAME ELEMENTS COORDINATES
 // -----------------------------------------------------------------------------
 
-// Warning: all coordinates are expressed in case of a Purple match!
-//          Coordinates for green match are automatically computed.
+// Warning: all coordinates are expressed in case of a Blue match!
+//          Coordinates for yellow match are automatically computed.
 
-void phys_init(void) {
+void phys_init(void)
+{
 
+  // Game elements, from the rules
+  // -----------------------------
 
-  phys.huts[PHYS_ID_HUT_1].x = 300;
-  phys.huts[PHYS_ID_HUT_1].y = 100;
-  phys.huts[PHYS_ID_HUT_1].a = 0;
+  // Mono modules on the table
+  phys.mods_mono_table[PHYS_ID_MODS_M_TA].x   =  950;
+  phys.mods_mono_table[PHYS_ID_MODS_M_TA].y   =  200;
+  phys.mods_mono_table[PHYS_ID_MODS_M_TA].a   =    0;
 
-  phys.huts[PHYS_ID_HUT_2].x = 600;
-  phys.huts[PHYS_ID_HUT_2].y = 100;
-  phys.huts[PHYS_ID_HUT_2].a = 0;
+  phys.mods_mono_table[PHYS_ID_MODS_M_TB].x   =  200;
+  phys.mods_mono_table[PHYS_ID_MODS_M_TB].y   =  600;
+  phys.mods_mono_table[PHYS_ID_MODS_M_TB].a   =    0;
 
-  phys.cube[PHYS_ID_CUBE_1].x = 600;
-  phys.cube[PHYS_ID_CUBE_1].y = 900;
-  phys.cube[PHYS_ID_CUBE_1].a = 0;
+  phys.mods_mono_table[PHYS_ID_MODS_M_TC].x   =  800;
+  phys.mods_mono_table[PHYS_ID_MODS_M_TC].y   = 1850;
+  phys.mods_mono_table[PHYS_ID_MODS_M_TC].a   =    0;
 
-  phys.cube[PHYS_ID_CUBE_2].x = 915;
-  phys.cube[PHYS_ID_CUBE_2].y = 200;
-  phys.cube[PHYS_ID_CUBE_2].a = 0;
+  // Mono modules in the spaceship
+  phys.mods_mono_ship.x                       = 1150;
+  phys.mods_mono_ship.y                       =   10;
+  phys.mods_mono_ship.a                       =    0;
 
-  phys.shells[PHYS_ID_SHELL_NW].x =200;
-  phys.shells[PHYS_ID_SHELL_NW].y =1250;
-  phys.shells[PHYS_ID_SHELL_NW].a =0;
+  // Ores small craters
+  phys.ores_small_crater[PHYS_ID_ORES_S_A].x  =  SMALL_CRATER_CENTER_X;
+  phys.ores_small_crater[PHYS_ID_ORES_S_A].y  =  SMALL_CRATER_CENTER_Y;
+  phys.ores_small_crater[PHYS_ID_ORES_S_A].a  =    0;
 
-  phys.shells[PHYS_ID_SHELL_SW].x =200;
-  phys.shells[PHYS_ID_SHELL_SW].y =1550;
-  phys.shells[PHYS_ID_SHELL_SW].a =0;
+  phys.ores_small_crater[PHYS_ID_ORES_S_B].x  = 1070;
+  phys.ores_small_crater[PHYS_ID_ORES_S_B].y  = 1870;
+  phys.ores_small_crater[PHYS_ID_ORES_S_B].a  =    0;
 
-  phys.shells[PHYS_ID_SHELL_NE].x =600;
-  phys.shells[PHYS_ID_SHELL_NE].y =1250;
-  phys.shells[PHYS_ID_SHELL_NE].a =0;
+  // Ores big crater
+  phys.ores_big_crater.x                      =  300; // TBC
+  phys.ores_big_crater.y                      = 1600; // TBC
+  phys.ores_big_crater.a                      =    0; // TBC
 
-  phys.shells[PHYS_ID_SHELL_SE].x =600;
-  phys.shells[PHYS_ID_SHELL_SE].y =1550;
-  phys.shells[PHYS_ID_SHELL_SE].a =0;
+  // Path-finding static polygons
+  // -----------------------------
 
+  // Opponent starting area (also includes the border)
+  phys.pf_opp_start_zone = path_add_new_poly(4);
+  path_poly_set_points(phys.pf_opp_start_zone, 0, TABLE_X_MAX - 1070,    0);
+  path_poly_set_points(phys.pf_opp_start_zone, 1, TABLE_X_MAX       ,    0);
+  path_poly_set_points(phys.pf_opp_start_zone, 2, TABLE_X_MAX       ,  368);
+  path_poly_set_points(phys.pf_opp_start_zone, 3, TABLE_X_MAX - 1070,  368);
 
-  // Initialize path-finding polygons
-  // --------------------------------
+  // Borders of the starting area
+  phys.pf_start_border = path_add_new_poly(4);
+  path_poly_set_points(phys.pf_start_border, 0,   0, 360);
+  path_poly_set_points(phys.pf_start_border, 1, 710, 360);
+  path_poly_set_points(phys.pf_start_border, 2, 710, 368);
+  path_poly_set_points(phys.pf_start_border, 3,   0, 368);
 
-  // Static polygon: Stairs are formed with a basic rectangle
-  //phys.pf_construction_area = path_add_new_poly(4);
+  // Small craters
+  phys.pf_small_crater_a = path_add_new_poly(6);
+  path_poly_set_points(phys.pf_small_crater_a, 0,   SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_SIDE_LENGTH/2);
+  path_poly_set_points(phys.pf_small_crater_a, 1,   SMALL_CRATER_CENTER_X                                ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_INTERNAL_SIZE/2);
+  path_poly_set_points(phys.pf_small_crater_a, 2,   SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_SIDE_LENGTH/2);
+  path_poly_set_points(phys.pf_small_crater_a, 3,   SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2);
+  path_poly_set_points(phys.pf_small_crater_a, 4,   SMALL_CRATER_CENTER_X                                ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_INTERNAL_SIZE/2);
+  path_poly_set_points(phys.pf_small_crater_a, 5,   SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2);
+
+  phys.pf_opp_small_crater_a = path_add_new_poly(6);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 0, TABLE_X_MAX - SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_SIDE_LENGTH/2);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 1, TABLE_X_MAX - SMALL_CRATER_CENTER_X                                ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_INTERNAL_SIZE/2);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 2, TABLE_X_MAX - SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_SIDE_LENGTH/2);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 3, TABLE_X_MAX - SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 4, TABLE_X_MAX - SMALL_CRATER_CENTER_X                                ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_INTERNAL_SIZE/2);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 5, TABLE_X_MAX - SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2);
+
+  // Big crater
+  phys.pf_big_crater = path_add_new_poly(5);
+  path_poly_set_points(phys.pf_big_crater, 0,                   0 , TABLE_Y_MAX);
+  path_poly_set_points(phys.pf_big_crater, 1,                   0 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
+  path_poly_set_points(phys.pf_big_crater, 2, BIG_CRATER_RADIUS/2 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
+  path_poly_set_points(phys.pf_big_crater, 3, BIG_CRATER_RADIUS   , TABLE_Y_MAX - BIG_CRATER_RADIUS/2);
+  path_poly_set_points(phys.pf_big_crater, 4, BIG_CRATER_RADIUS   , TABLE_Y_MAX);
+
+  phys.pf_opp_big_crater = path_add_new_poly(5);
+  path_poly_set_points(phys.pf_opp_big_crater, 0, TABLE_X_MAX -                   0 , TABLE_Y_MAX);
+  path_poly_set_points(phys.pf_opp_big_crater, 1, TABLE_X_MAX -                   0 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
+  path_poly_set_points(phys.pf_opp_big_crater, 2, TABLE_X_MAX - BIG_CRATER_RADIUS/2 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
+  path_poly_set_points(phys.pf_opp_big_crater, 3, TABLE_X_MAX - BIG_CRATER_RADIUS   , TABLE_Y_MAX - BIG_CRATER_RADIUS/2);
+  path_poly_set_points(phys.pf_opp_big_crater, 4, TABLE_X_MAX - BIG_CRATER_RADIUS   , TABLE_Y_MAX);
+
+  // Central area
+  phys.pf_central_area = path_add_new_poly(5);
+  path_poly_set_points(phys.pf_central_area, 0, 1000, TABLE_Y_MAX);
+  path_poly_set_points(phys.pf_central_area, 1, 1000, 1300);
+  path_poly_set_points(phys.pf_central_area, 2, 1500, 1150);
+  path_poly_set_points(phys.pf_central_area, 3, 2000, 1300);
+  path_poly_set_points(phys.pf_central_area, 4, 2000, TABLE_Y_MAX);
+
+  // Path-finding dynamic polygons
+  // -----------------------------
 
   // Dynamic polygon: opponent's robot #1
   // The opponent's robot model is an octogon which has identical segments length.
@@ -91,39 +138,50 @@ void phys_init(void) {
   
   // Sequencing and intermediate POIs
   // --------------------------------
-  
-  // Position of the robot after init
-  phys.reset.x = ROBOT_BACK_TO_CENTER;
-  phys.reset.y = 600+ROBOT_BASE_WIDTH/2;
-  phys.reset.a = 0 ;
 
-  // Very first exit point
-  phys.exit_start.x = 400;
-  phys.exit_start.y = 900;
-  phys.exit_start.a = 0;
+  // Coordinate of the robot at startup
+  phys.reset.x  = 500;  // TBC
+  phys.reset.y  = 180;
+  phys.reset.a  =   0; // Facing left
 
-  // Very first exit point
-  phys.drop.x = 1000;
-  phys.drop.y = 900;
-  phys.drop.a = 0;
+  // 1st exit point
+  phys.exit_start.x  = 1050;
+  phys.exit_start.y  = 180;
+  phys.exit_start.a  =   0;
+
+  // Waypoint for building modules on the side
+  phys.mods_build_side.x =   80;
+  phys.mods_build_side.y = 1150; // Starting at the bottom
+  phys.mods_build_side.a =    0;
+
+  // Shooting location for ores
+  phys.ores_basket_shoot.x = 250;
+  phys.ores_basket_shoot.y = 500;
+  phys.ores_basket_shoot.a =  90; // Facing to the north
 
   // Offsets of the Robot's actuators / systems
   // ------------------------------------------
-  phys.offset_center.x = 20;
-  phys.offset_center.y = 0;
-  phys.offset_center.a = 0;
+
+  //phys.offset_center.x = 20;
+  //phys.offset_center.y = 0;
+  //phys.offset_center.a = 0;
 
 
   // Strategic Point Of Interest
   // ---------------------------
   
+  // Temp for debug: TODO: proper clean print of all POIs + PF polys
+  int idx;
+  for(idx = 0; idx < pf.cur_poly_idx; idx++) {
+    DEBUG_INFO("Path: X = %u ; Y = %u"DEBUG_EOL, pf.pts[idx].x, pf.pts[idx].y);
+  }
 }
 
 // -----------------------------------------------------------------------------
 // COORDINATES TRANSLATORS
 // -----------------------------------------------------------------------------
 
-// Returns true whenever the north side is the left side (i.e. Yellow color)
+// Returns true whenever the north side is the left side
 uint8_t phys_is_north_left(void) {
   return match.color == MATCH_COLOR_BLUE;
 }
@@ -138,7 +196,6 @@ void phys_update_with_color(poi_t* poi) {
     if(!phys_is_north_left()) {
 
         poi->x = TABLE_LENGTH - poi->x;
-        //poi->y = TABLE_HEIGHT - poi->y;
         poi->a = 180 + poi->a;
         if(poi->a > 360) {
             poi->a-= 360;

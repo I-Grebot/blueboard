@@ -65,14 +65,7 @@ void sequencer_init(void)
   match.scored_points = 0;
   match.timer_msec = 0;
 
-  // Initialize physical engine
-  phys_init();
 
-  // Initialize all tasks + task manager
-  tasks_init();
-
-  // Initialize the path-finder module
-  path_init();
 
 }
 
@@ -110,6 +103,11 @@ void sequencer_task( void *pvParameters )
   avoidance_start();
   monitoring_start();
   led_start();
+
+  path_init();
+  phys_init();
+  tasks_init();
+
   sequencer_init();
 
   // Sequencer main loop

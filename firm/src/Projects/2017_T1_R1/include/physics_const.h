@@ -129,18 +129,11 @@
 #define TABLE_HEIGHT (TABLE_Y_MAX - TABLE_Y_MIN)
 
 // Playground elements
-#define ROCK_GREEN_X_MAX        2750
-#define ROCK_PURPLE_X_MAX       250
-#define ROCK_GREEN_Y_MIN        1750
-#define ROCK_PURPLE_Y_MIN       1750
-#define CONSTRUCTION_AREA_X_MIN 900
-#define CONSTRUCTION_AREA_X_MAX 2100
-#define CONSTRUCTION_AREA_MIDDLE_X    1500
-#define CONSTRUCTION_AREA_Y_MIN 750
-#define CONSTRUCTION_AREA_Y_MAX 1350
-#define SAND_DUNE_X_MIN         800
-#define SAND_DUNE_X_MAX         2200
-#define SAND_DUNE_Y_MAX         200
+#define SMALL_CRATER_CENTER_X         650
+#define SMALL_CRATER_CENTER_Y         540
+#define SMALL_CRATER_INTERNAL_SIZE    200 // 170 + 2 x 15 mm
+#define SMALL_CRATER_SIDE_LENGTH      100
+#define BIG_CRATER_RADIUS             510
 
 // Robot dimensions in mm
 #define ROBOT_FRONT_TO_CENTER   85 // Distance from the ball bearing to the center

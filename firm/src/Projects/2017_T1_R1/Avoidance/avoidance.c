@@ -129,7 +129,7 @@ bool avoidance_detection_is_valid(void) {
     avd_mask_sensor_from_wall(a, AV_ANGLE_SOUTH_WALL);
 
   // Construction area walls
-
+/*
   // West side of the construction area
   if(    (x <=  CONSTRUCTION_AREA_MIDDLE_X)
       && (x >= CONSTRUCTION_AREA_MIDDLE_X - ROBOT_RADIUS - AV_CONSTRUCTION_AREA_MARGIN)
@@ -143,7 +143,7 @@ bool avoidance_detection_is_valid(void) {
       && (y >= CONSTRUCTION_AREA_Y_MIN - ROBOT_RADIUS - AV_CONSTRUCTION_AREA_MARGIN)
       && (y <=  CONSTRUCTION_AREA_Y_MAX + ROBOT_RADIUS + AV_CONSTRUCTION_AREA_MARGIN))
       avd_mask_sensor_from_wall(a, AV_ANGLE_WEST_WALL);
-
+*/
 // We also take into account static elements as:
   // - Starting zone (the opponent cannot be present in here)
   // - Opponent zone (we will never go there)

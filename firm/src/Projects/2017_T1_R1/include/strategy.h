@@ -52,29 +52,37 @@
 
 
 // Place-holder for physicals definitions (robot or game elements)
-// Warning: all coordinates are expressed with the PURPLE point of view.
+// Warning: all coordinates are expressed with the BLUE point of view.
 // Coordinate system is the same than the rules metric.
 // (0;0) point is always the same, whatever the color is.
 // This origin is placed on the top-left side of the table,
-//   i.e. on the yellow side and on the stairs side.
+// (same than the rules drawings)
 typedef struct {
 
   // Game elements
-  poi_t huts[2];          // Location of the huts center
-  poi_t cube[2];			// Location of the cube
-  poi_t shells[4];
+  poi_t mods_mono_table[3];  // Monochrome modules on the table
+  poi_t mods_mono_ship;      // Monochrome modules in the ship
 
-  // Robot
-  poi_t reset;            // Location of the robot after reset (Purple)
-  poi_t exit_start;
-  poi_t drop;
-  poi_t offset_center;
-  poi_t offset_cube_E;
-  poi_t offset_cube_W;
+  // poly: won't do
+
+  poi_t ores_small_crater[2];   // Small ores craters
+  poi_t ores_big_crater;         // Big ores crater
+
+  // Important waypoints
+  poi_t reset;              // Location of the robot after reset (blue)
+  poi_t exit_start;         // Exit coordinate
+  poi_t mods_build_side;    // Modules side building area
+  poi_t ores_basket_shoot;  // Coordinate for shooting ores in the basket
 
   // Path-finder static polygons
-  //   path_poly_t* pf_construction_area;  // Obstacle delimited by the construction area
-  //  path_poly_t* pf_sand_dune;          // Obstacle of the sand dune
+  path_poly_t* pf_opp_start_zone;
+  path_poly_t* pf_start_border;
+  path_poly_t* pf_small_crater_a;
+  path_poly_t* pf_opp_small_crater_a;
+  path_poly_t* pf_big_crater;
+  path_poly_t* pf_opp_big_crater;
+  path_poly_t* pf_central_area;
+
 
   // Path-finder dynamic polygons (initialized with dummy values but updated
   // by the avoidance module)
@@ -84,14 +92,16 @@ typedef struct {
 } phys_t;
 
 // IDs for each object
-#define PHYS_ID_HUT_1 0
-#define PHYS_ID_HUT_2 1
-#define PHYS_ID_CUBE_1 0
-#define PHYS_ID_CUBE_2 1
-#define PHYS_ID_SHELL_NW 0
-#define PHYS_ID_SHELL_SW 1
-#define PHYS_ID_SHELL_NE 2
-#define PHYS_ID_SHELL_SE 3
+
+// Mono modules on the table
+#define PHYS_ID_MODS_M_TA   0
+#define PHYS_ID_MODS_M_TB   1
+#define PHYS_ID_MODS_M_TC   2
+
+// Ores small craters
+#define PHYS_ID_ORES_S_A   0
+#define PHYS_ID_ORES_S_B   1
+
 
 // -----------------------------------------------------------------------------
 // MAIN ROBOT & MATCH DEFINITIONS
