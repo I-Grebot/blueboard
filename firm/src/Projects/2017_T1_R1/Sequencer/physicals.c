@@ -77,17 +77,17 @@ void phys_init(void)
 
   // Opponent starting area (also includes the border)
   phys.pf_opp_start_zone = path_add_new_poly(4);
-  path_poly_set_points(phys.pf_opp_start_zone, 0, TABLE_X_MAX - 1070,    0);
+  path_poly_set_points(phys.pf_opp_start_zone, 0, TABLE_X_MAX - 1100,    0);
   path_poly_set_points(phys.pf_opp_start_zone, 1, TABLE_X_MAX       ,    0);
-  path_poly_set_points(phys.pf_opp_start_zone, 2, TABLE_X_MAX       ,  368);
-  path_poly_set_points(phys.pf_opp_start_zone, 3, TABLE_X_MAX - 1070,  368);
+  path_poly_set_points(phys.pf_opp_start_zone, 2, TABLE_X_MAX       ,  380);
+  path_poly_set_points(phys.pf_opp_start_zone, 3, TABLE_X_MAX - 1100,  380);
 
   // Borders of the starting area
   phys.pf_start_border = path_add_new_poly(4);
   path_poly_set_points(phys.pf_start_border, 0,   0, 360);
-  path_poly_set_points(phys.pf_start_border, 1, 710, 360);
-  path_poly_set_points(phys.pf_start_border, 2, 710, 368);
-  path_poly_set_points(phys.pf_start_border, 3,   0, 368);
+  path_poly_set_points(phys.pf_start_border, 1, 720, 360);
+  path_poly_set_points(phys.pf_start_border, 2, 720, 380);
+  path_poly_set_points(phys.pf_start_border, 3,   0, 380);
 
   // Small craters
   phys.pf_small_crater_a = path_add_new_poly(6);
@@ -123,11 +123,11 @@ void phys_init(void)
 
   // Central area
   phys.pf_central_area = path_add_new_poly(5);
-  path_poly_set_points(phys.pf_central_area, 0, 1000, TABLE_Y_MAX);
-  path_poly_set_points(phys.pf_central_area, 1, 1000, 1300);
+  path_poly_set_points(phys.pf_central_area, 0,  840, TABLE_Y_MAX);
+  path_poly_set_points(phys.pf_central_area, 1,  840, 1300);
   path_poly_set_points(phys.pf_central_area, 2, 1500, 1150);
-  path_poly_set_points(phys.pf_central_area, 3, 2000, 1300);
-  path_poly_set_points(phys.pf_central_area, 4, 2000, TABLE_Y_MAX);
+  path_poly_set_points(phys.pf_central_area, 3, TABLE_X_MAX - 840, 1300);
+  path_poly_set_points(phys.pf_central_area, 4, TABLE_X_MAX - 840, TABLE_Y_MAX);
 
   // Path-finding dynamic polygons
   // -----------------------------
@@ -169,12 +169,7 @@ void phys_init(void)
 
   // Strategic Point Of Interest
   // ---------------------------
-  
-  // Temp for debug: TODO: proper clean print of all POIs + PF polys
-  int idx;
-  for(idx = 0; idx < pf.cur_poly_idx; idx++) {
-    DEBUG_INFO("Path: X = %u ; Y = %u"DEBUG_EOL, pf.pts[idx].x, pf.pts[idx].y);
-  }
+
 }
 
 // -----------------------------------------------------------------------------
@@ -359,6 +354,42 @@ void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y) {
 	//path_poly_set_points(phys.pf_opponent1, 7, x - 3*OPPONENT1_SIZE/2,  y -   OPPONENT1_SIZE/2);
 //  }
   
+}
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+
+// Print-out polygons and points
+void phys_print_pf(void)
+{
+
+  uint8_t idx_poly;
+  uint8_t idx_pt;
+  path_poly_t* poly;
+
+  DEBUG_INFO("              Poly   Points (X;Y)"DEBUG_EOL);
+  DEBUG_INFO("-----------------------------------------------------------"DEBUG_EOL);
+
+  // Avoid 1st poly (special)
+  for(idx_poly = 1; idx_poly < pf.cur_poly_idx; idx_poly++)
+  {
+    poly = &pf.polys[idx_poly];
+
+    printf("[PHYS] [POLY] %u ", idx_poly);
+
+    for(idx_pt = 0; idx_pt < poly->n; idx_pt++)
+    {
+      printf("%u;%u ",
+            10*poly->pts[idx_pt].x,
+            10*poly->pts[idx_pt].y);
+    }
+    printf(DEBUG_EOL);
+
+  }
+
+
+
 }
 
 // -----------------------------------------------------------------------------

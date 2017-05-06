@@ -108,6 +108,8 @@ void sequencer_task( void *pvParameters )
   phys_init();
   tasks_init();
 
+  phys_print_pf(); // temp
+
   sequencer_init();
 
   // Sequencer main loop

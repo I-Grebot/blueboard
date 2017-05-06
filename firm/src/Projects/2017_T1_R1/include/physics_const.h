@@ -131,9 +131,9 @@
 // Playground elements
 #define SMALL_CRATER_CENTER_X         650
 #define SMALL_CRATER_CENTER_Y         540
-#define SMALL_CRATER_INTERNAL_SIZE    200 // 170 + 2 x 15 mm
+#define SMALL_CRATER_INTERNAL_SIZE    260
 #define SMALL_CRATER_SIDE_LENGTH      100
-#define BIG_CRATER_RADIUS             510
+#define BIG_CRATER_RADIUS             550
 
 // Robot dimensions in mm
 #define ROBOT_FRONT_TO_CENTER   85 // Distance from the ball bearing to the center
