@@ -168,6 +168,7 @@ void motion_cs_task(void *pvParameters)
       robot.cs.acceleration_d = robot.cs.speed_d - old_speed_d;
       old_speed_a = robot.cs.speed_a;
       old_speed_d = robot.cs.speed_d;
+
     }
 
     if (robot.cs.cs_events & DO_POWER)
@@ -208,12 +209,12 @@ void motion_cs_task(void *pvParameters)
 void motion_power_enable(void)
 {
   robot.cs.cs_events |=   DO_POWER;
-  robot.cs.cs_events |=   DO_CS;
+  //robot.cs.cs_events |=   DO_CS;
 }
 void motion_power_disable(void)
 {
   robot.cs.cs_events &= ~ DO_POWER;
-  robot.cs.cs_events &= ~ DO_CS;
+  //robot.cs.cs_events &= ~ DO_CS;
 }
 
 /* -----------------------------------------------------------------------------

@@ -165,13 +165,13 @@
  /*
   * Events periodicity
   */
-#define OS_MOTION_CONTROL_PERIOD_MS       50U
-#define OS_AVERSIVE_PERIOD_MS             50U
-#define OS_MONITORING_PERIOD_MS          100U
-#define OS_SEQUENCER_PERIOD_MS           100U
-#define OS_AI_TASKS_PERIOD_MS            100U
-#define OS_BEACONS_PERIOD_MS             100U
-#define OS_AVOIDANCE_PERIOD_MS            10U
+#define OS_MOTION_CONTROL_PERIOD_MS       50
+#define OS_AVERSIVE_PERIOD_MS             50
+#define OS_MONITORING_PERIOD_MS          100
+#define OS_SEQUENCER_PERIOD_MS           100
+#define OS_AI_TASKS_PERIOD_MS            100
+#define OS_BEACONS_PERIOD_MS             100
+#define OS_AVOIDANCE_PERIOD_MS            10
 
 /*
  * Software task 32 bits notifiers

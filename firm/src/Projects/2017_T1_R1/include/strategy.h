@@ -142,6 +142,7 @@ typedef struct {
   uint32_t timer_msec;        // Match time in milliseconds used for match time
   uint16_t scored_points;     // Calculated number of scored points
   // ...
+  bool sw_init;               // Flag'd to true if the init is performed by software
 } match_t;
 
 // Define a robot structure

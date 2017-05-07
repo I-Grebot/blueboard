@@ -610,7 +610,6 @@ static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             wp.offset.a = 0;
             wp.speed = WP_SPEED_NORMAL;
             wp.trajectory_must_finish = true;
-            wp.type = WP_GOTO_FWD;
 
             // Ensure we keep going for the next parameter
             xReturn = pdTRUE;
@@ -625,14 +624,51 @@ static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             // Decode the command
             // ------------------
 
-            // Goto
-            if((!strcasecmp(command, "goto")) && (lParameterNumber == 4)) {
-                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_MOT_PFX"Goto (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
+            // Goto Cases
+            if((!strcasecmp(command, "goto_auto")) && (lParameterNumber == 4)) {
+                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_MOT_PFX"Goto Auto (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
                 pcWriteBuffer += strlen(pcWriteBuffer);
-
+                wp.type = WP_GOTO_AUTO;
                 motion_add_new_wp(&wp);
 
-            } // goto
+            }
+
+            else if((!strcasecmp(command, "goto_fwd")) && (lParameterNumber == 4)) {
+              snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_MOT_PFX"Goto Forward (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
+              pcWriteBuffer += strlen(pcWriteBuffer);
+              wp.type = WP_GOTO_FWD;
+              motion_add_new_wp(&wp);
+            }
+
+            else if((!strcasecmp(command, "goto_bwd")) && (lParameterNumber == 4)) {
+              snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_MOT_PFX"Goto Backward (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
+              pcWriteBuffer += strlen(pcWriteBuffer);
+              wp.type = WP_GOTO_BWD;
+              motion_add_new_wp(&wp);
+            }
+
+            // Turnto Cases
+            else if((!strcasecmp(command, "turnto_front")) && (lParameterNumber == 4)) {
+              snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_MOT_PFX"Turnto Front (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
+              pcWriteBuffer += strlen(pcWriteBuffer);
+              wp.type = WP_ORIENT_FRONT;
+              motion_add_new_wp(&wp);
+            }
+
+            else if((!strcasecmp(command, "turnto_behind")) && (lParameterNumber == 4)) {
+              snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_MOT_PFX"Turnto Behind (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
+              pcWriteBuffer += strlen(pcWriteBuffer);
+              wp.type = WP_ORIENT_BEHIND;
+              motion_add_new_wp(&wp);
+            }
+
+            // Stop/Break
+            else if((!strcasecmp(command, "stop")) && (lParameterNumber == 2)) {
+              snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_MOT_PFX"Stop"SHELL_EOL);
+              pcWriteBuffer += strlen(pcWriteBuffer);
+              motion_clear_all_wp();
+              motion_traj_hard_stop();
+            }
 
 
             else {
@@ -1169,6 +1205,7 @@ static BaseType_t OS_SHL_SeqCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
   // Handle on the strategy task
   extern TaskHandle_t handle_task_sequencer;
+  extern match_t match;
 
   // Nothing to display by default
   memset( pcWriteBuffer, 0x00, xWriteBufferLen );
@@ -1211,7 +1248,7 @@ static BaseType_t OS_SHL_SeqCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
       // Decode the command
       // ------------------
 
-      // Software init
+      // Sequencer controls
       if((!strcasecmp(command, "init")) && (lParameterNumber == 2)) {
         xTaskNotify(handle_task_sequencer, OS_NOTIFY_INIT_START, eSetBits);
       }
@@ -1230,6 +1267,11 @@ static BaseType_t OS_SHL_SeqCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
       else if((!strcasecmp(command, "abort")) && (lParameterNumber == 2)) {
         xTaskNotify(handle_task_sequencer, OS_NOTIFY_MATCH_ABORT, eSetBits);
+      }
+
+      // Match color
+      else if((!strcasecmp(command, "color")) && (lParameterNumber == 3)) {
+        match.color = (match_color_e) value1;
       }
 
       // Some reporting

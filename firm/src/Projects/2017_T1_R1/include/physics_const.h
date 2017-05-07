@@ -35,21 +35,21 @@
 */
 
 /* Distance between motorized wheels, in millimeters */
-#define PHYS_ROBOT_MOTORS_TRACK_MM          ((double)  143.0)
+#define PHYS_ROBOT_MOTORS_TRACK_MM          ((double)  162.5)
 
 /* Distance between quadrature encoder wheels, in millimeters */
-#define PHYS_ROBOT_ENCODERS_TRACK_MM        ((double)  201.5)
+#define PHYS_ROBOT_ENCODERS_TRACK_MM        ((double)  278.0)
 
 /* Nominal Diameter of a quadrature encoder wheel, in millimeters */
-#define PHYS_ROBOT_ENCODER_WHEEL_DIAM_MM    ((double)   59.0)
+#define PHYS_ROBOT_ENCODER_WHEEL_DIAM_MM    ((double)   57.2) // R: 57.2 / L: 57.5
 
 /* Number of impulsions of the quadrature encoder per revolution */
 #define PHYS_ROBOT_ENCODER_NB_IMP_PER_REV   ((double) 4096.0)
 
 /* Encoder wheel gains to compensate for forward/backward rotation
  * (adjust sign) and diameter variations */
-#define PHYS_ROBOT_ENCODER_LEFT_GAIN        ((double)  1.000)
-#define PHYS_ROBOT_ENCODER_RIGHT_GAIN       ((double) -1.000)
+#define PHYS_ROBOT_ENCODER_LEFT_GAIN        ((double)  1.0000) //0052
+#define PHYS_ROBOT_ENCODER_RIGHT_GAIN       ((double) -1.0000)
 
 /* Centrifugal compensation coefficient. Value TO BE ADJUSTED */
 #define PHYS_ROBOT_CENTRIFUGAL_COEF         ((double)   5.0)

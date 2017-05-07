@@ -64,8 +64,7 @@ void sequencer_init(void)
   match.paused = false;
   match.scored_points = 0;
   match.timer_msec = 0;
-
-
+  match.sw_init = false;
 
 }
 
@@ -79,7 +78,7 @@ void sequencer_init(void)
 
 void sequencer_task( void *pvParameters )
 {
-  TickType_t next_wake_time = xTaskGetTickCount();;
+  TickType_t next_wake_time = xTaskGetTickCount();
 
   BaseType_t notified;
   uint32_t sw_notification;
@@ -95,6 +94,9 @@ void sequencer_task( void *pvParameters )
   vTaskDelayUntil(&next_wake_time, pdMS_TO_TICKS(OS_SHELL_BOOT_WAIT_MS));
 
   // Start modules initialization
+
+  sequencer_init();
+
   dsv_init(); //--> dsv_start();
   asv_start();
   //beacons_start();
@@ -108,9 +110,16 @@ void sequencer_task( void *pvParameters )
   phys_init();
   tasks_init();
 
-  phys_print_pf(); // temp
 
-  sequencer_init();
+  // TEMP
+  /*
+  bb_power_up();
+  motion_power_enable();
+
+  while(1)
+  {
+    notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_SEQUENCER_PERIOD_MS));
+  }*/
 
   // Sequencer main loop
   for( ;; )
@@ -133,8 +142,13 @@ void sequencer_task( void *pvParameters )
     case MATCH_STATE_READY:
     //-------------------------------------------------------------------------
 
-      if((SW_START == MATCH_START_INSERTED) ||                    // Hardware init
-         (notified && (sw_notification & OS_NOTIFY_INIT_START)))  // Software init
+      if(notified && (sw_notification & OS_NOTIFY_INIT_START))
+      {
+        match.sw_init = true;
+      }
+
+      if((SW_START == MATCH_START_INSERTED) ||  // Hardware init
+         match.sw_init)                         // Software init
       {
         match.state = MATCH_STATE_INIT;
 
@@ -182,7 +196,10 @@ void sequencer_task( void *pvParameters )
       // We need to have at least a basic software debouncing
       // to prevent false starts. START_JACK must be 1 after the
       // given time in order to detect the match
-      if(SW_START == MATCH_START_REMOVED)
+      //
+      // Note: when init is performed by software, the match must be also
+      //       started by software (to avoid headaches...)
+      if(!match.sw_init && (SW_START == MATCH_START_REMOVED))
       {
         if(match.timer_msec >= pdMS_TO_TICKS(START_DEBOUNCING_DELAY_MSEC))
         {
@@ -279,16 +296,28 @@ void sequencer_task( void *pvParameters )
 
 void sequencer_color_sample(void)
 {
-  if(SW_COLOR == MATCH_COLOR_BLUE)
+  // When the match is initialized by software, avoid latching the color
+  // (value is directly set)
+  if(!match.sw_init)
+  {
+    if(SW_COLOR == MATCH_COLOR_BLUE)
+    {
+      match.color = MATCH_COLOR_BLUE;
+    }
+    else
+    {
+      match.color = MATCH_COLOR_YELLOW;
+    }
+  }
+
+  // Display the selected color
+  if(match.color == MATCH_COLOR_BLUE)
   {
     led_set_color(BB_LED_BLUE);
-    match.color = MATCH_COLOR_BLUE;
-  }
-  else
-  {
+  } else {
     led_set_color(BB_LED_YELLOW);
-    match.color = MATCH_COLOR_YELLOW;
   }
+
 }
 
 // Print current match state
