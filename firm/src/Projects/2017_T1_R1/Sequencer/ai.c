@@ -70,7 +70,7 @@ void ai_init(void)
 
   // Reset motion position and enable motor power
 
-  //phys_update_with_color(&phys.exit_start);
+  phys_update_with_color(&phys.exit_start);
   //phys_update_with_color(&phys.drop);
   //phys_update_with_color(&phys.cube[PHYS_ID_CUBE_1]);
   //phys_update_with_color(&phys.huts[PHYS_ID_HUT_1]);

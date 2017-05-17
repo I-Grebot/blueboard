@@ -149,6 +149,7 @@ void ai_task_start(void *params)
   // Go to exit
   wp.coord.abs = phys.exit_start;
   wp.type = WP_GOTO_AUTO;
+
   motion_add_new_wp(&wp);
   avd_mask_all(false); // disable entirely avoidance for 1st point
 
