@@ -169,11 +169,13 @@ void ai_task_start(void *params)
     // 1st intermediate point
     wp.coord.abs.x = 1300;
     wp.coord.abs.y = 600;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
     motion_move_block_on_avd(&wp);
 
     // 2nd intermediate point
     wp.coord.abs.x = 750;
     wp.coord.abs.y = 900;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
     motion_move_block_on_avd(&wp);
 
     // Autokill (should be handled by main strat but we never know)
