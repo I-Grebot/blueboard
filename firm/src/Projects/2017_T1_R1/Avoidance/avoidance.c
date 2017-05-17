@@ -33,6 +33,8 @@ TaskHandle_t handle_task_avoidance;
 // Handle on the strategy task
 extern TaskHandle_t handle_task_sequencer;
 
+extern task_mgt_t task_mgt;
+
 void avoidance_start(void)
 {
 
@@ -44,6 +46,9 @@ static void avoidance_task( void *pvParameters )
 {
   TickType_t xNextWakeTime;
   BaseType_t xHigherPriorityTaskWoken = pdTRUE;
+
+  BaseType_t notified;
+  uint32_t sw_notification;
 
   avd_init();
 
@@ -64,7 +69,34 @@ static void avoidance_task( void *pvParameters )
     av.det_back_center = IND2_VALUE;
     av.det_back_right = IND3_VALUE;
 
-    //    	do_avoidance();
+    //do_avoidance();
+
+    // A new detection condition occurs
+    // This is a transitional state
+    if(av.state == AV_STATE_CLEAR && avd_detection_is_valid())
+    {
+      //xTaskNotify(handle_task_sequencer, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
+      xTaskNotify(task_mgt.active_task->handle, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
+      av.state = AV_STATE_DETECT;
+      vTaskDelayUntil( &xNextWakeTime, OS_AVOIDANCE_PERIOD_MS);
+    }
+
+    // A detection was triggered, wait for the clear notification
+    else if(av.state == AV_STATE_DETECT)
+    {
+
+      notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+
+      // Clear instruction received
+      if(notified && (sw_notification & OS_NOTIFY_AVOIDANCE_CLR))
+      {
+        av.state = AV_STATE_CLEAR;
+      }
+    }
+
+    else {
+      vTaskDelayUntil( &xNextWakeTime, OS_AVOIDANCE_PERIOD_MS);
+    }
 
     // Test notify every sec strategy
     /*if(!(++i % 100)) {
@@ -75,7 +107,7 @@ static void avoidance_task( void *pvParameters )
 
     }*/
 
-    vTaskDelayUntil( &xNextWakeTime, OS_AVOIDANCE_PERIOD_MS);
+
   }
 }
 
@@ -85,20 +117,40 @@ static void avd_init(void)
   av.action_done = 0;
   av.timer_ms = 0;
   av.timer_opp_validity_ms = 0;
+  avd_mask_all(true);
 
-  av.mask_front_left = true;
-  av.mask_front_center = true;
-  av.mask_front_right = true;
-  av.mask_back_left = true;
-  av.mask_back_center = true;
-  av.mask_back_right = true;
+}
+
+void avd_mask_all(bool value)
+{
+  av.mask_front_left = value;
+  av.mask_front_center = value;
+  av.mask_front_right = value;
+  av.mask_back_left = value;
+  av.mask_back_center = value;
+  av.mask_back_right = value;
+}
+
+void avd_mask_front(bool value)
+{
+  av.mask_front_left = value;
+  av.mask_front_center = value;
+  av.mask_front_right = value;
+}
+
+
+void avd_mask_back(bool value)
+{
+  av.mask_back_left = value;
+  av.mask_back_center = value;
+  av.mask_back_right = value;
 }
 
 // From the sensor values, the robot current position/orientation,
 // and the table dimension and shape decide if an opponent detection
 // should occur. Each sensor value is masked depending on these condition.
 // Finally if a detection is valid (and we should stop!) returns true.
-bool avoidance_detection_is_valid(void) {
+bool avd_detection_is_valid(void) {
 
   int16_t x;
   int16_t y;

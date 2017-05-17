@@ -266,7 +266,10 @@ BaseType_t monitoring_start(void);
 // -----------------------------------------------------------------------------
 
 void avoidance_start(void);
-bool avoidance_detection_is_valid(void);
+void avd_mask_all(bool value);
+void avd_mask_front(bool value);
+void avd_mask_back(bool value);
+bool avd_detection_is_valid(void);
 
 // -----------------------------------------------------------------------------
 // Beacons

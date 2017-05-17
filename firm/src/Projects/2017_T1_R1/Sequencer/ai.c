@@ -65,7 +65,7 @@ void ai_init(void)
   robot.opp_pos.x = OPPONENT_POS_INIT_X;
   robot.opp_pos.y = OPPONENT_POS_INIT_Y;
   robot.opp_pos.a = 0;
-  // phys_update_with_color(&robot.opp_pos);
+  phys_update_with_color(&robot.opp_pos);
   //    phys_set_opponent_position(1, robot.opp_pos.x, robot.opp_pos.y);
 
   // Reset motion position and enable motor power
@@ -119,9 +119,9 @@ void ai_manage(bool notified, uint32_t sw_notification)
       // - Increase the task's trials count.
       // - Apply the A.I. "on_suspend" policy, which can contain failure conditions
       //   or other dependencies freeing conditions
-      if(av.state == AV_STATE_DETECT) {
-        task_mgt.active_task->state = TASK_STATE_SUSPENDED;
-      }
+      //if(av.state == AV_STATE_DETECT) {
+      //  task_mgt.active_task->state = TASK_STATE_SUSPENDED;
+      //}
 
     }
 
