@@ -82,7 +82,7 @@ void bb_hmi_init(void)
     /* Configure custom fields */
     SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
     SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-    SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32; /* TBC */
+    SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256; /* TBC */
     SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
     SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
     SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
@@ -93,29 +93,47 @@ void bb_hmi_init(void)
     SPI_Init(HMI_COM, &SPI_InitStruct);
     SPI_SSOutputCmd(HMI_COM, ENABLE);
 
+
+
     /* Enable SPI module */
     HMI_CSN_WRITE(BB_HMI_FRAME_IDLE);
     SPI_Cmd(HMI_COM, ENABLE);
 
 }
-
+/*
 uint16_t bb_hmi_tx_rx(uint16_t value)
 {
-    /* Send a new 16 bits word */
     HMI_CSN_WRITE(BB_HMI_FRAME_ACTIVE);
     SPI_I2S_SendData16(HMI_COM, value);
 
-    /* Wait until transmit complete */
     while(SPI_I2S_GetFlagStatus(HMI_COM, SPI_I2S_FLAG_TXE) == RESET);
 
-    /* Wait until receive complete */
     while(SPI_I2S_GetFlagStatus(HMI_COM, SPI_I2S_FLAG_RXNE) == RESET);
 
-    /* Wait until SPI is not busy anymore */
     while(SPI_I2S_GetFlagStatus(HMI_COM, SPI_I2S_FLAG_BSY) == SET);
 
     HMI_CSN_WRITE(BB_HMI_FRAME_IDLE);
 
-    /* Return 16 bit received word */
     return SPI_I2S_ReceiveData16(HMI_COM);
+}*/
+
+uint16_t bb_hmi_tx_rx(size_t len, uint8_t* data_wr, uint8_t* data_rd)
+{
+  size_t idx = 0;
+
+  HMI_CSN_WRITE(BB_HMI_FRAME_ACTIVE);
+
+  for(idx = 0; idx < len; idx++)
+  {
+    SPI_SendData8(HMI_COM, *data_wr);
+    *data_rd = SPI_ReceiveData8(HMI_COM);
+
+    while(SPI_I2S_GetFlagStatus(HMI_COM, SPI_I2S_FLAG_BSY) == SET);
+
+    data_wr++;
+    data_rd++;
+  }
+
+  HMI_CSN_WRITE(BB_HMI_FRAME_IDLE);
+
 }

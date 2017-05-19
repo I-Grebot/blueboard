@@ -220,7 +220,8 @@ void bb_dio_init(void);
 
 /* Human-Machine Interface (HMI) */
 void bb_hmi_init(void);
-uint16_t bb_hmi_tx_rx(uint16_t value);
+//uint16_t bb_hmi_tx_rx(uint16_t value);
+uint16_t bb_hmi_tx_rx(size_t len, uint8_t* data_wr, uint8_t* data_rd);
 
 /* CAN Interface */
 // TODO
