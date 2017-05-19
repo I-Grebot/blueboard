@@ -38,7 +38,7 @@
 #define PHYS_ROBOT_MOTORS_TRACK_MM          ((double)  162.5)
 
 /* Distance between quadrature encoder wheels, in millimeters */
-#define PHYS_ROBOT_ENCODERS_TRACK_MM        ((double)  278.0)
+#define PHYS_ROBOT_ENCODERS_TRACK_MM        ((double)  273.0)
 
 /* Nominal Diameter of a quadrature encoder wheel, in millimeters */
 #define PHYS_ROBOT_ENCODER_WHEEL_DIAM_MM    ((double)   57.2) // R: 57.2 / L: 57.5

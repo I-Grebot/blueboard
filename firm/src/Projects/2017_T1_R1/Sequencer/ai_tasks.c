@@ -144,46 +144,74 @@ void ai_task_start(void *params)
   wp.offset.y = 0;
   wp.offset.a = 0;
   wp.speed = WP_SPEED_NORMAL;
-  wp.trajectory_must_finish = true;
+  wp.trajectory_must_finish = false;
 
-  // Go to exit
-  wp.coord.abs = phys.exit_start;
-  wp.type = WP_GOTO_AUTO;
+  avd_mask_all(false); // disable entirely avoidance
 
-  motion_add_new_wp(&wp);
-  avd_mask_all(false); // disable entirely avoidance for 1st point
-
-  // Block until we reach the target position
-  while(!motion_is_traj_finished())
-  {
-    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
-  }
 
   // Common for next motions
   wp.type = WP_GOTO_FWD;
-  avd_mask_front(true); // only enable front sensors
 
-  // Loop between 2 points...
+  // Loop between few points...
   for(;;)
   {
 
-    // 1st intermediate point
-    wp.coord.abs.x = 1300;
-    wp.coord.abs.y = 600;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    wp.coord.abs.x = 1450;
+    wp.coord.abs.y = 550;
     motion_move_block_on_avd(&wp);
 
-    // 2nd intermediate point
-    wp.coord.abs.x = 750;
-    wp.coord.abs.y = 900;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    wp.coord.abs.x = 911;
+    wp.coord.abs.y = 1005;
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 1065;
+    wp.coord.abs.y = 1243;
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 1215;
+    wp.coord.abs.y = 1409;
+    motion_move_block_on_avd(&wp);
+
+    wp.type = WP_GOTO_BWD;
+    wp.coord.abs.x = 993;
+    wp.coord.abs.y = 807;
+    motion_move_block_on_avd(&wp);
+
+
+    wp.coord.abs.x = 920;
+    wp.coord.abs.y = 212;
+    motion_move_block_on_avd(&wp);
+    wp.type = WP_GOTO_FWD;
+
+    wp.coord.abs.x = 933;
+    wp.coord.abs.y = 889;
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 613;
+    wp.coord.abs.y = 1390;
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 244;
+    wp.coord.abs.y = 1300;
+    motion_move_block_on_avd(&wp);
+    wp.type = WP_GOTO_BWD;
+
+    wp.coord.abs.x = 1005;
+    wp.coord.abs.y = 750;
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 850;
+    wp.coord.abs.y = 200;
+    motion_move_block_on_avd(&wp);
+
+    wp.type = WP_GOTO_FWD;
+
     motion_move_block_on_avd(&wp);
 
     // Autokill (should be handled by main strat but we never know)
     if(match.timer_msec >= MATCH_DURATION_MSEC) {
       self->state = TASK_STATE_SUCCESS;
     }
-
   }
 
 }

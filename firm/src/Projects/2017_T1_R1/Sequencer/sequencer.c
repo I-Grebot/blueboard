@@ -134,9 +134,34 @@ void sequencer_task( void *pvParameters )
     case MATCH_STATE_RESET:
     //-------------------------------------------------------------------------
 
-      match.state = MATCH_STATE_READY;
-      sequencer_print_match();
-      break;
+    	//XXX
+    	// Skip start sequence for unit testing at Persycup 2017
+        // Set some default motion parameters
+        motion_set_speed(SPEED_SLOW_D, SPEED_SLOW_A);
+
+        // Power-up
+        bb_power_up();
+        motion_power_enable();
+
+        match.color = MATCH_COLOR_BLUE;
+
+        led_set_mode(BB_LED_BLINK_FAST);
+        led_set_color(BB_LED_GREEN);
+
+
+        match.state = MATCH_STATE_RUN;
+
+        match.timer_msec = 0;
+        match.scored_points = 0;
+
+        // Initialize AI
+        ai_init();
+        break;
+        //XXX
+//
+//      match.state = MATCH_STATE_READY;
+//      sequencer_print_match();
+//      break;
 
     // Start to do some actual business
     case MATCH_STATE_READY:
