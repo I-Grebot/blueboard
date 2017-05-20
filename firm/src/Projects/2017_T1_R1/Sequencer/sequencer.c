@@ -97,15 +97,19 @@ void sequencer_task( void *pvParameters )
 
   sequencer_init();
 
-  dsv_init(); //--> dsv_start();
+  dsv_init();
   //asv_start();
   //beacons_start();
   motion_cs_start();
   motion_traj_start();
-  avoidance_start();
   monitoring_start();
   led_start();
 
+  // Sub-systems
+  sys_modules_start();
+
+  // High-level
+  avoidance_start();
   path_init();
   phys_init();
   tasks_init();

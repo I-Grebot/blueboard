@@ -260,7 +260,11 @@ dxl_status_t dxl_action(dxl_servo_t* servo);
 
 // Shorthands
 dxl_status_t dxl_get_model(dxl_servo_t* servo, uint16_t* model);
-void dxl_set_position(dxl_servo_t* servo, uint16_t new_position);
+dxl_status_t dxl_set_torque_enable(dxl_servo_t* servo, uint8_t torque_enable);
+dxl_status_t dxl_set_position(dxl_servo_t* servo, uint16_t new_position);
+dxl_status_t dxl_set_speed(dxl_servo_t* servo, uint16_t new_speed);
+dxl_status_t dxl_set_torque(dxl_servo_t* servo, uint16_t new_torque);
+dxl_status_t dxl_set_led(dxl_servo_t* servo, uint8_t led);
 
 // Service handlers
 void dxl_data_to_bytes_array(uint32_t data, size_t size, uint8_t* data_arr);

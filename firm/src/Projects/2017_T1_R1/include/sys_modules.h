@@ -23,7 +23,8 @@
 
 typedef enum
 {
-  SYS_MOD_INIT,       // Just woke up, system is initialized
+  SYS_MOD_RESET,      // Just woke up, system is in unknown state
+  SYS_MOD_INIT,       // Initializing system
   SYS_MOD_SELF_TEST,  // Performing self-test
   SYS_MOD_READY,      // Ready to run
   SYS_MOD_GRAB_READY, // Modules System is ready to grab and will do so upon detection

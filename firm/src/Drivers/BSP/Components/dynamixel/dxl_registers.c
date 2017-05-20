@@ -118,6 +118,17 @@ const dxl_register_t* dxl_reg_ccw_angle_limit          = dxl_registers +  6;
 const dxl_register_t* dxl_reg_v1_torque_enable         = dxl_registers +  24;
 const dxl_register_t* dxl_reg_v4_torque_enable         = dxl_registers +  49;
 
+const dxl_register_t* dxl_reg_v1_position              = dxl_registers +  33;
+const dxl_register_t* dxl_reg_v4_position              = dxl_registers +  54;
+
+const dxl_register_t* dxl_reg_v1_speed                 = dxl_registers +  34;
+const dxl_register_t* dxl_reg_v4_speed                 = dxl_registers +  55;
+
+const dxl_register_t* dxl_reg_v1_torque                = dxl_registers +  35;
+const dxl_register_t* dxl_reg_v4_torque                = dxl_registers +  56;
+
+const dxl_register_t* dxl_reg_v1_led                   = dxl_registers +  55;
+const dxl_register_t* dxl_reg_v4_led                   = dxl_registers +  50;
 /*
  * Converts an area type into a printable string
  */

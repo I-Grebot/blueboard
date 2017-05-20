@@ -89,11 +89,15 @@
 
 // Positions
 #define ASV_ROTATOR_MIN   0x0000
-#define ASV_ROTATOR_MAX   0xFFFF
+#define ASV_ROTATOR_MAX   ASV_TIMER_PERIOD
+#define ASV_ROTATOR_0    ((ASV_TIMER_PERIOD)/4)
+#define ASV_ROTATOR_90   ((ASV_TIMER_PERIOD)/2)
+#define ASV_ROTATOR_180   (3*(ASV_TIMER_PERIOD)/4)
 
-#define ASV_TROLLET_MIN   0x0000
-#define ASV_TROLLET_MAX   0xFFFF
-
+#define ASV_TROLLET_MIN    0x0000
+#define ASV_TROLLET_MAX    ASV_TIMER_PERIOD
+#define ASV_TROLLET_LEFT   0
+#define ASV_TROLLET_RIGHT  ASV_TIMER_PERIOD
 
 /**
 ********************************************************************************
@@ -103,13 +107,35 @@
 ********************************************************************************
 */
 
-/* Queues size for each channel, in Bytes */
+// Queues size for each channel, in Bytes
 #define DSV_RX_QUEUE_SIZE   64
 #define DSV_TX_QUEUE_SIZE   64
 
-/* Timeouts */
+// Timeouts
 #define DSV_RX_TIMEOUT      pdMS_TO_TICKS( 10 ) // Must be at least longest TX + Return-time delay
 #define DSV_TX_TIMEOUT      pdMS_TO_TICKS(  5 )
+
+// Servos IDs
+#define DSV_GRABBER_LEFT_ID     10  // TBC
+#define DSV_GRABBER_RIGHT_ID    20
+#define DSV_LANDER_RIGHT_ID     30
+
+// Positions
+#define DSV_GRABBER_LEFT_POS_OPENED    100 // TBC
+#define DSV_GRABBER_LEFT_POS_CLOSED    800
+#define DSV_GRABBER_RIGHT_POS_OPENED   900
+#define DSV_GRABBER_RIGHT_POS_CLOSED   200
+#define DSV_LANDER_POS_UP              400
+#define DSV_LANDER_POS_DOWN            600
+
+// Speeds
+#define DSV_GRABBERS_SPEED             500 // TBC
+#define DSV_LANDER_SPEED_UP            800
+#define DSV_LANDER_SPEED_DOWN          300
+
+// Torques
+#define DSV_GRABBERS_TORQUE            800 // TBC
+
 
 /**
 ********************************************************************************

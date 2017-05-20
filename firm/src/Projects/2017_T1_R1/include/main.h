@@ -150,7 +150,7 @@
 #define OS_TASK_STACK_AI_TASKS          configMINIMAL_STACK_SIZE
 #define OS_TASK_STACK_AVOIDANCE         200
 #define OS_TASK_STACK_BEACONS           configMINIMAL_STACK_SIZE
-#define OS_TASK_STACK_SYS_MODULES       configMINIMAL_STACK_SIZE
+#define OS_TASK_STACK_SYS_MODULES       200
 
  /* NVIC Priorities. Lower value means higher priority.
   * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY
@@ -195,8 +195,8 @@
 #define OS_NOTIFY_SYS_MOD_INIT        0x00000001    // Initialize the modules system
 #define OS_NOTIFY_SYS_MOD_SELF_TEST   0x00000002    // Launch self-test procedure
 #define OS_NOTIFY_SYS_MOD_FOLD        0x00000010    // Initiate procedure to fold state
-#define OS_NOTIFY_SYS_MOD_GRAB        0x00000012    // Initiate procedure to grab state
-#define OS_NOTIFY_SYS_MOD_LAND        0x00000014    // Initiate procedure to land state
+#define OS_NOTIFY_SYS_MOD_GRAB        0x00000020    // Initiate procedure to grab state
+#define OS_NOTIFY_SYS_MOD_LAND        0x00000040    // Initiate procedure to land state
 
 
 /**

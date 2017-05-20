@@ -35,6 +35,7 @@ available. */
 #define SHELL_DSV_PFX           "[DSV] "    // For returns of Dsv command
 #define SHELL_MOT_PFX           "[MOT] "    // For returns of Mot command
 #define SHELL_STR_PFX           "[STR] "    // For returns of Str command
+#define SHELL_SUB_PFX           "[SUB] "    // For returns of Sub command
 
 /* String displayed after each output */
 #define SHELL_END_OF_OUTPUT_STR         "\n\r> "

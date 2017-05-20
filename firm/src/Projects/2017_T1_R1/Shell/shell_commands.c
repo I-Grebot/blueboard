@@ -40,6 +40,7 @@ static BaseType_t OS_SHL_AsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 static BaseType_t OS_SHL_MonCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Monitoring
 static BaseType_t OS_SHL_DioCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Digital I/Os
 static BaseType_t OS_SHL_HmiCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // HMI Board
+static BaseType_t OS_SHL_SubCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Sub systems
 
 /* High-level modules management */
 static BaseType_t OS_SHL_LedCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString ); // Led
@@ -268,6 +269,16 @@ static const CLI_Command_Definition_t xSeq =
     -1 // Variable
 };
 
+// Sub-system commands
+static const CLI_Command_Definition_t xSub =
+{
+    "sub",
+    SHELL_EOL
+    "sub [system] [command] [value1]... [valueN]: Run a sub-system command."SHELL_EOL
+    ,OS_SHL_SubCmd,
+    -1 // Variable
+};
+
 
 
 /*
@@ -303,6 +314,7 @@ void shell_register_commands(void)
     FreeRTOS_CLIRegisterCommand( &xAvs );
     FreeRTOS_CLIRegisterCommand( &xAvd );
     FreeRTOS_CLIRegisterCommand( &xSeq );
+    FreeRTOS_CLIRegisterCommand( &xSub );
 }
 
 /* -----------------------------------------------------------------------------
@@ -928,6 +940,124 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
     return xReturn;
 
+}
+
+
+static BaseType_t OS_SHL_SubCmd( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
+{
+
+    char* pcParameter;
+    BaseType_t lParameterStringLength;
+    BaseType_t xReturn;
+    static BaseType_t lParameterNumber = 0;
+
+
+    static char* system;
+    static BaseType_t system_str_length;
+    static char* command;
+    static BaseType_t command_str_length;
+
+    static int value1;
+    static int value2;
+
+    // Nothing to display by default
+    memset( pcWriteBuffer, 0x00, xWriteBufferLen );
+
+    // Command start
+    if(lParameterNumber == 0)
+    {
+        lParameterNumber = 1;
+        xReturn = pdPASS;
+
+    } else {
+
+        // Get the parameter as a string
+        pcParameter = (char*) FreeRTOS_CLIGetParameter(pcCommandString, lParameterNumber, &lParameterStringLength );
+
+        // Parameter is fetched
+        if(pcParameter != NULL) {
+
+            switch(lParameterNumber) {
+              case 1:
+                system = pcParameter;
+                system_str_length = lParameterStringLength;
+                break;
+
+              case 2:
+                command = pcParameter;
+                command_str_length = lParameterStringLength;
+                break;
+
+              case 3: value1 = strtol(pcParameter, NULL, 10); break;
+              case 4: value2 = strtol(pcParameter, NULL, 10); break;
+                default: break;
+            }
+
+
+            // Ensure we keep going for the next parameter
+            xReturn = pdTRUE;
+            lParameterNumber++;
+
+        // End of decoding, launch the command
+        } else {
+
+            // Terminate the command string. Can be done only after all parameters are fetched
+            system[system_str_length] = 0;
+            command[command_str_length] = 0;
+
+            // Decode the system
+            // ------------------
+            if(!strcasecmp(system, "mod")) {
+
+              if((!strcasecmp(command, "init")) && (lParameterNumber == 3)) {
+                  //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_SUB_PFX"Initializing"SHELL_EOL);
+                  //pcWriteBuffer += strlen(pcWriteBuffer);
+                  sys_mod_do_init(NULL);
+              }
+
+              else if((!strcasecmp(command, "self_test")) && (lParameterNumber == 3)) {
+                  //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_SUB_PFX"Starting Self-test"SHELL_EOL);
+                  //pcWriteBuffer += strlen(pcWriteBuffer);
+                  sys_mod_do_self_test(NULL);
+              }
+
+              else if((!strcasecmp(command, "grab")) && (lParameterNumber == 4)) {
+                  //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_SUB_PFX"Grabbing at %d"SHELL_EOL, value1);
+                  //pcWriteBuffer += strlen(pcWriteBuffer);
+                  sys_mod_do_grab(NULL, (uint16_t) value1);
+              }
+
+              else if((!strcasecmp(command, "land")) && (lParameterNumber == 5)) {
+                  //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_SUB_PFX"Landing at %d, %d"SHELL_EOL, value1, value2);
+                  //pcWriteBuffer += strlen(pcWriteBuffer);
+                  sys_mod_do_land(NULL, (uint16_t) value1, (uint16_t) value2);
+              }
+
+              else if((!strcasecmp(command, "fold")) && (lParameterNumber == 3)) {
+                  //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_SUB_PFX"Folding"SHELL_EOL);
+                  //pcWriteBuffer += strlen(pcWriteBuffer);
+                  sys_mod_do_fold(NULL);
+              }
+
+              else {
+                  snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unrecognized command '%s' or parameters error"SHELL_EOL, command);
+              }
+            }
+
+            else {
+              snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unrecognized sub system '%s' or parameters error"SHELL_EOL, system);
+            }
+
+
+
+            // Ensure the function can start again
+            lParameterNumber = 0;
+            xReturn = pdFALSE;
+        }
+
+    }
+
+    return xReturn;
 }
 
 //"  - [ping] [if] [id]"SHELL_EOL

@@ -241,34 +241,77 @@ dxl_status_t dxl_get_model(dxl_servo_t* servo, uint16_t* model)
 }
 
 
-// TODO: cleanup
-void dxl_set_torque(dxl_servo_t* servo, uint8_t torque)
+dxl_status_t dxl_set_torque_enable(dxl_servo_t* servo, uint8_t torque_enable)
 {
     extern const dxl_register_t* dxl_reg_v1_torque_enable;
-    dxl_write_int(servo, dxl_reg_v1_torque_enable->address, torque, dxl_reg_v1_torque_enable->size, false);
+    extern const dxl_register_t* dxl_reg_v4_torque_enable;
+    dxl_register_t* reg;
+
+    if(servo->model->reg_table == DXL_REG4)
+      reg = dxl_reg_v4_torque_enable;
+    else
+      reg = dxl_reg_v1_torque_enable;
+
+    return dxl_write_int(servo, reg->address, torque_enable, reg->size, false);
 }
-/*
-void dxl_set_position(dxl_servo_t* servo, uint16_t new_position)
+
+dxl_status_t dxl_set_position(dxl_servo_t* servo, uint16_t new_position)
 {
-    // TEMP
-    extern const dxl_register_t* dxl_reg_v1_goal_position;
-    uint8_t data[2];
+  extern const dxl_register_t* dxl_reg_v1_position;
+  extern const dxl_register_t* dxl_reg_v4_position;
+  dxl_register_t* reg;
 
-    data[0] = (uint8_t) (new_position & 0x00FF);
-    data[1] = (uint8_t) (new_position >> 8);
+  if(servo->model->reg_table == DXL_REG4)
+    reg = dxl_reg_v4_position;
+  else
+    reg = dxl_reg_v1_position;
 
-    dxl_write(servo, dxl_reg_v1_goal_position->address, data, sizeof(data), false);
-
+  return dxl_write_int(servo, reg->address, new_position, reg->size, false);
 }
 
-void dxl_set_led(dxl_servo_t* servo, uint8_t led)
+dxl_status_t dxl_set_speed(dxl_servo_t* servo, uint16_t new_speed)
 {
-    extern const dxl_register_t* dxl_reg_v1_led;
+  extern const dxl_register_t* dxl_reg_v1_speed;
+  extern const dxl_register_t* dxl_reg_v4_speed;
+  dxl_register_t* reg;
 
-    dxl_write(servo, dxl_reg_v1_led->address, &led, sizeof(led), false);
+  if(servo->model->reg_table == DXL_REG4)
+    reg = dxl_reg_v4_speed;
+  else
+    reg = dxl_reg_v1_speed;
+
+  return dxl_write_int(servo, reg->address, new_speed, reg->size, false);
+}
+
+dxl_status_t dxl_set_torque(dxl_servo_t* servo, uint16_t new_torque)
+{
+  extern const dxl_register_t* dxl_reg_v1_torque;
+  extern const dxl_register_t* dxl_reg_v4_torque;
+  dxl_register_t* reg;
+
+  if(servo->model->reg_table == DXL_REG4)
+    reg = dxl_reg_v4_torque;
+  else
+    reg = dxl_reg_v1_torque;
+
+  return dxl_write_int(servo, reg->address, new_torque, reg->size, false);
+}
+
+dxl_status_t dxl_set_led(dxl_servo_t* servo, uint8_t led)
+{
+  extern const dxl_register_t* dxl_reg_v1_led;
+  extern const dxl_register_t* dxl_reg_v4_led;
+  dxl_register_t* reg;
+
+  if(servo->model->reg_table == DXL_REG4)
+    reg = dxl_reg_v4_led;
+  else
+    reg = dxl_reg_v1_led;
+
+  return dxl_write_int(servo, reg->address, led, reg->size, false);
 
 }
-*/
+
 
 /**
 ********************************************************************************
