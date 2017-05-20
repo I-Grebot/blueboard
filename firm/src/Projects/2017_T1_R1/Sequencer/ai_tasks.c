@@ -30,6 +30,10 @@ extern match_t match;
 extern robot_t robot;
 extern phys_t phys;
 extern path_t pf;
+extern TaskHandle_t handle_task_avoidance;
+
+// Local functions
+static void motion_move_block_on_avd(wp_t* wp);
 
 /**
 ********************************************************************************
@@ -40,7 +44,47 @@ extern path_t pf;
 ********************************************************************************
 */
 
-// TBD
+// Simple motion:
+// - Launch the waypoint
+// - Hardstop if an avoidance event is received
+// - Wait 3 seconds
+// - Clear avoidance event
+// - Restart
+// - Loop until waypoint is reached
+void motion_move_block_on_avd(wp_t* wp)
+{
+  TickType_t new_wake_time = xTaskGetTickCount();
+
+  // OS Software notifier
+  BaseType_t notified;
+  uint32_t sw_notification;
+
+  motion_add_new_wp(wp);
+
+  while(!motion_is_traj_done(wp))
+  {
+    // Wait for potential new notification, this will unblock upon notification RX
+    notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+
+    // Check to see for avoidance event
+    // This is normally handled by the ai_manage() function
+    if(notified && (sw_notification & OS_NOTIFY_AVOIDANCE_EVT))
+    {
+      DEBUG_INFO("Avoidance event!"DEBUG_EOL);
+
+      // Stop and wait 3 seconds
+      motion_traj_hard_stop();
+      vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(3000));
+
+      // Clear avoidance state
+      xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+
+      // Re-go
+      motion_add_new_wp(wp);
+    }
+  }
+
+}
 
 /**
 ********************************************************************************
@@ -84,22 +128,62 @@ extern path_t pf;
 
 void ai_task_start(void *params)
 {
+  // A waypoint for our motions
+  wp_t wp;
+
   // A pointer to corresponding task-structure (self) is passed
   task_t* self = (task_t*) params;
 
   // Tick timer
   TickType_t new_wake_time = xTaskGetTickCount();
 
+
+  // Static items of the waypoints
+  wp.coord.abs.a = 0;
+  wp.offset.x = 0;
+  wp.offset.y = 0;
+  wp.offset.a = 0;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.trajectory_must_finish = true;
+
+  // Go to exit
+  wp.coord.abs = phys.exit_start;
+  wp.type = WP_GOTO_AUTO;
+
+  motion_add_new_wp(&wp);
+  avd_mask_all(false); // disable entirely avoidance for 1st point
+
+  // Block until we reach the target position
+  while(!motion_is_traj_finished())
+  {
+    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+  }
+
+  // Common for next motions
+  wp.type = WP_GOTO_FWD;
+  avd_mask_front(true); // only enable front sensors
+
+  // Loop between 2 points...
   for(;;)
   {
 
-    // Test
-    if(match.timer_msec >= 10000) {
+    // 1st intermediate point
+    wp.coord.abs.x = 1300;
+    wp.coord.abs.y = 600;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    // 2nd intermediate point
+    wp.coord.abs.x = 750;
+    wp.coord.abs.y = 900;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    // Autokill (should be handled by main strat but we never know)
+    if(match.timer_msec >= MATCH_DURATION_MSEC) {
       self->state = TASK_STATE_SUCCESS;
     }
 
-    // Block until next iteration
-    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
   }
 
 }
@@ -141,3 +225,6 @@ void ai_task_start(void *params)
 // GET_ORES_S_2A
 // GET_ORES_S_2B
 // GET_ORES_B_2
+
+
+

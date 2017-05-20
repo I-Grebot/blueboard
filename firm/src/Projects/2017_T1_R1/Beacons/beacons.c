@@ -20,7 +20,6 @@
 TaskHandle_t handle_task_beacons;
 
 // Local and static functions
-BaseType_t beacons_init(void);
 static void beacons_task(void *pvParameters);
 
 /**
@@ -60,6 +59,35 @@ BaseType_t beacons_init(void)
 
 }
 
+void beacons_write_reg(uint8_t add, int16_t data)
+{
+  uint8_t wr_data[3];
+  uint8_t rd_data[3];
+
+  wr_data[0] = (add & 0x7F); // Command
+  wr_data[1] = data >> 8;
+  wr_data[2] = data & 0xFF;
+
+  memset(&rd_data, 0, sizeof(rd_data));
+
+  bb_hmi_tx_rx(3, wr_data, rd_data);
+
+}
+
+int16_t beacons_read_reg(uint8_t add)
+{
+  uint8_t wr_data[3];
+  uint8_t rd_data[3];
+
+  memset(&wr_data, 0, sizeof(wr_data));
+  wr_data[0] = 0x80 | (add & 0x7F); // Command
+
+  bb_hmi_tx_rx(3, wr_data, rd_data);
+
+  return (int16_t) (rd_data[1] << 8U) + rd_data[2];
+
+}
+
 /**
 ********************************************************************************
 **
@@ -72,14 +100,20 @@ static void beacons_task( void *pvParameters )
 {
   TickType_t next_wake_time = xTaskGetTickCount();
 
+  uint16_t i = 0;
+
   // Remove compiler warnings
   (void) pvParameters;
 
   for( ;; )
   {
 
-    // TBC
-    vTaskDelayUntil( &next_wake_time, OS_BEACONS_PERIOD_MS);
+    //bb_hmi_tx_rx(i++);
+    beacons_write_reg(0x55, i++);
+    beacons_read_reg(0);
+    beacons_read_reg(12);
+    //vTaskDelayUntil( &next_wake_time, pdMS_TO_TICKS(OS_BEACONS_PERIOD_MS));
+    vTaskDelayUntil( &next_wake_time, pdMS_TO_TICKS(100));
   }
 
 
