@@ -62,6 +62,37 @@
 ********************************************************************************
 */
 
+// Avoidance sensors
+#define SW_AVD_FRONT_LEFT_VALUE      IND4_VALUE
+#define SW_AVD_FRONT_CENTER_VALUE    IND7_VALUE
+#define SW_AVD_FRONT_RIGHT_VALUE     IND6_VALUE
+#define SW_AVD_BACK_LEFT_VALUE       IND1_VALUE
+#define SW_AVD_BACK_CENTER_VALUE     IND2_VALUE
+#define SW_AVD_BACK_RIGHT_VALUE      IND3_VALUE
+#define SW_AVD_ON                    true
+
+// Modules System
+#define SW_SYS_MOD_DETECT_VALUE      IND8_VALUE
+#define SW_SYS_MOD_DETECT_ON         true
+
+/**
+********************************************************************************
+**
+**  Analog Servos
+**
+********************************************************************************
+*/
+
+// Channels definition
+#define ASV_CHANNEL_ROTATOR   BB_ASV_CHANNEL1
+#define ASV_CHANNEL_TROLLET   BB_ASV_CHANNEL2
+
+// Positions
+#define ASV_ROTATOR_MIN   0x0000
+#define ASV_ROTATOR_MAX   0xFFFF
+
+#define ASV_TROLLET_MIN   0x0000
+#define ASV_TROLLET_MAX   0xFFFF
 
 
 /**

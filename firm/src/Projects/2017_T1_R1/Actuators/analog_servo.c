@@ -25,23 +25,16 @@
 #define UP 2950
 
 /* Local structures */
-typedef struct {
-	BB_ASV_ChannelTypeDef channel;
-	uint16_t current_Position;
-	uint16_t min_Position;
-	uint16_t max_Position;
-}ASV_ControlTypeDef;
 
 /* Local Variable Mutex */
 static xQueueHandle xASVMsgQueue;
-static ASV_ControlTypeDef leftArm, rightArm, centralIndex, parasol;
+//static ASV_ControlTypeDef leftArm, rightArm, centralIndex, parasol;
 
 /* Local, Private functions */
-static void OS_ASVTask(void *pvParameters);
-void ASV_Create(ASV_ControlTypeDef* ASV, BB_ASV_ChannelTypeDef channel, uint16_t min_Position, uint16_t max_Position);
+//static void OS_ASVTask(void *pvParameters);
 
 
-BaseType_t asv_start(void)
+/*BaseType_t asv_start(void)
 {
 	xASVMsgQueue = xQueueCreate( MAX_ASV_IN_QUEUE, sizeof(ASV_ControlTypeDef));
     if(xASVMsgQueue==NULL)
@@ -55,18 +48,17 @@ BaseType_t asv_start(void)
     ASV_Create(&rightArm, BB_ASV_CHANNEL2, 2000, 4000);
 
 	return xTaskCreate(OS_ASVTask, "ANALOG SERVO", OS_TASK_STACK_ASV, NULL, OS_TASK_PRIORITY_ASV, NULL );
-}
+}*/
 
-static void OS_ASVTask( void *pvParameters )
+/*static void OS_ASVTask( void *pvParameters )
 {
 	ASV_ControlTypeDef ASV_To_Manage;
 
-    /* Remove compiler warning about unused parameter. */
-    ( void ) pvParameters;
+   ( void ) pvParameters;
 
     for( ;; )
     {
-    	/* Block on the queue to wait for data to arrive */
+
     	xQueueReceive(xASVMsgQueue, &ASV_To_Manage, portMAX_DELAY);
     	if (ASV_To_Manage.current_Position > ASV_To_Manage.max_Position)
     		ASV_To_Manage.current_Position = ASV_To_Manage.max_Position;
@@ -76,12 +68,21 @@ static void OS_ASVTask( void *pvParameters )
     	bb_asv_set_pwm_pulse_length(ASV_To_Manage.channel,ASV_To_Manage.current_Position);
     }
 }
+*/
 
-void ASV_Create(ASV_ControlTypeDef* ASV, BB_ASV_ChannelTypeDef channel, uint16_t min_Position, uint16_t max_Position)
+/*void ASV_Create(ASV_ControlTypeDef* ASV, BB_ASV_ChannelTypeDef channel, uint16_t min_Position, uint16_t max_Position)
 {
 	ASV->channel = channel;
 	ASV->max_Position = max_Position;
 	ASV->min_Position = min_Position;
+}*/
+
+void asv_init_servo(asv_servo_t* servo, BB_ASV_ChannelTypeDef channel, uint16_t min_pos, uint16_t max_pos)
+{
+  servo->channel = channel;
+  servo->min_pos = min_pos;
+  servo->max_pos = max_pos;
+  servo->current_pos = min_pos;
 }
 
 /* EXAMPLE

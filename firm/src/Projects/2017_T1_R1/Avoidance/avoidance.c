@@ -31,6 +31,7 @@ static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a);
 TaskHandle_t handle_task_avoidance;
 
 // Handle on the strategy task
+// TODO: fixme; use functions instead and leave handles private
 extern TaskHandle_t handle_task_sequencer;
 
 void avoidance_start(void)
@@ -57,12 +58,13 @@ static void avoidance_task( void *pvParameters )
 
   for( ;; )
   {
-    av.det_front_left = IND4_VALUE;
-    av.det_front_center = IND7_VALUE;
-    av.det_front_right = IND6_VALUE;
-    av.det_back_left = IND1_VALUE;
-    av.det_back_center = IND2_VALUE;
-    av.det_back_right = IND3_VALUE;
+    // Sample sensors, apply polarity
+    av.det_front_left   = SW_AVD_FRONT_LEFT_VALUE   == SW_AVD_ON;
+    av.det_front_center = SW_AVD_FRONT_CENTER_VALUE == SW_AVD_ON;
+    av.det_front_right  = SW_AVD_FRONT_RIGHT_VALUE  == SW_AVD_ON;
+    av.det_back_left    = SW_AVD_BACK_LEFT_VALUE    == SW_AVD_ON;
+    av.det_back_center  = SW_AVD_BACK_LEFT_VALUE    == SW_AVD_ON;
+    av.det_back_right   = SW_AVD_BACK_RIGHT_VALUE   == SW_AVD_ON;
 
     //    	do_avoidance();
 

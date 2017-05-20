@@ -74,6 +74,7 @@
 #include "physics_const.h"
 #include "hardware_const.h"
 #include "digital_servo.h"
+#include "sys_modules.h"
 #include "monitoring.h"
 #include "motion.h"
 #include "shell.h"
@@ -121,6 +122,7 @@
 #define OS_TASK_PRIORITY_MONITORING   ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_ASV          ( tskIDLE_PRIORITY + 2  )
 #define OS_TASK_PRIORITY_DSV          ( tskIDLE_PRIORITY + 2  )
+#define OS_TASK_PRIORITY_SYS_MODULES  ( tskIDLE_PRIORITY + 2  )
 
 #define OS_TASK_PRIORITY_SEQUENCER    ( tskIDLE_PRIORITY + 3  )
 #define OS_TASK_PRIORITY_AI_TASKS     ( tskIDLE_PRIORITY + 3  )
@@ -148,6 +150,7 @@
 #define OS_TASK_STACK_AI_TASKS          configMINIMAL_STACK_SIZE
 #define OS_TASK_STACK_AVOIDANCE         200
 #define OS_TASK_STACK_BEACONS           configMINIMAL_STACK_SIZE
+#define OS_TASK_STACK_SYS_MODULES       configMINIMAL_STACK_SIZE
 
  /* NVIC Priorities. Lower value means higher priority.
   * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY
@@ -172,19 +175,29 @@
 #define OS_AI_TASKS_PERIOD_MS            100
 #define OS_BEACONS_PERIOD_MS             100
 #define OS_AVOIDANCE_PERIOD_MS            10
+#define OS_SYS_MODULES_PERIOD_MS         100
 
 /*
  * Software task 32 bits notifiers
  */
 
-#define OS_NOTIFY_AVOIDANCE_EVT       0x0001    // Avoidance event: must be assess quickly
-#define OS_NOTIFY_AVOIDANCE_CLR       0x0002    // Avoidance clear flag
+// Main sequencer notifiers
+#define OS_NOTIFY_AVOIDANCE_EVT       0x00000001    // Avoidance event: must be assess quickly
+#define OS_NOTIFY_AVOIDANCE_CLR       0x00000002    // Avoidance clear flag
 // ...
-#define OS_NOTIFY_INIT_START          0x0100    // Software start of the initialization phase
-#define OS_NOTIFY_MATCH_START         0x0200    // Software start of the match notification
-#define OS_NOTIFY_MATCH_PAUSE         0x0400    // Software pause of the match (freeze everything)
-#define OS_NOTIFY_MATCH_RESUME        0x0800    // Software resume of the match (continues)
-#define OS_NOTIFY_MATCH_ABORT         0x1000    // Software abort of the match (clean end, no reset)
+#define OS_NOTIFY_INIT_START          0x00000100    // Software start of the initialization phase
+#define OS_NOTIFY_MATCH_START         0x00000200    // Software start of the match notification
+#define OS_NOTIFY_MATCH_PAUSE         0x00000400    // Software pause of the match (freeze everything)
+#define OS_NOTIFY_MATCH_RESUME        0x00000800    // Software resume of the match (continues)
+#define OS_NOTIFY_MATCH_ABORT         0x00001000    // Software abort of the match (clean end, no reset)
+
+// Modules system notifiers
+#define OS_NOTIFY_SYS_MOD_INIT        0x00000001    // Initialize the modules system
+#define OS_NOTIFY_SYS_MOD_SELF_TEST   0x00000002    // Launch self-test procedure
+#define OS_NOTIFY_SYS_MOD_FOLD        0x00000010    // Initiate procedure to fold state
+#define OS_NOTIFY_SYS_MOD_GRAB        0x00000012    // Initiate procedure to grab state
+#define OS_NOTIFY_SYS_MOD_LAND        0x00000014    // Initiate procedure to land state
+
 
 /**
 ********************************************************************************
@@ -260,6 +273,12 @@ BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength);
 // -----------------------------------------------------------------------------
 
 BaseType_t monitoring_start(void);
+
+// -----------------------------------------------------------------------------
+// Analog Servos
+// -----------------------------------------------------------------------------
+
+void asv_init_servo(asv_servo_t* servo, BB_ASV_ChannelTypeDef channel, uint16_t min_pos, uint16_t max_pos);
 
 // -----------------------------------------------------------------------------
 // Avoidance
@@ -415,6 +434,18 @@ int8_t path_get_result(path_poly_t* polys, uint8_t* rays);
 int8_t path_process(void);
 
 // TODO: result
+
+// -----------------------------------------------------------------------------
+// Systems
+// -----------------------------------------------------------------------------
+
+BaseType_t sys_modules_start(void);
+
+void sys_mod_do_init(TaskHandle_t* caller);
+void sys_mod_do_self_test(TaskHandle_t* caller);
+void sys_mod_do_grab(TaskHandle_t* caller, uint16_t grab_pos);
+void sys_mod_do_land(TaskHandle_t* caller, uint16_t land_pos, uint16_t land_angle);
+void sys_mod_do_fold(TaskHandle_t* caller);
 
 // -----------------------------------------------------------------------------
 // RGB LED
