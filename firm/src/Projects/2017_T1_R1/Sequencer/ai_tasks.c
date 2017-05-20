@@ -137,6 +137,13 @@ void ai_task_start(void *params)
   // Tick timer
   TickType_t new_wake_time = xTaskGetTickCount();
 
+  for(;;)
+    {
+    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+    }
+
+
+/*
 
   // Static items of the waypoints
   wp.coord.abs.a = 0;
@@ -184,7 +191,7 @@ void ai_task_start(void *params)
       self->state = TASK_STATE_SUCCESS;
     }
 
-  }
+  }*/
 
 }
 

@@ -294,7 +294,10 @@ bool avd_detection_is_valid(void);
 // Beacons
 // -----------------------------------------------------------------------------
 
+BaseType_t beacons_init(void);
 BaseType_t beacons_start(void);
+void beacons_write_reg(uint8_t add, int16_t data);
+int16_t beacons_read_reg(uint8_t add);
 
 // -----------------------------------------------------------------------------
 // Motion Control System

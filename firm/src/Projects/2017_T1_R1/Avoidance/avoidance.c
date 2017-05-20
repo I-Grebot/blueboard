@@ -75,7 +75,7 @@ static void avoidance_task( void *pvParameters )
 
     // A new detection condition occurs
     // This is a transitional state
-    if(av.state == AV_STATE_CLEAR && avd_detection_is_valid())
+    /*if(av.state == AV_STATE_CLEAR && avd_detection_is_valid())
     {
       //xTaskNotify(handle_task_sequencer, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
       xTaskNotify(task_mgt.active_task->handle, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
@@ -96,9 +96,9 @@ static void avoidance_task( void *pvParameters )
       }
     }
 
-    else {
+    else {*/
       vTaskDelayUntil( &xNextWakeTime, OS_AVOIDANCE_PERIOD_MS);
-    }
+    //}
 
     // Test notify every sec strategy
     /*if(!(++i % 100)) {
