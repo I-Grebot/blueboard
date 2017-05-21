@@ -25,6 +25,8 @@ static void avoidance_task(void *pvParameters);
 static void avd_init(void);
 
 static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a);
+static inline uint16_t avd_mask_get_word(void);
+static inline uint16_t avd_det_get_word(void);
 //bool av_compute_opponent_position(void);
 //void do_avoidance(void);
 
@@ -34,7 +36,6 @@ TaskHandle_t handle_task_avoidance;
 // TODO: fixme; use functions instead and leave handles private
 extern TaskHandle_t handle_task_sequencer;
 
-extern task_mgt_t task_mgt;
 
 void avoidance_start(void)
 {
@@ -46,7 +47,6 @@ void avoidance_start(void)
 static void avoidance_task( void *pvParameters )
 {
   TickType_t xNextWakeTime;
-  BaseType_t xHigherPriorityTaskWoken = pdTRUE;
 
   BaseType_t notified;
   uint32_t sw_notification;
@@ -68,46 +68,44 @@ static void avoidance_task( void *pvParameters )
     av.det_front_center = SW_AVD_FRONT_CENTER_VALUE == SW_AVD_ON;
     av.det_front_right  = SW_AVD_FRONT_RIGHT_VALUE  == SW_AVD_ON;
     av.det_back_left    = SW_AVD_BACK_LEFT_VALUE    == SW_AVD_ON;
-    av.det_back_center  = SW_AVD_BACK_LEFT_VALUE    == SW_AVD_ON;
+    av.det_back_center  = SW_AVD_BACK_CENTER_VALUE  == SW_AVD_ON;
     av.det_back_right   = SW_AVD_BACK_RIGHT_VALUE   == SW_AVD_ON;
+    av.det_word = avd_det_get_word();
 
     //do_avoidance();
 
     // A new detection condition occurs
     // This is a transitional state
-    /*if(av.state == AV_STATE_CLEAR && avd_detection_is_valid())
+    if(av.state == AV_STATE_CLEAR && avd_detection_is_valid())
     {
-      //xTaskNotify(handle_task_sequencer, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
-      xTaskNotify(task_mgt.active_task->handle, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
+      DEBUG_INFO("[AVD] Detection!"DEBUG_EOL);
+
+      xTaskNotify(handle_task_sequencer, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
+
       av.state = AV_STATE_DETECT;
-      vTaskDelayUntil( &xNextWakeTime, OS_AVOIDANCE_PERIOD_MS);
+
+      vTaskDelayUntil( &xNextWakeTime, pdMS_TO_TICKS(OS_AVOIDANCE_PERIOD_MS));
     }
 
     // A detection was triggered, wait for the clear notification
     else if(av.state == AV_STATE_DETECT)
     {
 
-      notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+      notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AVOIDANCE_PERIOD_MS));
 
       // Clear instruction received
       if(notified && (sw_notification & OS_NOTIFY_AVOIDANCE_CLR))
       {
+        DEBUG_INFO("[AVD] Clear!"DEBUG_EOL);
         av.state = AV_STATE_CLEAR;
       }
     }
 
-    else {*/
-      vTaskDelayUntil( &xNextWakeTime, OS_AVOIDANCE_PERIOD_MS);
-    //}
-
-    // Test notify every sec strategy
-    /*if(!(++i % 100)) {
-
-      if(i < 1000) {
-        xTaskNotify(handle_task_sequencer, OS_NOTIFY_AVOIDANCE_EVT, eSetBits);
-      }
-
-    }*/
+    // Nothing happened.
+    else
+    {
+      vTaskDelayUntil( &xNextWakeTime, pdMS_TO_TICKS(OS_AVOIDANCE_PERIOD_MS));
+    }
 
 
   }
@@ -131,6 +129,7 @@ void avd_mask_all(bool value)
   av.mask_back_left = value;
   av.mask_back_center = value;
   av.mask_back_right = value;
+  av.mask_word = avd_mask_get_word();
 }
 
 void avd_mask_front(bool value)
@@ -138,6 +137,7 @@ void avd_mask_front(bool value)
   av.mask_front_left = value;
   av.mask_front_center = value;
   av.mask_front_right = value;
+  av.mask_word = avd_mask_get_word();
 }
 
 
@@ -146,6 +146,29 @@ void avd_mask_back(bool value)
   av.mask_back_left = value;
   av.mask_back_center = value;
   av.mask_back_right = value;
+  av.mask_word = avd_mask_get_word();
+}
+
+uint16_t avd_mask_get_word(void)
+{
+  return
+      (av.mask_front_left   << 0U)  |
+      (av.mask_front_center << 1U)  |
+      (av.mask_front_right  << 2U)  |
+      (av.mask_back_left    << 3U)  |
+      (av.mask_back_center  << 4U)  |
+      (av.mask_back_right   << 5U);
+}
+
+uint16_t avd_det_get_word(void)
+{
+  return
+      (av.det_front_left   << 0U)  |
+      (av.det_front_center << 1U)  |
+      (av.det_front_right  << 2U)  |
+      (av.det_back_left    << 3U)  |
+      (av.det_back_center  << 4U)  |
+      (av.det_back_right   << 5U);
 }
 
 // From the sensor values, the robot current position/orientation,
@@ -160,9 +183,9 @@ bool avd_detection_is_valid(void) {
 
   // Sample values at once and use local variables only from here.
   // This ensure atomicity (almost ~).
-  //x = OS_MotionGetX();		// TODO : handle mutex here
-  //y = OS_MotionGetY();
-  //a = OS_MotionGetA();
+  x = motion_get_x();
+  y = motion_get_y();
+  a = motion_get_a();
 
   // Look at the robot orientation and mask sensors pointing outside
   // of the playground.
@@ -181,6 +204,7 @@ bool avd_detection_is_valid(void) {
     avd_mask_sensor_from_wall(a, AV_ANGLE_NORTH_WALL);
   if(y > TABLE_Y_MAX - ROBOT_RADIUS - AV_TABLE_MARGIN)
     avd_mask_sensor_from_wall(a, AV_ANGLE_SOUTH_WALL);
+
 
   // Construction area walls
 /*
@@ -210,8 +234,9 @@ bool avd_detection_is_valid(void) {
   av.det_back_center &= av.mask_back_center;
   av.det_back_right &= av.mask_back_right;
 
-  return av.det_front_left || av.det_front_center || av.det_front_right ||
-         av.det_back_left  || av.det_back_center || av.det_back_right;
+  av.det_effective_word = avd_det_get_word();
+
+  return av.det_effective_word != 0;
 }
 
 // Mask the robot sensors based on its the orientation, in order to ignore

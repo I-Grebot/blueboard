@@ -123,6 +123,9 @@ void ai_manage(bool notified, uint32_t sw_notification)
       //  task_mgt.active_task->state = TASK_STATE_SUSPENDED;
       //}
 
+      DEBUG_INFO("AI mgt event handle = %X!"DEBUG_EOL, (uint32_t) task_mgt.active_task->handle);
+      task_print(task_mgt.active_task);
+
     }
 
     // Notify the current AI task with the same notifications (forward)
@@ -131,10 +134,10 @@ void ai_manage(bool notified, uint32_t sw_notification)
   }
 
   // Clear avoidance state, so another detection can be triggered
-  if(av.state == AV_STATE_REROUTE)
+  /*if(av.state == AV_STATE_REROUTE)
   {
     xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
-  }
+  }*/
 
   // Check to see if active task is valid
   if(task_mgt.active_task != NULL)

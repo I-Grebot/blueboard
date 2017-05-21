@@ -92,6 +92,7 @@ typedef struct
   bool mask_back_left;
   bool mask_back_center;
   bool mask_back_right;
+  uint16_t mask_word; // Redundant, in word
 
   // Sensors detection flags, after filtering
   // (basically different than robot.X flags)
@@ -101,6 +102,8 @@ typedef struct
   bool det_back_left;
   bool det_back_center;
   bool det_back_right;
+  uint16_t det_word; // Redundant, in word
+  uint16_t det_effective_word; // Effective masking after from_wall()
 
   // Generic purpose timer
   int16_t timer_ms;

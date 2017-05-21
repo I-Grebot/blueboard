@@ -33,7 +33,7 @@ BaseType_t sys_create_task(TaskFunction_t pxTaskCode,
   {
     DEBUG_CRITICAL("[TASK] Could not start %s task!"DEBUG_EOL, pcName);
   } else {
-    DEBUG_INFO("[TASK] Starting %s task"DEBUG_EOL, pcName);
+    DEBUG_INFO("[TASK] Starting %s task (handle 0x%08X)"DEBUG_EOL, pcName, *pxCreatedTask);
   }
 
   return xReturn;

@@ -19,6 +19,7 @@
 /* External variables; for setting and probing */
 extern OS_SHL_ConfigTypeDef OS_SHL_Config;
 extern robot_t robot;
+extern av_t av;
 
 extern const uint8_t dsv_nb_channels;
 extern dsv_channel_t dsv_chan1;
@@ -105,6 +106,12 @@ const OS_SHL_VarItemTypeDef OS_SHL_varList[] = {
          ,{"robot.cs.cs_a.consign"    , TYPE_INT32, ACC_RD, &robot.cs.cs_a.consign_value,     "deg"}
          ,{"robot.cs.cs_a.output"     , TYPE_INT32, ACC_RD, &robot.cs.cs_a.out_value,         "deg"}
          ,{"robot.cs.cs_a.error"      , TYPE_INT32, ACC_RD, &robot.cs.cs_a.error_value,       "deg"}
+
+         // Avoidance
+         ,{"av.mask"                , TYPE_UINT16, ACC_RD, &av.mask_word,           "NA"}
+         ,{"av.det"                 , TYPE_UINT16, ACC_RD, &av.det_word,            "NA"}
+         ,{"av.det_effective"       , TYPE_UINT16, ACC_RD, &av.det_effective_word,  "NA"}
+
 };
 const size_t OS_SHL_varListLength = sizeof(OS_SHL_varList) / sizeof(OS_SHL_VarItemTypeDef);
 

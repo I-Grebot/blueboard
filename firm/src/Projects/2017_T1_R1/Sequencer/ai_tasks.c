@@ -134,6 +134,11 @@ void ai_task_start(void *params)
   // A pointer to corresponding task-structure (self) is passed
   task_t* self = (task_t*) params;
 
+
+  // OS Software notifier
+  BaseType_t notified;
+  uint32_t sw_notification;
+
   // Tick timer
   TickType_t new_wake_time = xTaskGetTickCount();
 
@@ -174,45 +179,52 @@ void ai_task_start(void *params)
     wp.type = WP_GOTO_FWD;
     avd_mask_front(true); // only enable front sensors
 
-    /*wp.coord.abs.x = 1500;
-    wp.coord.abs.y = 0;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
-    motion_move_block_on_avd(&wp);
-
     wp.coord.abs.x = 1500;
-    wp.coord.abs.y = 800;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
-    motion_move_block_on_avd(&wp);
-
-    wp.coord.abs.x = 0;
-    wp.coord.abs.y = 800;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
-    motion_move_block_on_avd(&wp);
-
-    wp.coord.abs.x = 0;
     wp.coord.abs.y = 0;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+
+    motion_add_new_wp(&wp);
+
+    while(!motion_is_traj_done(&wp))
+    {
+      // Wait for potential new notification, this will unblock upon notification RX
+      notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+
+      // Check to see for avoidance event
+      // This is normally handled by the ai_manage() function
+      if(notified && (sw_notification & OS_NOTIFY_AVOIDANCE_EVT))
+      {
+        DEBUG_INFO("Avoidance event!"DEBUG_EOL);
+      }
+    }
+
+
+    /*
+    wp.coord.abs.x = 1000;
+    wp.coord.abs.y = 600;
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 500;
+    wp.coord.abs.y = 1100;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 200;
+    wp.coord.abs.y = 600;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 900;
+    wp.coord.abs.y = 1400;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = phys.reset.x;
+    wp.coord.abs.y = phys.reset.y;
     phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
     motion_move_block_on_avd(&wp);*/
 
-    wp.coord.abs.x = 0;
-    wp.coord.abs.y = 800;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
-    motion_move_block_on_avd(&wp);
-
-    wp.coord.abs.x = 1500;
-    wp.coord.abs.y = 800;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
-    motion_move_block_on_avd(&wp);
-
-    wp.coord.abs.x = 1500;
-    wp.coord.abs.y = 0;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
-    motion_move_block_on_avd(&wp);
-
-    wp.coord.abs.x = 0;
-    wp.coord.abs.y = 0;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
-    motion_move_block_on_avd(&wp);
+    self->state = TASK_STATE_SUCCESS;
 
     // Autokill (should be handled by main strat but we never know)
     if(match.timer_msec >= MATCH_DURATION_MSEC) {
