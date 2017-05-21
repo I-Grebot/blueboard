@@ -140,8 +140,8 @@ void phys_init(void)
   // --------------------------------
 
   // Coordinate of the robot at startup
-  phys.reset.x  = 500;  // TBC
-  phys.reset.y  = 180;
+  phys.reset.x  = 0;//500;  // TBC
+  phys.reset.y  = 0;//180;
   phys.reset.a  =   0; // Facing left
 
   // 1st exit point

@@ -137,13 +137,13 @@ void ai_task_start(void *params)
   // Tick timer
   TickType_t new_wake_time = xTaskGetTickCount();
 
-  for(;;)
+  /*for(;;)
     {
     vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
-    }
+    }*/
 
 
-/*
+
 
   // Static items of the waypoints
   wp.coord.abs.a = 0;
@@ -154,35 +154,63 @@ void ai_task_start(void *params)
   wp.trajectory_must_finish = true;
 
   // Go to exit
-  wp.coord.abs = phys.exit_start;
-  wp.type = WP_GOTO_AUTO;
+  //wp.coord.abs = phys.exit_start;
+  //wp.type = WP_GOTO_AUTO;
 
-  motion_add_new_wp(&wp);
-  avd_mask_all(false); // disable entirely avoidance for 1st point
+  //motion_add_new_wp(&wp);
+
+  //avd_mask_all(false); // disable entirely avoidance for 1st point
 
   // Block until we reach the target position
-  while(!motion_is_traj_finished())
+  /*while(!motion_is_traj_finished())
   {
     vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
-  }
+  }*/
 
-  // Common for next motions
-  wp.type = WP_GOTO_FWD;
-  avd_mask_front(true); // only enable front sensors
-
-  // Loop between 2 points...
   for(;;)
   {
 
-    // 1st intermediate point
-    wp.coord.abs.x = 1300;
-    wp.coord.abs.y = 600;
+    // Common for next motions
+    wp.type = WP_GOTO_FWD;
+    avd_mask_front(true); // only enable front sensors
+
+    /*wp.coord.abs.x = 1500;
+    wp.coord.abs.y = 0;
     phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
     motion_move_block_on_avd(&wp);
 
-    // 2nd intermediate point
-    wp.coord.abs.x = 750;
-    wp.coord.abs.y = 900;
+    wp.coord.abs.x = 1500;
+    wp.coord.abs.y = 800;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 0;
+    wp.coord.abs.y = 800;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 0;
+    wp.coord.abs.y = 0;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);*/
+
+    wp.coord.abs.x = 0;
+    wp.coord.abs.y = 800;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 1500;
+    wp.coord.abs.y = 800;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 1500;
+    wp.coord.abs.y = 0;
+    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
+    motion_move_block_on_avd(&wp);
+
+    wp.coord.abs.x = 0;
+    wp.coord.abs.y = 0;
     phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
     motion_move_block_on_avd(&wp);
 
@@ -191,7 +219,8 @@ void ai_task_start(void *params)
       self->state = TASK_STATE_SUCCESS;
     }
 
-  }*/
+    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+   }
 
 }
 

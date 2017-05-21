@@ -620,7 +620,8 @@ static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
             wp.offset.x = 0;
             wp.offset.y = 0;
             wp.offset.a = 0;
-            wp.speed = WP_SPEED_NORMAL;
+            //wp.speed = WP_SPEED_NORMAL;
+            wp.speed = WP_SPEED_FAST;
             wp.trajectory_must_finish = true;
 
             // Ensure we keep going for the next parameter
