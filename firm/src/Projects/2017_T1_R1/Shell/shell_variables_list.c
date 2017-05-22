@@ -108,9 +108,10 @@ const OS_SHL_VarItemTypeDef OS_SHL_varList[] = {
          ,{"robot.cs.cs_a.error"      , TYPE_INT32, ACC_RD, &robot.cs.cs_a.error_value,       "deg"}
 
          // Avoidance
-         ,{"av.mask"                , TYPE_UINT16, ACC_RD, &av.mask_word,           "NA"}
-         ,{"av.det"                 , TYPE_UINT16, ACC_RD, &av.det_word,            "NA"}
-         ,{"av.det_effective"       , TYPE_UINT16, ACC_RD, &av.det_effective_word,  "NA"}
+         ,{"av.mask_static"         , TYPE_UINT16, ACC_RD, &av.mask_static_word,      "NA"}
+         ,{"av.mask_dynamic"        , TYPE_UINT16, ACC_RD, &av.mask_dynamic_word,     "NA"}
+         ,{"av.det"                 , TYPE_UINT16, ACC_RD, &av.det_word,              "NA"}
+         ,{"av.det_effective"       , TYPE_UINT16, ACC_RD, &av.det_effective_word,    "NA"}
 
 };
 const size_t OS_SHL_varListLength = sizeof(OS_SHL_varList) / sizeof(OS_SHL_VarItemTypeDef);

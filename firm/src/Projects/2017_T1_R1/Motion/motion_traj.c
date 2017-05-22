@@ -72,13 +72,6 @@ static void motion_traj_task( void *pvParameters )
   {
     xQueueReceive(xWaypointQueue, &current_waypoint, portMAX_DELAY);
 
-    // TODO: check
-    // Handle avoidance blockage
-    av.mask_back_left = true;
-    av.mask_back_right = true;
-    av.mask_front_center = true;
-    av.mask_front_left = true;
-    av.mask_front_right = true;
 
     motion_execute_wp(&current_waypoint);
 
@@ -87,11 +80,6 @@ static void motion_traj_task( void *pvParameters )
       vTaskDelay(pdMS_TO_TICKS(OS_MOTION_CONTROL_PERIOD_MS));
     }
 
-    av.mask_back_left = false;
-    av.mask_back_right = false;
-    av.mask_front_center = false;
-    av.mask_front_left = false;
-    av.mask_front_right = false;
   } // traj done
 
 }

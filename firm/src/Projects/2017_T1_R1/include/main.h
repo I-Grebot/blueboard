@@ -147,7 +147,7 @@
 #define OS_TASK_STACK_SEQUENCER         300
 #define OS_TASK_STACK_MOTION_CS         300
 #define OS_TASK_STACK_MOTION_TRAJ       200
-#define OS_TASK_STACK_AI_TASKS          200
+#define OS_TASK_STACK_AI_TASKS          300
 #define OS_TASK_STACK_AVOIDANCE         200
 #define OS_TASK_STACK_BEACONS           configMINIMAL_STACK_SIZE
 #define OS_TASK_STACK_SYS_MODULES       200
@@ -285,6 +285,8 @@ void asv_init_servo(asv_servo_t* servo, BB_ASV_ChannelTypeDef channel, uint16_t 
 // -----------------------------------------------------------------------------
 
 void avoidance_start(void);
+void avd_enable(void);
+void avd_disable(void);
 void avd_mask_all(bool value);
 void avd_mask_front(bool value);
 void avd_mask_back(bool value);
@@ -383,13 +385,19 @@ void task_add_elt(task_t* task, task_elt_t* elt);
 
 void phys_init(void);
 uint8_t phys_is_north_left(void);
+void phys_update_color_pois(void);
+void phys_update_color_polys(void);
 void phys_update_with_color(poi_t* poi);
 void phys_update_with_color_xya(int16_t* x, int16_t* y, int16_t* a);
 void phys_update_with_color_xy(int16_t* x, int16_t* y);
+void phys_update_with_color_poly(path_poly_t* poly);
 void phys_apply_offset(poi_t* src, poi_t* dest, const poi_t* offset);
 void phys_apply_polar_offset(int16_t* x, int16_t* y, int16_t d, int16_t a_deg);
 void phys_set_obstacle_positions(void);
 void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y);
+
+void phys_poly_to_str(path_poly_t* poly, uint8_t idx_poly, char* str, size_t len);
+BaseType_t phys_print_pf_polys(char* ret, size_t len);
 
 // -----------------------------------------------------------------------------
 // AI

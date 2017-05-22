@@ -47,40 +47,33 @@ extern TaskHandle_t handle_task_avoidance;
 // Color selection is already done and stored in the match structure.
 void ai_init(void)
 {
-  poi_t reset_pos;
-
-  // Update all variables that depends on the color choice
-
-  // Initialize robot position with correct color
-  reset_pos = phys.reset;
-  phys_update_with_color(&reset_pos);
-  motion_set_x(reset_pos.x);
-  motion_set_y(reset_pos.y);
-  motion_set_a(reset_pos.a);
 
   // Define static obstacles positions
-  //     phys_set_obstacle_positions();
+  phys_set_obstacle_positions();
 
   // Opponent position: probably in starting zone but we don't know
   robot.opp_pos.x = OPPONENT_POS_INIT_X;
   robot.opp_pos.y = OPPONENT_POS_INIT_Y;
   robot.opp_pos.a = 0;
-  phys_update_with_color(&robot.opp_pos);
-  //    phys_set_opponent_position(1, robot.opp_pos.x, robot.opp_pos.y);
 
-  // Reset motion position and enable motor power
+  // Update POIs and Path-Finder polygons depending on color
+  phys_update_color_pois();
+  phys_update_color_polys();
 
-  phys_update_with_color(&phys.exit_start);
-  //phys_update_with_color(&phys.drop);
-  //phys_update_with_color(&phys.cube[PHYS_ID_CUBE_1]);
-  //phys_update_with_color(&phys.huts[PHYS_ID_HUT_1]);
-  //phys_update_with_color(&phys.huts[PHYS_ID_HUT_2]);
+  // Initialize robot position with correct color
+  motion_set_x(phys.reset.x);
+  motion_set_y(phys.reset.y);
+  motion_set_a(phys.reset.a);
+
+  // Enable avoidance
+  avd_enable();
 
 }
 
 // Called at the end of the match
 void ai_stop(void)
 {
+  avd_disable();
   motion_traj_hard_stop();
   motion_power_disable();
   bb_power_down();
@@ -205,6 +198,12 @@ void ai_manage(bool notified, uint32_t sw_notification)
         ai_task_launch(task_mgt.active_task);
         task_print(task_mgt.active_task);
         DEBUG_INFO("[TASK] Launching new task %s"DEBUG_EOL, task_mgt.active_task->name);
+
+      // Idle
+      } else {
+
+        // Simply ensure that we stop
+        motion_traj_stop();
 
       }
 

@@ -74,7 +74,8 @@
 
 typedef enum
 {
-  AV_STATE_CLEAR,     // No detection
+  AV_STATE_DISABLE,   // Avoidance is OFF
+  AV_STATE_CLEAR,     // Enabled but no detection
   AV_STATE_FILTER,    // Filtering potential glitches
   AV_STATE_DETECT,    // An opponent was detected, stop and wait
   AV_STATE_REROUTE    // Robot is rerouting, await for clear irq
@@ -85,14 +86,23 @@ typedef struct
   // Current FSM state
   av_state_e state;
 
-  // Sensor masks, can be set by external systems
-  bool mask_front_left;
-  bool mask_front_center;
-  bool mask_front_right;
-  bool mask_back_left;
-  bool mask_back_center;
-  bool mask_back_right;
-  uint16_t mask_word; // Redundant, in word
+  // Static sensor masks, can be set by external systems
+  bool mask_static_front_left;
+  bool mask_static_front_center;
+  bool mask_static_front_right;
+  bool mask_static_back_left;
+  bool mask_static_back_center;
+  bool mask_static_back_right;
+  uint16_t mask_static_word; // Redundant, in word
+
+  // Dynamic sensor masks, computed automatically
+  bool mask_dyn_front_left;
+  bool mask_dyn_front_center;
+  bool mask_dyn_front_right;
+  bool mask_dyn_back_left;
+  bool mask_dyn_back_center;
+  bool mask_dyn_back_right;
+  uint16_t mask_dynamic_word; // Redundant, in word
 
   // Sensors detection flags, after filtering
   // (basically different than robot.X flags)

@@ -114,17 +114,6 @@ void sequencer_task( void *pvParameters )
   phys_init();
   tasks_init();
 
-
-  // TEMP
-  /*
-  bb_power_up();
-  motion_power_enable();
-
-  while(1)
-  {
-    notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_SEQUENCER_PERIOD_MS));
-  }*/
-
   // Sequencer main loop
   for( ;; )
   {
@@ -327,7 +316,7 @@ void sequencer_color_sample(void)
 // Print current match state
 void sequencer_print_match(void)
 {
-  DEBUG_INFO("[MATCH] %-16s %-8s %-16s %-03u %-05u"DEBUG_EOL,
+  DEBUG_INFO_NOPFX("[MATCH] %-16s %-8s %-16s %-03u %-05u"DEBUG_EOL,
       match_state_to_str(match.state),
       match_color_to_str(match.color),
       task_mgt.active_task == NULL ? "IDLE" : task_mgt.active_task->name,

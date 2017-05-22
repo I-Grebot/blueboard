@@ -25,6 +25,7 @@ phys_t phys;
 
 // Externs
 extern match_t match;
+extern robot_t robot;
 extern path_t pf; // temp
 
 // -----------------------------------------------------------------------------
@@ -140,9 +141,9 @@ void phys_init(void)
   // --------------------------------
 
   // Coordinate of the robot at startup
-  phys.reset.x  = 880;//500;  // TBC
+  phys.reset.x  = 880;
   phys.reset.y  = 180;
-  phys.reset.a  = 270; // Facing left
+  phys.reset.a  =  90; // Facing south
 
   // 1st exit point
   phys.exit_start.x  = 1050;
@@ -172,6 +173,22 @@ void phys_init(void)
 
 }
 
+// Update POIs depending on the match color
+void phys_update_color_pois(void)
+{
+  phys_update_with_color(&phys.reset);
+  phys_update_with_color(&phys.exit_start);
+  phys_update_with_color(&robot.opp_pos);
+  // TODO: add other POIs
+}
+
+// Update polygons depending on the match color (mirror them or not)
+void phys_update_color_polys(void)
+{
+  phys_update_with_color_poly(phys.pf_start_border);
+  phys_update_with_color_poly(phys.pf_opp_start_zone);
+}
+
 // -----------------------------------------------------------------------------
 // COORDINATES TRANSLATORS
 // -----------------------------------------------------------------------------
@@ -191,7 +208,7 @@ void phys_update_with_color(poi_t* poi) {
     if(!phys_is_north_left()) {
 
         poi->x = TABLE_LENGTH - poi->x;
-        poi->a = 180 + poi->a;
+        poi->a = 180 - poi->a;
         if(poi->a > 360) {
             poi->a-= 360;
         }
@@ -220,6 +237,24 @@ void phys_update_with_color_xy(int16_t* x, int16_t* y) {
     int16_t a = 0;
     phys_update_with_color_xya(x, y, &a);
 
+}
+
+// Apply the color transform on all points of the poly
+void phys_update_with_color_poly(path_poly_t* poly) {
+
+  uint8_t idx_pt;
+  int16_t x;
+  int16_t y;
+
+  for(idx_pt = 0; idx_pt < poly->n; idx_pt++)
+  {
+    x = (int16_t) 10*poly->pts[idx_pt].x;
+    y = (int16_t) 10*poly->pts[idx_pt].y;
+    phys_update_with_color_xy(&x, &y);
+    poly->pts[idx_pt].x = (int32_t) x/10;
+    poly->pts[idx_pt].y = (int32_t) y/10;
+
+  }
 }
 
 // Apply a cartesian offset on the dst point, knowing the current location.
@@ -360,19 +395,52 @@ void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y) {
 // Helpers
 // -----------------------------------------------------------------------------
 
-// Print-out polygons and points
-void phys_print_pf(void)
+void phys_poly_to_str(path_poly_t* poly, uint8_t idx_poly, char* str, size_t len)
 {
 
-  uint8_t idx_poly;
   uint8_t idx_pt;
-  path_poly_t* poly;
 
-  DEBUG_INFO("              Poly   Points (X;Y)"DEBUG_EOL);
-  DEBUG_INFO("-----------------------------------------------------------"DEBUG_EOL);
+  snprintf(str, len, "[PHYS] [POLY] %u ", idx_poly);
+  str += strlen(str);
+
+  for(idx_pt = 0; idx_pt < poly->n; idx_pt++)
+  {
+    snprintf(str, len, "%u;%u ",
+             10*poly->pts[idx_pt].x,
+             10*poly->pts[idx_pt].y);
+    str += strlen(str);
+  }
+  snprintf(str, len, SHELL_EOL);
+}
+
+// Print-out polygons and points
+BaseType_t phys_print_pf_polys(char* ret, size_t len)
+{
+
+  static uint8_t idx_poly;
+  static path_poly_t* poly = NULL;
+  uint8_t idx_pt;
+
+  const char* header = "              Poly   Points (X;Y)"SHELL_EOL
+                       "-----------------------------------------------------------"SHELL_EOL;
+
+  // Starting
+  if(poly == NULL)
+  {
+    idx_poly = 1;
+    poly = &pf.polys[idx_poly];
+
+    // Header
+    strcpy(ret, header);
+    ret += strlen(ret);
+  }
+
+  // Print all points of the poly
+  phys_poly_to_str(poly, idx_poly, ret, len);
+
 
   // Avoid 1st poly (special)
-  for(idx_poly = 1; idx_poly < pf.cur_poly_idx; idx_poly++)
+  /*for(idx_poly = 1; idx_poly < pf.cur_poly_idx; idx_poly++)
   {
     poly = &pf.polys[idx_poly];
 
@@ -386,9 +454,20 @@ void phys_print_pf(void)
     }
     printf(DEBUG_EOL);
 
+  }*/
+
+  // Manage next call
+  idx_poly++;
+  if(idx_poly < pf.cur_poly_idx)
+  {
+    poly++;
+    return pdTRUE;
+
+  // Finished
+  } else {
+    poly = NULL;
+    return pdFALSE;
   }
-
-
 
 }
 

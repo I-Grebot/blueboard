@@ -25,7 +25,8 @@ static void avoidance_task(void *pvParameters);
 static void avd_init(void);
 
 static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a);
-static inline uint16_t avd_mask_get_word(void);
+static inline uint16_t avd_mask_static_get_word(void);
+static inline uint16_t avd_mask_dynamic_get_word(void);
 static inline uint16_t avd_det_get_word(void);
 //bool av_compute_opponent_position(void);
 //void do_avoidance(void);
@@ -50,6 +51,7 @@ static void avoidance_task( void *pvParameters )
 
   BaseType_t notified;
   uint32_t sw_notification;
+  bool valid_detection;
 
   avd_init();
 
@@ -74,9 +76,13 @@ static void avoidance_task( void *pvParameters )
 
     //do_avoidance();
 
+    // Check to see if there is a valid detection
+    // Also update dynamic masks and effective detection values
+    valid_detection = avd_detection_is_valid();
+
     // A new detection condition occurs
     // This is a transitional state
-    if(av.state == AV_STATE_CLEAR && avd_detection_is_valid())
+    if(av.state == AV_STATE_CLEAR && valid_detection)
     {
       DEBUG_INFO("[AVD] Detection!"DEBUG_EOL);
 
@@ -113,7 +119,7 @@ static void avoidance_task( void *pvParameters )
 
 static void avd_init(void)
 {
-  av.state = AV_STATE_CLEAR;
+  av.state = AV_STATE_DISABLE;
   av.action_done = 0;
   av.timer_ms = 0;
   av.timer_opp_validity_ms = 0;
@@ -121,43 +127,70 @@ static void avd_init(void)
 
 }
 
+void avd_enable(void)
+{
+  // Re-init
+  avd_init();
+
+  // Move to clear
+  av.state = AV_STATE_CLEAR;
+
+}
+
+void avd_disable(void)
+{
+  av.state = AV_STATE_DISABLE;
+
+}
+
 void avd_mask_all(bool value)
 {
-  av.mask_front_left = value;
-  av.mask_front_center = value;
-  av.mask_front_right = value;
-  av.mask_back_left = value;
-  av.mask_back_center = value;
-  av.mask_back_right = value;
-  av.mask_word = avd_mask_get_word();
+  av.mask_static_front_left = value;
+  av.mask_static_front_center = value;
+  av.mask_static_front_right = value;
+  av.mask_static_back_left = value;
+  av.mask_static_back_center = value;
+  av.mask_static_back_right = value;
+  av.mask_static_word = avd_mask_static_get_word();
 }
 
 void avd_mask_front(bool value)
 {
-  av.mask_front_left = value;
-  av.mask_front_center = value;
-  av.mask_front_right = value;
-  av.mask_word = avd_mask_get_word();
+  av.mask_static_front_left = value;
+  av.mask_static_front_center = value;
+  av.mask_static_front_right = value;
+  av.mask_static_word = avd_mask_static_get_word();
 }
 
 
 void avd_mask_back(bool value)
 {
-  av.mask_back_left = value;
-  av.mask_back_center = value;
-  av.mask_back_right = value;
-  av.mask_word = avd_mask_get_word();
+  av.mask_static_back_left = value;
+  av.mask_static_back_center = value;
+  av.mask_static_back_right = value;
+  av.mask_static_word = avd_mask_static_get_word();
 }
 
-uint16_t avd_mask_get_word(void)
+uint16_t avd_mask_static_get_word(void)
 {
   return
-      (av.mask_front_left   << 0U)  |
-      (av.mask_front_center << 1U)  |
-      (av.mask_front_right  << 2U)  |
-      (av.mask_back_left    << 3U)  |
-      (av.mask_back_center  << 4U)  |
-      (av.mask_back_right   << 5U);
+      (av.mask_static_front_left   << 0U)  |
+      (av.mask_static_front_center << 1U)  |
+      (av.mask_static_front_right  << 2U)  |
+      (av.mask_static_back_left    << 3U)  |
+      (av.mask_static_back_center  << 4U)  |
+      (av.mask_static_back_right   << 5U);
+}
+
+uint16_t avd_mask_dynamic_get_word(void)
+{
+  return
+      (av.mask_dyn_front_left   << 0U)  |
+      (av.mask_dyn_front_center << 1U)  |
+      (av.mask_dyn_front_right  << 2U)  |
+      (av.mask_dyn_back_left    << 3U)  |
+      (av.mask_dyn_back_center  << 4U)  |
+      (av.mask_dyn_back_right   << 5U);
 }
 
 uint16_t avd_det_get_word(void)
@@ -186,6 +219,14 @@ bool avd_detection_is_valid(void) {
   x = motion_get_x();
   y = motion_get_y();
   a = motion_get_a();
+
+  // Initialize dynamic masks (enabled)
+  av.mask_dyn_front_left    = true;
+  av.mask_dyn_front_center  = true;
+  av.mask_dyn_front_right   = true;
+  av.mask_dyn_back_left     = true;
+  av.mask_dyn_back_center   = true;
+  av.mask_dyn_back_right    = true;
 
   // Look at the robot orientation and mask sensors pointing outside
   // of the playground.
@@ -226,14 +267,16 @@ bool avd_detection_is_valid(void) {
   // - Starting zone (the opponent cannot be present in here)
   // - Opponent zone (we will never go there)
 
-  // Mask if required
-  av.det_front_left &= av.mask_front_left;
-  av.det_front_center &= av.mask_front_center;
-  av.det_front_right &= av.mask_front_right;
-  av.det_back_left &= av.mask_back_left;
-  av.det_back_center &= av.mask_back_center;
-  av.det_back_right &= av.mask_back_right;
+  // Mask if required with static and dynamic masks
+  av.det_front_left   &= av.mask_static_front_left    & av.mask_dyn_front_left;
+  av.det_front_center &= av.mask_static_front_center  & av.mask_dyn_front_center;
+  av.det_front_right  &= av.mask_static_front_right   & av.mask_dyn_front_right;
+  av.det_back_left    &= av.mask_static_back_left     & av.mask_dyn_back_left;
+  av.det_back_center  &= av.mask_static_back_center   & av.mask_dyn_back_center;
+  av.det_back_right   &= av.mask_static_back_right    & av.mask_dyn_back_right;
 
+  // Update feedbacks
+  av.mask_dynamic_word = avd_mask_dynamic_get_word();
   av.det_effective_word = avd_det_get_word();
 
   return av.det_effective_word != 0;
@@ -247,10 +290,10 @@ bool avd_detection_is_valid(void) {
 // -180 for a East wall (vertical wall, the robot on its left)
 //  +90 for a South wall (horizontal wall, the robot is above)
 //  -90 for a North wall (horizontal wall, the robot is bellow)
-
 // and a robot with an orientation = 0 (looking to the est).
-// For
-static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a) {
+// This updates the dynamic masks
+static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a)
+{
 
   // Offset the robot position with the wall orientation
   a += wall_a;
@@ -261,53 +304,48 @@ static void avd_mask_sensor_from_wall(int16_t a, int16_t wall_a) {
   else if(a >= 180)
     a -= 360;
 
-  // South: use L + C +BL
+  // South: Mask Right sensors
   if((a >= 90 - AV_ANGULAR_CONE) && (a < 90 + AV_ANGULAR_CONE)) {
-    av.det_front_right = false;
-    av.det_back_right = false;
+    av.mask_dyn_front_right = false;
+    av.mask_dyn_back_right = false;
 
-  // South-West: use BL + BR
+  // South-East: Mask FR + FC
   } else if((a >= 90 + AV_ANGULAR_CONE) && (a < 180 - AV_ANGULAR_CONE)) {
-    av.det_front_left = false;
-    av.det_front_center = false;
-    av.det_front_right = false;
+    av.mask_dyn_front_center = false;
+    av.mask_dyn_front_right = false;
 
-  // West: use BL + BR + BC
+  // East: Mask Front sensors
   } else if((a >= 180 - AV_ANGULAR_CONE) || (a < -180 + AV_ANGULAR_CONE)) {
-    av.det_front_left = false;
-    av.det_front_center = false;
-    av.det_front_right = false;
+    av.mask_dyn_front_left = false;
+    av.mask_dyn_front_center = false;
+    av.mask_dyn_front_right = false;
 
-   // North-West : use BL + BR
+   // North-East : Mask FL + FC
   } else if((a >= -180 + AV_ANGULAR_CONE) && (a < -90 - AV_ANGULAR_CONE)) {
-    av.det_front_left = false;
-    av.det_front_center = false;
-    av.det_front_right = false;
+    av.mask_dyn_front_left = false;
+    av.mask_dyn_front_center = false;
 
-  // North : use R + C + BR
+  // North : Mask Left sensors
   } else if((a >= -90 - AV_ANGULAR_CONE) && (a < -90 + AV_ANGULAR_CONE)) {
-    av.det_front_left = false;
-    av.det_back_left = false;
+    av.mask_dyn_front_left = false;
+    av.mask_dyn_back_left = false;
 
-  // North-East : use R + C
+  // North-West : Mask BL + BC
   } else if((a >= -90 + AV_ANGULAR_CONE) && (a < - AV_ANGULAR_CONE)) {
-      av.det_front_left = false;
-      av.det_back_left = false;
-      av.det_back_center = false;
-      av.det_back_right = false;
+    av.mask_dyn_back_left = false;
+    av.mask_dyn_back_center = false;
 
-  // East : use L + C + R
+  // West : Mask Back sensors
   } else if((a >= - AV_ANGULAR_CONE) && (a < AV_ANGULAR_CONE)) {
-    av.det_back_left = false;
-    av.det_back_center = false;
-    av.det_back_right = false;
+    av.mask_dyn_back_left = false;
+    av.mask_dyn_back_center = false;
+    av.mask_dyn_back_right = false;
 
-  // South-Est: use C + L
+  // South-West: Mask BC + BR
   } else {
-    av.det_front_right = false;
-    av.det_back_left = false;
-    av.det_back_center = false;
-    av.det_back_right = false;
+    av.mask_dyn_back_center = false;
+    av.mask_dyn_back_right = false;
+
   }
 
 }

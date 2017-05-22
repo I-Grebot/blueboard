@@ -59,6 +59,7 @@ void motion_move_block_on_avd(wp_t* wp)
   BaseType_t notified;
   uint32_t sw_notification;
 
+  phys_update_with_color_xy(&wp->coord.abs.x, &wp->coord.abs.y);
   motion_add_new_wp(wp);
 
   while(!motion_is_traj_done(wp))
@@ -179,7 +180,7 @@ void ai_task_start(void *params)
     wp.type = WP_GOTO_FWD;
     avd_mask_front(true); // only enable front sensors
 
-    wp.coord.abs.x = 1500;
+    /*wp.coord.abs.x = 1500;
     wp.coord.abs.y = 0;
     phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
 
@@ -196,33 +197,28 @@ void ai_task_start(void *params)
       {
         DEBUG_INFO("Avoidance event!"DEBUG_EOL);
       }
-    }
+    }*/
 
 
-    /*
     wp.coord.abs.x = 1000;
     wp.coord.abs.y = 600;
     motion_move_block_on_avd(&wp);
 
     wp.coord.abs.x = 500;
     wp.coord.abs.y = 1100;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
     motion_move_block_on_avd(&wp);
 
     wp.coord.abs.x = 200;
     wp.coord.abs.y = 600;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
     motion_move_block_on_avd(&wp);
 
     wp.coord.abs.x = 900;
     wp.coord.abs.y = 1400;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
     motion_move_block_on_avd(&wp);
 
     wp.coord.abs.x = phys.reset.x;
     wp.coord.abs.y = phys.reset.y;
-    phys_update_with_color_xy(&wp.coord.abs.x, &wp.coord.abs.y);
-    motion_move_block_on_avd(&wp);*/
+    motion_move_block_on_avd(&wp);
 
     self->state = TASK_STATE_SUCCESS;
 

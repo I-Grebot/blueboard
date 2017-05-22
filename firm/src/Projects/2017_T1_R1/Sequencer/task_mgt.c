@@ -207,7 +207,7 @@ void task_print(task_t* task)
 {
   char str[100];
   task_to_str(task, str, sizeof(str)/sizeof(char));
-  DEBUG_INFO("%s", str);
+  DEBUG_INFO_NOPFX("%s", str);
 }
 
 // Display all the task within the list

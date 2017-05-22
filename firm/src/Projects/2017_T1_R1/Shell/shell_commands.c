@@ -1405,7 +1405,7 @@ static BaseType_t OS_SHL_SeqCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
         match.color = (match_color_e) value1;
       }
 
-      // Some reporting
+      // Some reporting of the tasks
       else if((!strcasecmp(command, "tasks")) && (lParameterNumber == 2)) {
 
         xReturn = task_print_list(pcWriteBuffer, xWriteBufferLen);
@@ -1416,6 +1416,18 @@ static BaseType_t OS_SHL_SeqCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
         }
         return xReturn;
 
+      }
+
+      // Reporting of the path-finder polygons
+      else if((!strcasecmp(command, "polys")) && (lParameterNumber == 2)) {
+
+        xReturn = phys_print_pf_polys(pcWriteBuffer, xWriteBufferLen);
+
+        // Cleanup when finished
+        if(xReturn == pdFALSE) {
+          lParameterNumber = 0;
+        }
+        return xReturn;
       }
 
       else {

@@ -81,6 +81,8 @@
 #define DEBUG_ERROR(...)     { if(DEBUG_LEVEL <= DEBUG_LEVEL_ERROR)    { DEBUG_PRINTF(DEBUG_ERROR_PFX    __VA_ARGS__); } }
 #define DEBUG_WARNING(...)   { if(DEBUG_LEVEL <= DEBUG_LEVEL_WARNING)  { DEBUG_PRINTF(DEBUG_WARNING_PFX  __VA_ARGS__); } }
 #define DEBUG_INFO(...)      { if(DEBUG_LEVEL <= DEBUG_LEVEL_INFO)     { DEBUG_PRINTF(DEBUG_INFO_PFX     __VA_ARGS__); } }
+#define DEBUG_INFO_NOPFX(...){ if(DEBUG_LEVEL <= DEBUG_LEVEL_INFO)     { DEBUG_PRINTF(                   __VA_ARGS__); } }
 #define DEBUG_TRACE(...)     { if(DEBUG_LEVEL <= DEBUG_LEVEL_TRACE)    { DEBUG_PRINTF(DEBUG_TRACE_PFX    __VA_ARGS__); } }
+
 
 #endif /* __DEBUG_H */
