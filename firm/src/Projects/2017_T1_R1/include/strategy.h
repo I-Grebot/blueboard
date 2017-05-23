@@ -68,6 +68,9 @@ typedef struct {
   poi_t ores_small_crater[2];   // Small ores craters
   poi_t ores_big_crater;         // Big ores crater
 
+  // Robot offsets
+  poi_t offset_center;      // Center of the robot
+
   // Important waypoints
   poi_t reset;              // Location of the robot after reset (blue)
   poi_t exit_start;         // Exit coordinate
@@ -83,11 +86,11 @@ typedef struct {
   path_poly_t* pf_opp_big_crater;
   path_poly_t* pf_central_area;
 
-
   // Path-finder dynamic polygons (initialized with dummy values but updated
   // by the avoidance module)
-  //    path_poly_t* pf_opponent1;          // First opponent's robot
-  //   path_poly_t* pf_opponent2;          // Second opponent's robot
+  path_poly_t* pf_teammate;           // Our teammate
+  path_poly_t* pf_opponent1;          // First opponent's robot
+  path_poly_t* pf_opponent2;          // Second opponent's robot
 
 } phys_t;
 
@@ -152,8 +155,10 @@ typedef struct
   // Aversive control system
   avs_cs_t cs;
 
-  // Opponent position
-  poi_t opp_pos;
+  // Other robots positions
+  poi_t teammate_pos;
+  poi_t opp1_pos;
+  poi_t opp2_pos;
 
 } robot_t;
 

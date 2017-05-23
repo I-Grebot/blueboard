@@ -47,15 +47,6 @@ extern TaskHandle_t handle_task_avoidance;
 // Color selection is already done and stored in the match structure.
 void ai_init(void)
 {
-
-  // Define static obstacles positions
-  phys_set_obstacle_positions();
-
-  // Opponent position: probably in starting zone but we don't know
-  robot.opp_pos.x = OPPONENT_POS_INIT_X;
-  robot.opp_pos.y = OPPONENT_POS_INIT_Y;
-  robot.opp_pos.a = 0;
-
   // Update POIs and Path-Finder polygons depending on color
   phys_update_color_pois();
   phys_update_color_polys();

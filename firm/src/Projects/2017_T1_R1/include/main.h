@@ -394,9 +394,11 @@ void phys_update_with_color_poly(path_poly_t* poly);
 void phys_apply_offset(poi_t* src, poi_t* dest, const poi_t* offset);
 void phys_apply_polar_offset(int16_t* x, int16_t* y, int16_t d, int16_t a_deg);
 void phys_set_obstacle_positions(void);
+void phys_set_teammate_position(int16_t x, int16_t y);
 void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y);
 
-void phys_poly_to_str(path_poly_t* poly, uint8_t idx_poly, char* str, size_t len);
+void phys_pf_poly_to_str(path_poly_t* poly, uint8_t idx_poly, char* str, size_t len);
+void phys_pf_path_to_str(char* ret, size_t len);
 BaseType_t phys_print_pf_polys(char* ret, size_t len);
 
 // -----------------------------------------------------------------------------
@@ -414,6 +416,9 @@ void ai_on_failure_policy(task_t* task);
 
 // AI tasks
 void ai_task_start(void *params);
+
+
+BaseType_t ai_move_with_pf(wp_t* wp);
 
 // -----------------------------------------------------------------------------
 // Path-finder

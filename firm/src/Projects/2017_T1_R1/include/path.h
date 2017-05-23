@@ -35,7 +35,7 @@
 #define PATH_MAX_POLYS 16 // must be < 256
 
 // Maximum number of rays, i.e. resulting segments the "visible point" algorithm.
-#define PATH_MAX_RAYS 500   // i.e. twice more points references
+#define PATH_MAX_RAYS 1000   // i.e. twice more points references
 
 // Maximum number of pass-by points allowed for a resulting trajectory path.
 #define PATH_MAX_CHECKPOINTS 8
@@ -141,7 +141,7 @@ typedef struct
     int32_t c;
 } path_line_t;
 
-// Structure repsenting a polygon.
+// Structure representing a polygon.
 // A polygon is formed by n individual points and enclosed by segments.
 typedef struct
 {
@@ -165,6 +165,7 @@ typedef struct
         uint8_t rays[PATH_MAX_RAYS*2];
         poi_t res[PATH_MAX_CHECKPOINTS];
     } u;
+    uint8_t nb_checkpoint;
 } path_t;
 
 

@@ -162,9 +162,9 @@ void path_point_to_line(const path_proc_pt_t* p1, const path_proc_pt_t* p2, path
 
   int32_t max;
 
-  l->a = -(p2->y - p1->y);
-  l->b =  (p2->x - p1->x);
-  l->c = -(l->a * p1->x + l->b * p1->y);
+  l->a = -(p2->y - p1->y);                // max 400
+  l->b =  (p2->x - p1->x);                // max 600
+  l->c = -(l->a * p1->x + l->b * p1->y);  // max 400 x 300 + 600 x 200 = 240000
 
   // Find the maximum coefficient
   max = MAX3(ABS(l->a), ABS(l->b), ABS(l->c));
@@ -172,7 +172,7 @@ void path_point_to_line(const path_proc_pt_t* p1, const path_proc_pt_t* p2, path
   // Normalize
   l->a = (l->a * PATH_MAX_LINE_COEFF) / max;
   l->b = (l->b * PATH_MAX_LINE_COEFF) / max;
-  l->c = (l->c * PATH_MAX_LINE_COEFF) / max;
+  l->c = (l->c * PATH_MAX_LINE_COEFF) / max; // PATH_MAX_LINE_COEFF absolute max = 8947
 }
 
 // Returns the crossing status of 2 lines. If they cross, update the p parameter.
@@ -241,6 +241,9 @@ path_seg_cross_e path_intersect_segment(path_proc_pt_t* s1, path_proc_pt_t* s2,
   int8_t u1;
   int8_t u2;
 
+  DEBUG_TRACE_NOPFX("    Seg: [(%d;%d) ; (%d;%d)] / [(%d;%d) ; (%d;%d)] ",
+      s1->x, s1->y, s2->x, s2->y, t1->x, t1->y, t2->x, t2->y);
+
   // Check to see if at least, lines cross
   path_point_to_line(s1, s2, &ls);
   path_point_to_line(t1, t2, &lt);
@@ -249,15 +252,21 @@ path_seg_cross_e path_intersect_segment(path_proc_pt_t* s1, path_proc_pt_t* s2,
 
   // Lines do not cross: no chance that segments would cross
   if(line_cross == PATH_LINE_NO_CROSS) {
+    DEBUG_TRACE_NOPFX("-> Line no cross"DEBUG_EOL);
     return PATH_SEG_NO_CROSS;
   }
 
   // Lines are parallels and cross
   if(line_cross == PATH_LINE_PARALLEL_CROSS) {
-    if(prod_scal_sign(t1->x-s1->x, t1->y-s1->y, t1->x-s2->x, t1->y-s2->y ) <= 0 )
+    if(prod_scal_sign(t1->x-s1->x, t1->y-s1->y, t1->x-s2->x, t1->y-s2->y ) <= 0 ) {
+      DEBUG_TRACE_NOPFX("-> Parallel Cross"DEBUG_EOL);
       return PATH_SEG_PARALLEL_CROSS;
-    if (prod_scal_sign(t2->x-s1->x, t2->y-s1->y, t2->x-s2->x, t2->y-s2->y ) <= 0 )
+    }
+    if (prod_scal_sign(t2->x-s1->x, t2->y-s1->y, t2->x-s2->x, t2->y-s2->y ) <= 0 ) {
+      DEBUG_TRACE_NOPFX("-> Segment parallel cross"DEBUG_EOL);
       return PATH_SEG_PARALLEL_CROSS;
+    }
+    DEBUG_TRACE_NOPFX("-> No cross parallel"DEBUG_EOL);
     return PATH_SEG_NO_CROSS;
   }
 
@@ -282,14 +291,18 @@ path_seg_cross_e path_intersect_segment(path_proc_pt_t* s1, path_proc_pt_t* s2,
     return PATH_SEG_CROSS_POINT;
   }
 
+  DEBUG_TRACE_NOPFX("[cross = (%d;%d) ] ", p->x, p->y);
   // General case
   // We need to check if p (crossing point of lines) is contained in the segments
-  u1 = prod_scal_sign(p->x-s1->x, p->y-s1->y, p->x-s2->x, p->y-s2->y);
-  u2 = prod_scal_sign(p->x-t1->x, p->y-t1->y, p->x-t2->x, p->y-t2->y);
+  u1 = prod_scal_sign(p->x - s1->x, p->y - s1->y, p->x - s2->x, p->y - s2->y);
+  u2 = prod_scal_sign(p->x - t1->x, p->y - t1->y, p->x - t2->x, p->y - t2->y);
 
   // Disjoint
-  if (u1>0 || u2>0)
+  if (u1>0 || u2>0) {
+    DEBUG_TRACE_NOPFX("-> No cross disjoint (u1 = %d , u2 = %d)"DEBUG_EOL, u1, u2);
     return PATH_SEG_NO_CROSS;
+  }
+
 
   // Segment point is just equal to the line crossing point
   if (u1==0 || u2==0)
@@ -316,6 +329,7 @@ path_pt_in_poly_e path_pt_is_in_poly(const path_proc_pt_t* p, const path_poly_t*
   }
 
   // General case
+  DEBUG_TRACE("    Pt in poly z = ");
   for(i = 0; i < poly->n; i++) {
 
     // Get the index of the next point.
@@ -331,8 +345,11 @@ path_pt_in_poly_e path_pt_is_in_poly(const path_proc_pt_t* p, const path_poly_t*
                        poly->pts[i].x - p->x, poly->pts[i].y - p->y);
     z_min = MIN(z_min, z);
     z_max = MAX(z_max, z);
+    DEBUG_TRACE_NOPFX("%d ", z);
 
   } // for i
+
+  DEBUG_TRACE_NOPFX(DEBUG_EOL);
 
   // If at least on vectorial product is null, it means that the point is on
   // one of the polygon's edge
@@ -423,9 +440,10 @@ path_seg_cross_poly_e path_seg_is_crossing_poly(path_proc_pt_t p1,
       break;
 
     case 2: // segment touches a corner of the polygon
-      if(ret1 == PATH_PT_POLY_OUTSIDE || ret2 == PATH_PT_POLY_OUTSIDE)
+      if(ret1 == PATH_PT_POLY_OUTSIDE || ret2 == PATH_PT_POLY_OUTSIDE) {
+        DEBUG_TRACE("    Touch Edge: 1 = %u , 2 = %u"DEBUG_EOL, ret1, ret2);
         return PATH_SEG_POLY_TOUCH_EDGE;
-      else // at least one point is on edge
+      } else // at least one point is on edge
         return PATH_SEG_POLY_CROSS;
       break;
   }
@@ -464,6 +482,7 @@ uint16_t path_compute_rays(path_poly_t* polys, uint8_t n_polys, uint8_t* rays) {
   bool is_ok;
   uint8_t pt1;
   uint8_t pt2;
+  path_seg_cross_poly_e seg_crossing_poly;
 
   // Warning: First poly is the starting point
 
@@ -493,9 +512,9 @@ uint16_t path_compute_rays(path_poly_t* polys, uint8_t n_polys, uint8_t* rays) {
         if(idx == i)
           continue;
 
-        if(path_seg_is_crossing_poly(polys[i].pts[j],
-                                     polys[i].pts[k],
-                                     &polys[idx]) == PATH_SEG_POLY_CROSS) {
+        seg_crossing_poly = path_seg_is_crossing_poly(polys[i].pts[j], polys[i].pts[k], &polys[idx]);
+
+        if(seg_crossing_poly == PATH_SEG_POLY_CROSS) {
           is_ok = false;
           break;
         }
@@ -507,6 +526,7 @@ uint16_t path_compute_rays(path_poly_t* polys, uint8_t n_polys, uint8_t* rays) {
         rays[ray_n++] = j;
         rays[ray_n++] = i;
         rays[ray_n++] = k;
+        DEBUG_TRACE("Inner Ray #%u : %d"DEBUG_EOL, ray_n>>2, seg_crossing_poly);
       }
     } // for(j)
   } // for(i)
@@ -516,7 +536,7 @@ uint16_t path_compute_rays(path_poly_t* polys, uint8_t n_polys, uint8_t* rays) {
   for(i = 0; i < n_polys-1; i++) {
     for(pt1 = 0; pt1 < polys[i].n ; pt1++) {
 
-      // If a given point of a polygon is not in the playground, not rays is computed form it
+      // If a given point of a polygon is not in the playground, no rays is computed form it
       if(!PATH_IS_IN_PLAYGROUND(polys[i].pts[pt1]))
         continue;
 
@@ -532,9 +552,9 @@ uint16_t path_compute_rays(path_poly_t* polys, uint8_t n_polys, uint8_t* rays) {
           // Test if the [pt1;pt2] segment crosses a polygon
           is_ok = true;
           for(idx = 1; idx < n_polys; idx++) {
-            if(path_seg_is_crossing_poly(polys[i].pts[pt1],
-                                         polys[j].pts[pt2],
-                                         &polys[idx]) == PATH_SEG_POLY_CROSS) {
+            seg_crossing_poly = path_seg_is_crossing_poly(polys[i].pts[pt1], polys[j].pts[pt2], &polys[idx]);
+
+            if(seg_crossing_poly == PATH_SEG_POLY_CROSS) {
               is_ok = false;
               break;
             }
@@ -546,13 +566,13 @@ uint16_t path_compute_rays(path_poly_t* polys, uint8_t n_polys, uint8_t* rays) {
             rays[ray_n++] = pt1;
             rays[ray_n++] = j;
             rays[ray_n++] = pt2;
+            DEBUG_TRACE("Inter-Ray #%u : %d"DEBUG_EOL, ray_n>>2, seg_crossing_poly);
           }
 
         } // for(pt2)
       } // for(j)
     } // for(pt1)
   } // for(i)
-
 
   return ray_n;
 
@@ -579,6 +599,11 @@ void path_compute_rays_weight(const path_poly_t* polys, const uint8_t* rays, uin
 
     weight[i>>2] = norm2 + 1;
 
+    // Display Ray infos
+    DEBUG_INFO_NOPFX("[PHYS] [RAY] %d %d;%d %d;%d"DEBUG_EOL,
+        weight[i>>2],
+        10*x1, 10*y1,
+        10*x2, 10*y2);
   }
 }
 
@@ -706,6 +731,9 @@ int8_t path_get_result(path_poly_t* polys, uint8_t* rays) {
     nb_checkpoints++;
 
   } // while
+
+  // Save result
+  pf.nb_checkpoint = nb_checkpoints;
 
   return nb_checkpoints;
 }

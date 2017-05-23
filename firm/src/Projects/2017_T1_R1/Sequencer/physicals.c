@@ -73,70 +73,6 @@ void phys_init(void)
   phys.ores_big_crater.y                      = 1600; // TBC
   phys.ores_big_crater.a                      =    0; // TBC
 
-  // Path-finding static polygons
-  // -----------------------------
-
-  // Opponent starting area (also includes the border)
-  phys.pf_opp_start_zone = path_add_new_poly(4);
-  path_poly_set_points(phys.pf_opp_start_zone, 0, TABLE_X_MAX - 1100,    0);
-  path_poly_set_points(phys.pf_opp_start_zone, 1, TABLE_X_MAX       ,    0);
-  path_poly_set_points(phys.pf_opp_start_zone, 2, TABLE_X_MAX       ,  380);
-  path_poly_set_points(phys.pf_opp_start_zone, 3, TABLE_X_MAX - 1100,  380);
-
-  // Borders of the starting area
-  phys.pf_start_border = path_add_new_poly(4);
-  path_poly_set_points(phys.pf_start_border, 0,   0, 360);
-  path_poly_set_points(phys.pf_start_border, 1, 720, 360);
-  path_poly_set_points(phys.pf_start_border, 2, 720, 380);
-  path_poly_set_points(phys.pf_start_border, 3,   0, 380);
-
-  // Small craters
-  phys.pf_small_crater_a = path_add_new_poly(6);
-  path_poly_set_points(phys.pf_small_crater_a, 0,   SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_SIDE_LENGTH/2);
-  path_poly_set_points(phys.pf_small_crater_a, 1,   SMALL_CRATER_CENTER_X                                ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_INTERNAL_SIZE/2);
-  path_poly_set_points(phys.pf_small_crater_a, 2,   SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_SIDE_LENGTH/2);
-  path_poly_set_points(phys.pf_small_crater_a, 3,   SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2);
-  path_poly_set_points(phys.pf_small_crater_a, 4,   SMALL_CRATER_CENTER_X                                ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_INTERNAL_SIZE/2);
-  path_poly_set_points(phys.pf_small_crater_a, 5,   SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2);
-
-  phys.pf_opp_small_crater_a = path_add_new_poly(6);
-  path_poly_set_points(phys.pf_opp_small_crater_a, 0, TABLE_X_MAX - SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_SIDE_LENGTH/2);
-  path_poly_set_points(phys.pf_opp_small_crater_a, 1, TABLE_X_MAX - SMALL_CRATER_CENTER_X                                ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_INTERNAL_SIZE/2);
-  path_poly_set_points(phys.pf_opp_small_crater_a, 2, TABLE_X_MAX - SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y - SMALL_CRATER_SIDE_LENGTH/2);
-  path_poly_set_points(phys.pf_opp_small_crater_a, 3, TABLE_X_MAX - SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2);
-  path_poly_set_points(phys.pf_opp_small_crater_a, 4, TABLE_X_MAX - SMALL_CRATER_CENTER_X                                ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_INTERNAL_SIZE/2);
-  path_poly_set_points(phys.pf_opp_small_crater_a, 5, TABLE_X_MAX - SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 ,  SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2);
-
-  // Big crater
-  phys.pf_big_crater = path_add_new_poly(5);
-  path_poly_set_points(phys.pf_big_crater, 0,                   0 , TABLE_Y_MAX);
-  path_poly_set_points(phys.pf_big_crater, 1,                   0 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
-  path_poly_set_points(phys.pf_big_crater, 2, BIG_CRATER_RADIUS/2 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
-  path_poly_set_points(phys.pf_big_crater, 3, BIG_CRATER_RADIUS   , TABLE_Y_MAX - BIG_CRATER_RADIUS/2);
-  path_poly_set_points(phys.pf_big_crater, 4, BIG_CRATER_RADIUS   , TABLE_Y_MAX);
-
-  phys.pf_opp_big_crater = path_add_new_poly(5);
-  path_poly_set_points(phys.pf_opp_big_crater, 0, TABLE_X_MAX -                   0 , TABLE_Y_MAX);
-  path_poly_set_points(phys.pf_opp_big_crater, 1, TABLE_X_MAX -                   0 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
-  path_poly_set_points(phys.pf_opp_big_crater, 2, TABLE_X_MAX - BIG_CRATER_RADIUS/2 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
-  path_poly_set_points(phys.pf_opp_big_crater, 3, TABLE_X_MAX - BIG_CRATER_RADIUS   , TABLE_Y_MAX - BIG_CRATER_RADIUS/2);
-  path_poly_set_points(phys.pf_opp_big_crater, 4, TABLE_X_MAX - BIG_CRATER_RADIUS   , TABLE_Y_MAX);
-
-  // Central area
-  phys.pf_central_area = path_add_new_poly(5);
-  path_poly_set_points(phys.pf_central_area, 0,  840, TABLE_Y_MAX);
-  path_poly_set_points(phys.pf_central_area, 1,  840, 1300);
-  path_poly_set_points(phys.pf_central_area, 2, 1500, 1150);
-  path_poly_set_points(phys.pf_central_area, 3, TABLE_X_MAX - 840, 1300);
-  path_poly_set_points(phys.pf_central_area, 4, TABLE_X_MAX - 840, TABLE_Y_MAX);
-
-  // Path-finding dynamic polygons
-  // -----------------------------
-
-  // Dynamic polygon: opponent's robot #1
-  // The opponent's robot model is an octogon which has identical segments length.
- // phys.pf_opponent1 = path_add_new_poly(8);
-  
   // Sequencing and intermediate POIs
   // --------------------------------
 
@@ -163,13 +99,38 @@ void phys_init(void)
   // Offsets of the Robot's actuators / systems
   // ------------------------------------------
 
-  //phys.offset_center.x = 20;
-  //phys.offset_center.y = 0;
-  //phys.offset_center.a = 0;
+  // When we don't want to apply any offset
+  phys.offset_center.x =  0;
+  phys.offset_center.y =  0;
+  phys.offset_center.a =  0;
 
 
   // Strategic Point Of Interest
   // ---------------------------
+
+  // TODO
+
+
+  // Teammate position
+  robot.teammate_pos.x = TEAMMATE_POS_INIT_X;
+  robot.teammate_pos.y = TEAMMATE_POS_INIT_Y;
+  robot.teammate_pos.a = 0;
+
+  // Opponents robots position (best guess)
+  robot.opp1_pos.x = OPPONENT1_POS_INIT_X;
+  robot.opp1_pos.y = OPPONENT1_POS_INIT_Y;
+  robot.opp1_pos.a = 0;
+
+  robot.opp2_pos.x = OPPONENT2_POS_INIT_X;
+  robot.opp2_pos.y = OPPONENT2_POS_INIT_Y;
+  robot.opp2_pos.a = 0;
+
+  // Define static & dynamic obstacles positions
+  phys_set_obstacle_positions();
+  phys_set_teammate_position(robot.teammate_pos.x, robot.teammate_pos.y);
+  phys_set_opponent_position(1, robot.opp1_pos.x, robot.opp1_pos.y);
+  phys_set_opponent_position(2, robot.opp2_pos.x, robot.opp2_pos.y);
+
 
 }
 
@@ -178,7 +139,9 @@ void phys_update_color_pois(void)
 {
   phys_update_with_color(&phys.reset);
   phys_update_with_color(&phys.exit_start);
-  phys_update_with_color(&robot.opp_pos);
+  phys_update_with_color(&robot.teammate_pos);
+  phys_update_with_color(&robot.opp1_pos);
+  phys_update_with_color(&robot.opp2_pos);
   // TODO: add other POIs
 }
 
@@ -187,6 +150,9 @@ void phys_update_color_polys(void)
 {
   phys_update_with_color_poly(phys.pf_start_border);
   phys_update_with_color_poly(phys.pf_opp_start_zone);
+  phys_update_with_color_poly(phys.pf_teammate);
+  phys_update_with_color_poly(phys.pf_opponent1);
+  phys_update_with_color_poly(phys.pf_opponent2);
 }
 
 // -----------------------------------------------------------------------------
@@ -334,60 +300,135 @@ void phys_apply_polar_offset(int16_t* x, int16_t* y, int16_t d, int16_t a_deg) {
 // PATH-FINDING STATIC POLYGON DEFINITIONS
 // -----------------------------------------------------------------------------
 
-// Define obstacle positions depending on the color
+// Define obstacle positions.
+// Warning: all coordinates are given assuming to be the 1st team (blue).
+//          final coordinates are mirrored (if required), depending on the color
+//          thanks to the function phys_update_color_polys().
 void phys_set_obstacle_positions(void) {
-    
-  // Static polygon: Stairs are formed with a basic rectangle
-  //path_poly_set_points(phys.pf_construction_area, 0, CONSTRUCTION_AREA_X_MIN - ROBOT_RADIUS, CONSTRUCTION_AREA_Y_MIN - ROBOT_RADIUS);
-  //path_poly_set_points(phys.pf_construction_area, 1, CONSTRUCTION_AREA_X_MAX + ROBOT_RADIUS, CONSTRUCTION_AREA_Y_MIN - ROBOT_RADIUS);
-  //path_poly_set_points(phys.pf_construction_area, 2, CONSTRUCTION_AREA_X_MAX + ROBOT_RADIUS, CONSTRUCTION_AREA_Y_MAX + ROBOT_RADIUS);
-  //path_poly_set_points(phys.pf_construction_area, 3, CONSTRUCTION_AREA_X_MIN - ROBOT_RADIUS, CONSTRUCTION_AREA_Y_MAX + ROBOT_RADIUS);
+
+  // Path-finding static polygons
+  // -----------------------------
+
+  // Opponent starting area (also includes the border)
+  phys.pf_opp_start_zone = path_add_new_poly(4);
+  path_poly_set_points(phys.pf_opp_start_zone, 0, TABLE_X_MAX - 1100 - ROBOT_RADIUS,    0);
+  path_poly_set_points(phys.pf_opp_start_zone, 1, TABLE_X_MAX                      ,    0);
+  path_poly_set_points(phys.pf_opp_start_zone, 2, TABLE_X_MAX                      ,  START_BORDER_Y +  ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_opp_start_zone, 3, TABLE_X_MAX - 1100 - ROBOT_RADIUS,  START_BORDER_Y +  ROBOT_RADIUS);
+
+  // Borders of the starting area
+  phys.pf_start_border = path_add_new_poly(4);
+  path_poly_set_points(phys.pf_start_border, 0,   0,                           START_BORDER_Y - ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_start_border, 1, START_BORDER_W + ROBOT_RADIUS, START_BORDER_Y - ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_start_border, 2, START_BORDER_W + ROBOT_RADIUS, START_BORDER_Y + ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_start_border, 3,   0,                           START_BORDER_Y + ROBOT_RADIUS);
+
+  // Small craters
+  phys.pf_small_crater_a = path_add_new_poly(5);
+  path_poly_set_points(phys.pf_small_crater_a, 0,   SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 - ROBOT_RADIUS , START_BORDER_Y + ROBOT_RADIUS - 20);
+  path_poly_set_points(phys.pf_small_crater_a, 1,   SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 - ROBOT_RADIUS , SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2     + ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_small_crater_a, 2,   SMALL_CRATER_CENTER_X                                               , SMALL_CRATER_CENTER_Y + SMALL_CRATER_INTERNAL_SIZE/2   + ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_small_crater_a, 3,   SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 + ROBOT_RADIUS , SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2     + ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_small_crater_a, 4,   SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 + ROBOT_RADIUS , START_BORDER_Y + ROBOT_RADIUS - 20);
+
+  phys.pf_opp_small_crater_a = path_add_new_poly(5);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 0,   TABLE_X_MAX - SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 - ROBOT_RADIUS , START_BORDER_Y + ROBOT_RADIUS - 20);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 1,   TABLE_X_MAX - SMALL_CRATER_CENTER_X - SMALL_CRATER_INTERNAL_SIZE/2 - ROBOT_RADIUS , SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2     + ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 2,   TABLE_X_MAX - SMALL_CRATER_CENTER_X                                               , SMALL_CRATER_CENTER_Y + SMALL_CRATER_INTERNAL_SIZE/2   + ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 3,   TABLE_X_MAX - SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 + ROBOT_RADIUS , SMALL_CRATER_CENTER_Y + SMALL_CRATER_SIDE_LENGTH/2     + ROBOT_RADIUS);
+  path_poly_set_points(phys.pf_opp_small_crater_a, 4,   TABLE_X_MAX - SMALL_CRATER_CENTER_X + SMALL_CRATER_INTERNAL_SIZE/2 + ROBOT_RADIUS , START_BORDER_Y + ROBOT_RADIUS - 20);
+
+  // Big crater
+  phys.pf_big_crater = path_add_new_poly(5);
+  path_poly_set_points(phys.pf_big_crater, 0,                   0 , TABLE_Y_MAX);
+  path_poly_set_points(phys.pf_big_crater, 1,                   0 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
+  path_poly_set_points(phys.pf_big_crater, 2, BIG_CRATER_RADIUS/2 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
+  path_poly_set_points(phys.pf_big_crater, 3, BIG_CRATER_RADIUS   , TABLE_Y_MAX - BIG_CRATER_RADIUS/2);
+  path_poly_set_points(phys.pf_big_crater, 4, BIG_CRATER_RADIUS   , TABLE_Y_MAX);
+
+  phys.pf_opp_big_crater = path_add_new_poly(5);
+  path_poly_set_points(phys.pf_opp_big_crater, 0, TABLE_X_MAX -                   0 , TABLE_Y_MAX);
+  path_poly_set_points(phys.pf_opp_big_crater, 1, TABLE_X_MAX -                   0 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
+  path_poly_set_points(phys.pf_opp_big_crater, 2, TABLE_X_MAX - BIG_CRATER_RADIUS/2 , TABLE_Y_MAX - BIG_CRATER_RADIUS);
+  path_poly_set_points(phys.pf_opp_big_crater, 3, TABLE_X_MAX - BIG_CRATER_RADIUS   , TABLE_Y_MAX - BIG_CRATER_RADIUS/2);
+  path_poly_set_points(phys.pf_opp_big_crater, 4, TABLE_X_MAX - BIG_CRATER_RADIUS   , TABLE_Y_MAX);
+
+  // Central area
+  phys.pf_central_area = path_add_new_poly(5);
+  path_poly_set_points(phys.pf_central_area, 0,  840, TABLE_Y_MAX);
+  path_poly_set_points(phys.pf_central_area, 1,  840, 1300);
+  path_poly_set_points(phys.pf_central_area, 2, 1500, 1150);
+  path_poly_set_points(phys.pf_central_area, 3, TABLE_X_MAX - 840, 1300);
+  path_poly_set_points(phys.pf_central_area, 4, TABLE_X_MAX - 840, TABLE_Y_MAX);
+
+  // Path-finding dynamic polygons
+  // -----------------------------
+
+  // Other robots:
+  // They are all represented as an octogon with identical segments length.
+  phys.pf_teammate  = path_add_new_poly(8);
+  phys.pf_opponent1 = path_add_new_poly(8);
+  phys.pf_opponent2 = path_add_new_poly(8);
   
 }
-
 
 // -----------------------------------------------------------------------------
 // PATH-FINDING DYNAMIC POLYGON DEFINITIONS
 // -----------------------------------------------------------------------------
 
-// Redefine the path-finder polygon associated with the opponent's robot
-void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y) {
+/*
+   Other robots model is an octogon:
 
-  /*
-     The opponent's robot model is an octogon:
-
-          (0)_________(1)
-            /         \
-        (7)/           \(2)
-          |             |
-          |    (x,y)    |
-       (6)|             |(3)
-           \           /
-         (5)\_________/(4)
+        (0)_________(1)
+          /         \
+      (7)/           \(2)
+        |             |
+        |    (x,y)    |
+     (6)|             |(3)
+         \           /
+       (5)\_________/(4)
 
 */
-  // Secondary robot: smaller lengths
-//  if(robot_idx >= 2) {
-//    path_poly_set_points(phys.pf_opponent2, 0, x -   OPPONENT2_SIZE/2,  y - 3*OPPONENT2_SIZE/2);
-//    path_poly_set_points(phys.pf_opponent2, 1, x +   OPPONENT2_SIZE/2,  y - 3*OPPONENT2_SIZE/2);
-//    path_poly_set_points(phys.pf_opponent2, 2, x + 3*OPPONENT2_SIZE/2,  y -   OPPONENT2_SIZE/2);
-//    path_poly_set_points(phys.pf_opponent2, 3, x + 3*OPPONENT2_SIZE/2,  y +   OPPONENT2_SIZE/2);
-//    path_poly_set_points(phys.pf_opponent2, 4, x +   OPPONENT2_SIZE/2,  y + 3*OPPONENT2_SIZE/2);
-//    path_poly_set_points(phys.pf_opponent2, 5, x -   OPPONENT2_SIZE/2,  y + 3*OPPONENT2_SIZE/2);
-//    path_poly_set_points(phys.pf_opponent2, 6, x - 3*OPPONENT2_SIZE/2,  y +   OPPONENT2_SIZE/2);
-//    path_poly_set_points(phys.pf_opponent2, 7, x - 3*OPPONENT2_SIZE/2,  y -   OPPONENT2_SIZE/2);
+
+// Redefine the path-finder polygon associated with the teammate's robot
+void phys_set_teammate_position(int16_t x, int16_t y)
+{
+  path_poly_set_points(phys.pf_teammate, 0, x -   TEAMMATE_SIZE/2,  y - 3*TEAMMATE_SIZE/2);
+  path_poly_set_points(phys.pf_teammate, 1, x +   TEAMMATE_SIZE/2,  y - 3*TEAMMATE_SIZE/2);
+  path_poly_set_points(phys.pf_teammate, 2, x + 3*TEAMMATE_SIZE/2,  y -   TEAMMATE_SIZE/2);
+  path_poly_set_points(phys.pf_teammate, 3, x + 3*TEAMMATE_SIZE/2,  y +   TEAMMATE_SIZE/2);
+  path_poly_set_points(phys.pf_teammate, 4, x +   TEAMMATE_SIZE/2,  y + 3*TEAMMATE_SIZE/2);
+  path_poly_set_points(phys.pf_teammate, 5, x -   TEAMMATE_SIZE/2,  y + 3*TEAMMATE_SIZE/2);
+  path_poly_set_points(phys.pf_teammate, 6, x - 3*TEAMMATE_SIZE/2,  y +   TEAMMATE_SIZE/2);
+  path_poly_set_points(phys.pf_teammate, 7, x - 3*TEAMMATE_SIZE/2,  y -   TEAMMATE_SIZE/2);
+}
+
+// Redefine the path-finder polygon associated with the opponent's robot
+void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y)
+{
 
   // Primary robot
-//  } else {
-    //path_poly_set_points(phys.pf_opponent1, 0, x -   OPPONENT1_SIZE/2,  y - 3*OPPONENT1_SIZE/2);
-	// path_poly_set_points(phys.pf_opponent1, 1, x +   OPPONENT1_SIZE/2,  y - 3*OPPONENT1_SIZE/2);
-	//path_poly_set_points(phys.pf_opponent1, 2, x + 3*OPPONENT1_SIZE/2,  y -   OPPONENT1_SIZE/2);
-	//path_poly_set_points(phys.pf_opponent1, 3, x + 3*OPPONENT1_SIZE/2,  y +   OPPONENT1_SIZE/2);
-	//path_poly_set_points(phys.pf_opponent1, 4, x +   OPPONENT1_SIZE/2,  y + 3*OPPONENT1_SIZE/2);
-	//path_poly_set_points(phys.pf_opponent1, 5, x -   OPPONENT1_SIZE/2,  y + 3*OPPONENT1_SIZE/2);
-	//path_poly_set_points(phys.pf_opponent1, 6, x - 3*OPPONENT1_SIZE/2,  y +   OPPONENT1_SIZE/2);
-	//path_poly_set_points(phys.pf_opponent1, 7, x - 3*OPPONENT1_SIZE/2,  y -   OPPONENT1_SIZE/2);
-//  }
+  if(robot_idx == 1) {
+    path_poly_set_points(phys.pf_opponent1, 0, x -   OPPONENT1_SIZE/2,  y - 3*OPPONENT1_SIZE/2);
+    path_poly_set_points(phys.pf_opponent1, 1, x +   OPPONENT1_SIZE/2,  y - 3*OPPONENT1_SIZE/2);
+    path_poly_set_points(phys.pf_opponent1, 2, x + 3*OPPONENT1_SIZE/2,  y -   OPPONENT1_SIZE/2);
+    path_poly_set_points(phys.pf_opponent1, 3, x + 3*OPPONENT1_SIZE/2,  y +   OPPONENT1_SIZE/2);
+    path_poly_set_points(phys.pf_opponent1, 4, x +   OPPONENT1_SIZE/2,  y + 3*OPPONENT1_SIZE/2);
+    path_poly_set_points(phys.pf_opponent1, 5, x -   OPPONENT1_SIZE/2,  y + 3*OPPONENT1_SIZE/2);
+    path_poly_set_points(phys.pf_opponent1, 6, x - 3*OPPONENT1_SIZE/2,  y +   OPPONENT1_SIZE/2);
+    path_poly_set_points(phys.pf_opponent1, 7, x - 3*OPPONENT1_SIZE/2,  y -   OPPONENT1_SIZE/2);
+
+    // Secondary robot: smaller lengths
+  } else {
+    path_poly_set_points(phys.pf_opponent2, 0, x -   OPPONENT2_SIZE/2,  y - 3*OPPONENT2_SIZE/2);
+    path_poly_set_points(phys.pf_opponent2, 1, x +   OPPONENT2_SIZE/2,  y - 3*OPPONENT2_SIZE/2);
+    path_poly_set_points(phys.pf_opponent2, 2, x + 3*OPPONENT2_SIZE/2,  y -   OPPONENT2_SIZE/2);
+    path_poly_set_points(phys.pf_opponent2, 3, x + 3*OPPONENT2_SIZE/2,  y +   OPPONENT2_SIZE/2);
+    path_poly_set_points(phys.pf_opponent2, 4, x +   OPPONENT2_SIZE/2,  y + 3*OPPONENT2_SIZE/2);
+    path_poly_set_points(phys.pf_opponent2, 5, x -   OPPONENT2_SIZE/2,  y + 3*OPPONENT2_SIZE/2);
+    path_poly_set_points(phys.pf_opponent2, 6, x - 3*OPPONENT2_SIZE/2,  y +   OPPONENT2_SIZE/2);
+    path_poly_set_points(phys.pf_opponent2, 7, x - 3*OPPONENT2_SIZE/2,  y -   OPPONENT2_SIZE/2);
+  }
   
 }
 
@@ -395,9 +436,8 @@ void phys_set_opponent_position(uint8_t robot_idx, int16_t x, int16_t y) {
 // Helpers
 // -----------------------------------------------------------------------------
 
-void phys_poly_to_str(path_poly_t* poly, uint8_t idx_poly, char* str, size_t len)
+void phys_pf_poly_to_str(path_poly_t* poly, uint8_t idx_poly, char* str, size_t len)
 {
-
   uint8_t idx_pt;
 
   snprintf(str, len, "[PHYS] [POLY] %u ", idx_poly);
@@ -405,12 +445,39 @@ void phys_poly_to_str(path_poly_t* poly, uint8_t idx_poly, char* str, size_t len
 
   for(idx_pt = 0; idx_pt < poly->n; idx_pt++)
   {
-    snprintf(str, len, "%u;%u ",
+    snprintf(str, len, "%d;%d ",
              10*poly->pts[idx_pt].x,
              10*poly->pts[idx_pt].y);
     str += strlen(str);
   }
   snprintf(str, len, SHELL_EOL);
+}
+
+
+// Print out resulting path-finder path
+void phys_pf_path_to_str(char* ret, size_t len)
+{
+  uint8_t idx_checkpoint;
+
+  // Add the robot current position
+  snprintf(ret, len, "[PHYS] [PATH] %d;%d ",
+           robot.cs.pos.pos_s16.x,
+           robot.cs.pos.pos_s16.y);
+  ret += strlen(ret);
+
+  // Print each checkpoint if result is valid
+  if(pf.nb_checkpoint != PATH_RESULT_ERROR)
+  {
+    for(idx_checkpoint = 0; idx_checkpoint < pf.nb_checkpoint; idx_checkpoint++)
+    {
+     snprintf(ret, len, "%d;%d ",
+              pf.u.res[idx_checkpoint].x,
+              pf.u.res[idx_checkpoint].y);
+    ret += strlen(ret);
+    }
+  }
+
+  snprintf(ret, len, SHELL_EOL);
 }
 
 // Print-out polygons and points
@@ -436,7 +503,7 @@ BaseType_t phys_print_pf_polys(char* ret, size_t len)
   }
 
   // Print all points of the poly
-  phys_poly_to_str(poly, idx_poly, ret, len);
+  phys_pf_poly_to_str(poly, idx_poly, ret, len);
 
 
   // Avoid 1st poly (special)
@@ -470,6 +537,7 @@ BaseType_t phys_print_pf_polys(char* ret, size_t len)
   }
 
 }
+
 
 // -----------------------------------------------------------------------------
 // Define some global POI constants

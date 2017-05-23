@@ -129,6 +129,8 @@
 #define TABLE_HEIGHT (TABLE_Y_MAX - TABLE_Y_MIN)
 
 // Playground elements
+#define START_BORDER_W                720
+#define START_BORDER_Y                370
 #define SMALL_CRATER_CENTER_X         650
 #define SMALL_CRATER_CENTER_Y         540
 #define SMALL_CRATER_INTERNAL_SIZE    260
@@ -148,22 +150,32 @@
 #define TRAJECTORY_NEAR_WINDOW_D  200
 #define TRAJECTORY_NEAR_WINDOW_A  10
 
-#define OPPONENT_POS_INIT_X     6000 // Out of table
-#define OPPONENT_POS_INIT_Y     4000
-
 /**
 ********************************************************************************
 **
-**  Opponent robots constants
+**  Other robots constants
 **
 ********************************************************************************
 */
 
-// Sizes for opponent robots
+// Default teammate position
+#define TEAMMATE_POS_INIT_X       160
+#define TEAMMATE_POS_INIT_Y       180
+
+// Default opponent 1 position
+#define OPPONENT1_POS_INIT_X     2130
+#define OPPONENT1_POS_INIT_Y      180
+
+// Default opponent 2 position
+#define OPPONENT2_POS_INIT_X     2820
+#define OPPONENT2_POS_INIT_Y      180
+
+// Sizes for other robots
 // Lengths of one small segment of the octogon.
-// The larger length is equal to ~1.41 x small length
-#define OPPONENT1_SIZE  300
-#define OPPONENT2_SIZE  100
+#define TEAMMATE_SIZE   150
+#define OPPONENT1_SIZE  200
+#define OPPONENT2_SIZE  150
+
 
 
 

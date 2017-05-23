@@ -642,7 +642,9 @@ static BaseType_t OS_SHL_MotCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
                 snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_MOT_PFX"Goto Auto (%d;%d)"SHELL_EOL, wp.coord.abs.x, wp.coord.abs.y);
                 pcWriteBuffer += strlen(pcWriteBuffer);
                 wp.type = WP_GOTO_AUTO;
-                motion_add_new_wp(&wp);
+                //motion_add_new_wp(&wp);
+                ai_move_with_pf(&wp);
+                phys_pf_path_to_str(pcWriteBuffer, xWriteBufferLen);
 
             }
 
