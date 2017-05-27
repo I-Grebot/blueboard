@@ -65,14 +65,17 @@ void bb_dio_init(void)
     GPIO_Init(END6_GPIO_PORT, &GPIO_InitStructure);
 
     GPIO_InitStructure.GPIO_Pin = END7_PIN;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
     GPIO_Init(END7_GPIO_PORT, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IN;
-    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
     GPIO_InitStructure.GPIO_Pin = END8_PIN;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_DOWN;
     GPIO_Init(END8_GPIO_PORT, &GPIO_InitStructure);
 
     /* Configure end industrial sensors as input */
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_Pin = IND1_PIN;
     GPIO_Init(IND1_GPIO_PORT, &GPIO_InitStructure);
 
@@ -103,6 +106,4 @@ void bb_dio_init(void)
     GPIO_InitStructure.GPIO_Pin = IND10_PIN;
     GPIO_Init(IND10_GPIO_PORT, &GPIO_InitStructure);
 
-	GPIO_WriteBit((GPIO_TypeDef*) END6_GPIO_PORT, END6_PIN, Bit_SET);
-	GPIO_WriteBit((GPIO_TypeDef*) END7_GPIO_PORT, END7_PIN, Bit_SET);
 }

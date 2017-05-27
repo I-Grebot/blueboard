@@ -106,7 +106,8 @@ void sequencer_task( void *pvParameters )
   led_start();
 
   // Sub-systems
-  sys_modules_start();
+  //sys_modules_start();
+  sys_modules_init();
 
   // High-level
   avoidance_start();
@@ -168,6 +169,16 @@ void sequencer_task( void *pvParameters )
       led_set_mode(BB_LED_BLINK_FAST);
       led_set_color(BB_LED_GREEN);
 
+      // Temp
+      extern phys_t phys;
+      motion_set_x(phys.reset.x);
+      motion_set_y(phys.reset.y);
+      motion_set_a(phys.reset.a);
+
+      sys_mod_proc_init();
+      vTaskDelayUntil(&next_wake_time, pdMS_TO_TICKS(2000));
+      sys_mod_proc_fold();
+
       break;
 
     // I'am a big boy now
@@ -175,6 +186,10 @@ void sequencer_task( void *pvParameters )
     //-------------------------------------------------------------------------
 
       // TODO: define a dedicated task for that
+
+      // Temp for funny
+      bb_asv_set_pwm_pulse_length(ASV_CHANNEL_FUNNY, ASV_FUNNY_OFF);
+      sys_mod_proc_fold();
 
       match.state = MATCH_STATE_WAIT_START;
 
@@ -233,7 +248,7 @@ void sequencer_task( void *pvParameters )
     //-------------------------------------------------------------------------
 
       // Count the time and execute the match strategy
-      if((match.timer_msec >= MATCH_DURATION_MSEC) ||               // Normal match timeout end
+      if((match.timer_msec >= MATCH_DURATION__WITH_FUNNY_MSEC) ||               // Normal match timeout end
          (notified && (sw_notification & OS_NOTIFY_MATCH_ABORT)))   // Software stop (abort)
       {
         match.state = MATCH_STATE_STOPPED;
@@ -322,7 +337,7 @@ void sequencer_print_match(void)
       task_mgt.active_task == NULL ? "IDLE" : task_mgt.active_task->name,
       match.timer_msec/1000,
       match.scored_points
-      )
+      );
 
 }
 

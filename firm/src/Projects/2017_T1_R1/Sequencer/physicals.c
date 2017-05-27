@@ -77,13 +77,13 @@ void phys_init(void)
   // --------------------------------
 
   // Coordinate of the robot at startup
-  phys.reset.x  = 880;
-  phys.reset.y  = 180;
+  phys.reset.x  = 922;
+  phys.reset.y  =  85;
   phys.reset.a  =  90; // Facing south
 
   // 1st exit point
-  phys.exit_start.x  = 1050;
-  phys.exit_start.y  = 180;
+  phys.exit_start.x  = 1400;
+  phys.exit_start.y  = 400;
   phys.exit_start.a  =   0;
 
   // Waypoint for building modules on the side

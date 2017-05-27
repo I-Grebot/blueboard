@@ -80,8 +80,8 @@
 #define PHYS_CS_D_PID_DRV_FILTER            ((uint8_t)      4)
 #define PHYS_CS_D_QUAD_POS_SPEED            ((uint32_t)  1200)
 #define PHYS_CS_D_QUAD_NEG_SPEED            ((uint32_t)  1200)
-#define PHYS_CS_D_QUAD_POS_ACCEL            ((uint32_t)     20)
-#define PHYS_CS_D_QUAD_NEG_ACCEL            ((uint32_t)     20)
+#define PHYS_CS_D_QUAD_POS_ACCEL            ((uint32_t)    40)
+#define PHYS_CS_D_QUAD_NEG_ACCEL            ((uint32_t)    40)
 
 /* Control System in Angle filters parameters */
 #define PHYS_CS_A_PID_KP                    ((int16_t)   2500)
@@ -94,8 +94,8 @@
 #define PHYS_CS_A_PID_DRV_FILTER            ((uint8_t)      4)
 #define PHYS_CS_A_QUAD_POS_SPEED            ((uint32_t)  1200)
 #define PHYS_CS_A_QUAD_NEG_SPEED            ((uint32_t)  1200)
-#define PHYS_CS_A_QUAD_POS_ACCEL            ((uint32_t)     8)
-#define PHYS_CS_A_QUAD_NEG_ACCEL            ((uint32_t)     8)
+#define PHYS_CS_A_QUAD_POS_ACCEL            ((uint32_t)    24)
+#define PHYS_CS_A_QUAD_NEG_ACCEL            ((uint32_t)    24)
 
 /* Trajectory Manager parameters */
 #define PHYS_TRAJ_D_DEFAULT_SPEED           ((int16_t)    1500)
@@ -144,7 +144,7 @@
 #define ROBOT_BASE_WIDTH        250 // Distance between the two encoder wheels
 #define ROBOT_LOW_WIDTH         230 // Distance from the two arm in idle position
 #define ROBOT_HIGH_WIDTH        290 // Distance from the two arm when moving
-#define ROBOT_RADIUS            130 // In Idle position the robot can fit in a cylinder of this radius.
+#define ROBOT_RADIUS            170 // In Idle position the robot can fit in a cylinder of this radius.
 #define ROBOT_RADIUS_W_CUBE     260 // With Cube the robot can fit in a cylinder of this radius.
 
 #define TRAJECTORY_NEAR_WINDOW_D  200

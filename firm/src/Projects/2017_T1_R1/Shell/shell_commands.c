@@ -923,21 +923,23 @@ static BaseType_t OS_SHL_DsvCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
 			{
 				snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_DSV_PFX"Test on interface #%u ..."SHELL_EOL, itf);
 
+				dsv_scan_servos();
+
 				//xl_320_set_led(254, XL_320_LED_CYAN);
-				servo.itf = &(dsv_chan1.dxl);
+				/*servo.itf = &(dsv_chan1.dxl);
 				servo.id = 45;
-				dxl_write_int(&servo, 25, XL_320_LED_CYAN, 1, false);
+				dxl_write_int(&servo, 25, XL_320_LED_CYAN, 1, false);*/
 
-            }
-            else
-            {
-                snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unrecognized command '%s' or parameters error"SHELL_EOL, command);
-            }
+      }
+      else
+      {
+          snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_ERR_PFX"Unrecognized command '%s' or parameters error"SHELL_EOL, command);
+      }
 
-            // Ensure the function can start again
-            lParameterNumber = 0;
-            xReturn = pdFALSE;
-        }
+      // Ensure the function can start again
+      lParameterNumber = 0;
+      xReturn = pdFALSE;
+  }
 
     }
 

@@ -230,60 +230,62 @@
  */
 
 /* END1 Mapped on PC0 */
-#define END1_GPIO_PORT				GPIOC
+#define END1_GPIO_PORT				      GPIOC
 #define END1_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE)
 #define END1_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, DISABLE)
 #define END1_PIN                    GPIO_Pin_0
 #define END1_VALUE                 	GPIO_ReadInputDataBit(END1_GPIO_PORT, END1_PIN)
 
 /* END2 Mapped on PC1 */
-#define END2_GPIO_PORT				GPIOC
+#define END2_GPIO_PORT				      GPIOC
 #define END2_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE)
 #define END2_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, DISABLE)
 #define END2_PIN                    GPIO_Pin_1
 #define END2_VALUE                 	GPIO_ReadInputDataBit(END2_GPIO_PORT, END2_PIN)
 
 /* END3 Mapped on PB2 */
-#define END3_GPIO_PORT				GPIOB
+#define END3_GPIO_PORT				      GPIOB
 #define END3_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE)
 #define END3_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE)
 #define END3_PIN                    GPIO_Pin_2
 #define END3_VALUE                 	GPIO_ReadInputDataBit(END3_GPIO_PORT, END3_PIN)
 
 /* END4 Mapped on PB11 */
-#define END4_GPIO_PORT				GPIOB
+#define END4_GPIO_PORT				      GPIOB
 #define END4_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE)
 #define END4_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE)
 #define END4_PIN                    GPIO_Pin_11
 #define END4_VALUE                 	GPIO_ReadInputDataBit(END4_GPIO_PORT, END4_PIN)
 
 /* END5 Mapped on PA15 */
-#define END5_GPIO_PORT				GPIOA
+#define END5_GPIO_PORT				      GPIOA
 #define END5_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE)
 #define END5_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, DISABLE)
 #define END5_PIN                    GPIO_Pin_15
 #define END5_VALUE                 	GPIO_ReadInputDataBit(END5_GPIO_PORT, END5_PIN)
 
 /* END6 Mapped on PC10 */
-#define END6_GPIO_PORT				GPIOC
+#define END6_GPIO_PORT				      GPIOC
 #define END6_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE)
 #define END6_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, DISABLE)
 #define END6_PIN                    GPIO_Pin_10
 #define END6_VALUE                 	GPIO_ReadInputDataBit(END6_GPIO_PORT, END6_PIN)
 
 /* END7 Mapped on PC11 */
-#define END7_GPIO_PORT				GPIOC
+#define END7_GPIO_PORT				      GPIOC
 #define END7_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE)
 #define END7_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, DISABLE)
 #define END7_PIN                    GPIO_Pin_11
 #define END7_VALUE                 	GPIO_ReadInputDataBit(END7_GPIO_PORT, END7_PIN)
+#define END7_WRITE(v)               GPIO_WriteBit(END7_GPIO_PORT, END7_PIN, (v))
 
 /* END8 Mapped on PC12 */
-#define END8_GPIO_PORT				GPIOC
+#define END8_GPIO_PORT				      GPIOC
 #define END8_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE)
 #define END8_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, DISABLE)
 #define END8_PIN                    GPIO_Pin_12
 #define END8_VALUE                 	GPIO_ReadInputDataBit(END8_GPIO_PORT, END8_PIN)
+#define END8_WRITE(v)               GPIO_WriteBit(END8_GPIO_PORT, END8_PIN, (v))
 
 /**
  * @}

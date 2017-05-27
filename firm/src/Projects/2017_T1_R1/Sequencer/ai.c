@@ -107,13 +107,14 @@ void ai_manage(bool notified, uint32_t sw_notification)
       //  task_mgt.active_task->state = TASK_STATE_SUSPENDED;
       //}
 
-      DEBUG_INFO("AI mgt event handle = %X!"DEBUG_EOL, (uint32_t) task_mgt.active_task->handle);
       task_print(task_mgt.active_task);
 
     }
 
     // Notify the current AI task with the same notifications (forward)
-    xTaskNotify(task_mgt.active_task->handle, sw_notification, eSetBits);
+    if(task_mgt.active_task->handle != NULL) {
+      xTaskNotify(task_mgt.active_task->handle, sw_notification, eSetBits);
+    }
 
   }
 
@@ -122,6 +123,17 @@ void ai_manage(bool notified, uint32_t sw_notification)
   {
     xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
   }*/
+
+  // Funny action
+  if(match.timer_msec >= FUNNY_TRIGGER_MSEC)
+  {
+    bb_asv_set_pwm_pulse_length(ASV_CHANNEL_FUNNY, ASV_FUNNY_TRIGGER);
+  }
+
+  // Stop motion
+  else if(match.timer_msec >= MATCH_DURATION_MSEC) {
+    motion_traj_hard_stop();
+  }
 
   // Check to see if active task is valid
   if(task_mgt.active_task != NULL)
@@ -202,6 +214,10 @@ void ai_manage(bool notified, uint32_t sw_notification)
 
   // Active task is not valid
   } else {
+
+
+    xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+
 
     // Launch a new task if we can find one that is OK
     // (will be managed at next ai_manage() call)

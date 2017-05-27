@@ -46,13 +46,31 @@
 
 /* Start switch */
 #define SW_START            SW2_VALUE
-#define SW_START_INSERTED   1U
-#define SW_START_REMOVED    0U
+#define SW_START_INSERTED   0U
+#define SW_START_REMOVED    1U
 
 /* Color switch */
 #define SW_COLOR            SW1_VALUE
 #define SW_COLOR_TEAM1      0U
 #define SW_COLOR_TEAM2      1U
+
+/**
+********************************************************************************
+**
+**  Output commands
+**
+********************************************************************************
+*/
+
+// Command for the trollet
+#define SW_TROLLET_CMD0   END8_WRITE
+#define SW_TROLLET_CMD1   END7_WRITE
+
+// Commands decoding
+#define SW_TROLLET_NOP          3U // matches default GPIO config with a pull-down
+#define SW_TROLLET_GOTO_LEFT    2U
+#define SW_TROLLET_GOTO_MIDDLE  1U
+#define SW_TROLLET_GOTO_RIGHT   0U // also triggers auto init
 
 /**
 ********************************************************************************
@@ -84,15 +102,18 @@
 */
 
 // Channels definition
-#define ASV_CHANNEL_ROTATOR   BB_ASV_CHANNEL1
-#define ASV_CHANNEL_TROLLET   BB_ASV_CHANNEL2
+#define ASV_CHANNEL_FUNNY     BB_ASV_CHANNEL1
+#define ASV_CHANNEL_ROTATOR   BB_ASV_CHANNEL2
+#define ASV_CHANNEL_TROLLET   BB_ASV_CHANNEL3
 
 // Positions
-#define ASV_ROTATOR_MIN   0x0000
-#define ASV_ROTATOR_MAX   ASV_TIMER_PERIOD
-#define ASV_ROTATOR_0    ((ASV_TIMER_PERIOD)/4)
-#define ASV_ROTATOR_90   ((ASV_TIMER_PERIOD)/2)
-#define ASV_ROTATOR_180   (3*(ASV_TIMER_PERIOD)/4)
+#define ASV_FUNNY_OFF       (ASV_TIMER_PERIOD/10)
+#define ASV_FUNNY_TRIGGER   (ASV_TIMER_PERIOD/20)
+
+#define ASV_ROTATOR_MIN   (ASV_TIMER_PERIOD/10)
+#define ASV_ROTATOR_MAX   (ASV_TIMER_PERIOD/20)
+#define ASV_ROTATOR_0     (ASV_TIMER_PERIOD/20)
+#define ASV_ROTATOR_90    (3800)
 
 #define ASV_TROLLET_MIN    0x0000
 #define ASV_TROLLET_MAX    ASV_TIMER_PERIOD
@@ -116,25 +137,26 @@
 #define DSV_TX_TIMEOUT      pdMS_TO_TICKS(  5 )
 
 // Servos IDs
-#define DSV_GRABBER_LEFT_ID     10  // TBC
-#define DSV_GRABBER_RIGHT_ID    20
-#define DSV_LANDER_RIGHT_ID     30
+#define DSV_GRABBER_LEFT_ID     43
+#define DSV_GRABBER_RIGHT_ID    60
+#define DSV_LANDER_ID           50
 
 // Positions
-#define DSV_GRABBER_LEFT_POS_OPENED    100 // TBC
-#define DSV_GRABBER_LEFT_POS_CLOSED    800
-#define DSV_GRABBER_RIGHT_POS_OPENED   900
-#define DSV_GRABBER_RIGHT_POS_CLOSED   200
-#define DSV_LANDER_POS_UP              400
-#define DSV_LANDER_POS_DOWN            600
+#define DSV_GRABBER_LEFT_POS_OPENED    625
+#define DSV_GRABBER_LEFT_POS_CLOSED    391
+#define DSV_GRABBER_RIGHT_POS_OPENED   389
+#define DSV_GRABBER_RIGHT_POS_CLOSED   632
+#define DSV_LANDER_POS_UP              735
+#define DSV_LANDER_POS_DOWN            520
 
 // Speeds
-#define DSV_GRABBERS_SPEED             500 // TBC
-#define DSV_LANDER_SPEED_UP            800
-#define DSV_LANDER_SPEED_DOWN          300
+#define DSV_GRABBERS_SPEED             1023
+#define DSV_LANDER_SPEED_UP            1023
+#define DSV_LANDER_SPEED_DOWN          1023
 
 // Torques
-#define DSV_GRABBERS_TORQUE            800 // TBC
+#define DSV_GRABBERS_TORQUE             800
+#define DSV_LANDER_TORQUE              1000
 
 
 /**

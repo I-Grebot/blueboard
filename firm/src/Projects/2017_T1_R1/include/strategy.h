@@ -46,9 +46,9 @@
 #define WAIT_BEFORE_START_MSEC          3000U
 
 // Match duration (RUN state)
-#define MATCH_DURATION_MSEC            90000U
-
-
+#define MATCH_DURATION_MSEC             90000U
+#define FUNNY_TRIGGER_MSEC              91000U
+#define MATCH_DURATION__WITH_FUNNY_MSEC 92000U
 
 
 // Place-holder for physicals definitions (robot or game elements)
@@ -144,7 +144,7 @@ typedef struct {
   match_color_e color;        // Selected color (sampled at the end of INIT)
   uint32_t timer_msec;        // Match time in milliseconds used for match time
   uint16_t scored_points;     // Calculated number of scored points
-  // ...
+    // ...
   bool sw_init;               // Flag'd to true if the init is performed by software
 } match_t;
 

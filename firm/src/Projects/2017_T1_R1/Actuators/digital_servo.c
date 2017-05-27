@@ -89,7 +89,7 @@ void dsv_init(void)
      *   8 bits length + 1 stop bit, no parity
      */
     dsv_chan2.uart.USART_Mode                = USART_Mode_Rx | USART_Mode_Tx;
-    dsv_chan2.uart.USART_BaudRate            = 57600;
+    dsv_chan2.uart.USART_BaudRate            = 57600; // actual = 57143
     dsv_chan2.uart.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     dsv_chan2.uart.USART_Parity              = USART_Parity_No;
     dsv_chan2.uart.USART_StopBits            = USART_StopBits_1;
@@ -141,16 +141,16 @@ void dsv_init(void)
 void dsv_update_config(void)
 {
     /* Disable hardware */
-    bb_dsv_disable(dsv_chan1.dxl.itf_idx);
-    bb_dsv_disable(dsv_chan2.dxl.itf_idx);
+    /*bb_dsv_disable(dsv_chan1.dxl.itf_idx);
+    bb_dsv_disable(dsv_chan2.dxl.itf_idx);*/
 
     /* Cleanup queues */
-    vQueueDelete(dsv_chan1.rx_queue);
+    /*vQueueDelete(dsv_chan1.rx_queue);
     vQueueDelete(dsv_chan1.tx_queue);
     vQueueDelete(dsv_chan2.rx_queue);
-    vQueueDelete(dsv_chan2.tx_queue);
-
-    /* Restart the entire initialization */
+    vQueueDelete(dsv_chan2.tx_queue)
+*/
+    // Restart the entire initialization
     bb_dsv_init(dsv_chan1.dxl.itf_idx, &dsv_chan1.uart);
     bb_dsv_init(dsv_chan2.dxl.itf_idx, &dsv_chan2.uart);
 }
@@ -415,12 +415,14 @@ void dsv_scan_servos(void)
     size_t i;
     char str[100];
 
+    servo1.id = DXL_ID_BROADCAST;
+
     for(i = 0; i<dxl_baudrates_size; i++)
     {
         sprintf(str, "> BR = %ld\n\r", dxl_baudrates[i]);
         serial_puts(str);
 
-        //dsv_update_config();
+        dsv_update_config();
 
         //bb_dsv_disable(dsv_chan2.dxl.itf_idx);
         USART_Cmd(RS485_COM, DISABLE);
@@ -431,6 +433,8 @@ void dsv_scan_servos(void)
 
         //dsv_test_led(254, 1);
         vTaskDelay(pdMS_TO_TICKS(1000));
+        dxl_ping(&servo1);
+        dxl_set_led(&servo1, 1);
     }
 
 }
