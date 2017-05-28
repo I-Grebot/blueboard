@@ -78,7 +78,8 @@ static void avoidance_task( void *pvParameters )
 
     // Check to see if there is a valid detection
     // Also update dynamic masks and effective detection values
-    valid_detection = avd_detection_is_valid();
+    //valid_detection = avd_detection_is_valid();
+    valid_detection = false;
 
     // A new detection condition occurs
     // This is a transitional state

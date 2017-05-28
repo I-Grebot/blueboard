@@ -405,8 +405,11 @@ BaseType_t phys_print_pf_polys(char* ret, size_t len);
 // AI
 // -----------------------------------------------------------------------------
 
-void ai_init(void);
-void ai_stop(void);
+BaseType_t ai_init(void);
+BaseType_t ai_self_test(void);
+BaseType_t ai_start(void);
+BaseType_t ai_stop(void);
+
 void ai_manage(bool notified, uint32_t sw_notification);
 void ai_tasks_def(void);
 BaseType_t ai_task_launch(task_t* task);
@@ -419,6 +422,7 @@ void ai_task_start(void *params);
 
 
 BaseType_t ai_move_with_pf(wp_t* wp);
+void motion_move_block_on_avd(wp_t* wp);
 
 // -----------------------------------------------------------------------------
 // Path-finder
@@ -476,6 +480,11 @@ BaseType_t sys_mod_proc_prepare_grab(void);
 BaseType_t sys_mod_proc_grab(void);
 BaseType_t sys_mod_proc_land(void);
 BaseType_t sys_mod_proc_fold(void);
+
+BaseType_t sys_mod_proc_grab_back(bool left_not_right);
+
+BaseType_t sys_mod_proc_close_back(bool left_not_right);
+BaseType_t sys_mod_proc_release_back(bool left_not_right);
 
 
 // -----------------------------------------------------------------------------

@@ -45,8 +45,28 @@ extern TaskHandle_t handle_task_avoidance;
 
 // AI Initialization, called at the beginning of the match
 // Color selection is already done and stored in the match structure.
-void ai_init(void)
+BaseType_t ai_init(void)
 {
+  // A waypoint for our motions
+  wp_t wp;
+
+  // Static items of the waypoints
+  wp.coord.abs.a = 0;
+  wp.offset.x = 0;
+  wp.offset.y = 0;
+  wp.offset.a = 0;
+  wp.speed = WP_SPEED_VERY_SLOW;
+  wp.trajectory_must_finish = true;
+
+  // Disable avoidance
+  avd_disable();
+  avd_mask_all(false);
+
+  // Power-up
+  bb_power_up();
+  motion_power_enable();
+  vTaskDelay(pdMS_TO_TICKS(1000));
+
   // Update POIs and Path-Finder polygons depending on color
   phys_update_color_pois();
   phys_update_color_polys();
@@ -56,18 +76,89 @@ void ai_init(void)
   motion_set_y(phys.reset.y);
   motion_set_a(phys.reset.a);
 
-  // Enable avoidance
-  avd_enable();
+  // Prepare funny
+  bb_asv_set_pwm_pulse_length(ASV_CHANNEL_FUNNY, ASV_FUNNY_OFF);
 
+  // Initialize modules system
+  sys_mod_proc_init();
+
+  // Open only the back grabber corresponding to our color
+  sys_mod_proc_grab_back(match.color != MATCH_COLOR_BLUE);
+  sys_mod_proc_release_back(match.color == MATCH_COLOR_BLUE);
+
+  // Wait 3 sec before going to start zone
+  vTaskDelay(pdMS_TO_TICKS(3000));
+
+  // GOTO start zone
+  // (Avoidance is OFF)
+
+  wp.type = WP_GOTO_FWD;
+  wp.coord.abs.x =  1068;
+  wp.coord.abs.y =  500;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_proc_close_back(true);
+  sys_mod_proc_close_back(false);
+  sys_mod_proc_fold();
+
+  /*
+  wp.type = WP_GOTO_BWD;
+  wp.coord.abs.x =  922;
+  wp.coord.abs.y =  170;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_ORIENT_BEHIND;
+  wp.coord.abs.x =  922;
+  wp.coord.abs.y =  0;
+  motion_move_block_on_avd(&wp);
+*/
+
+  wp.type = WP_GOTO_FWD;
+  wp.coord.abs.x =  912;
+  wp.coord.abs.y =  195;
+  motion_move_block_on_avd(&wp);
+
+
+  wp.type = WP_ORIENT_BEHIND;
+  wp.coord.abs.x =  1500;
+  wp.coord.abs.y =  195;
+  motion_move_block_on_avd(&wp);
+
+  return pdPASS;
 }
 
+// Self-Test procedure
+BaseType_t ai_self_test(void)
+{
+  /*sys_mod_proc_grab_back(true);
+  sys_mod_proc_grab_back(false);*/
+
+  return pdPASS;
+}
+
+BaseType_t ai_start(void)
+{
+
+  // Enable avoidance
+  avd_enable();
+  avd_mask_all(true);
+
+  return pdPASS;
+}
+
+
+
+
 // Called at the end of the match
-void ai_stop(void)
+BaseType_t ai_stop(void)
 {
   avd_disable();
+
   motion_traj_hard_stop();
   motion_power_disable();
   bb_power_down();
+
+  return pdPASS;
 }
 
 // Main manager, called from the sequencer during match execution
@@ -127,11 +218,19 @@ void ai_manage(bool notified, uint32_t sw_notification)
   // Funny action
   if(match.timer_msec >= FUNNY_TRIGGER_MSEC)
   {
+    motion_traj_hard_stop();
     bb_asv_set_pwm_pulse_length(ASV_CHANNEL_FUNNY, ASV_FUNNY_TRIGGER);
   }
 
   // Stop motion
   else if(match.timer_msec >= MATCH_DURATION_MSEC) {
+
+    extern sys_mod_t sys_mod;
+
+    //vTaskDelete(task_mgt.active_task->handle);
+    //dxl_set_position(&sys_mod.grabber_left, DSV_GRABBER_LEFT_POS_OPENED);
+    //dxl_set_position(&sys_mod.grabber_right, DSV_GRABBER_RIGHT_POS_OPENED);
+
     motion_traj_hard_stop();
   }
 

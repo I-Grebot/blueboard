@@ -77,9 +77,9 @@ void phys_init(void)
   // --------------------------------
 
   // Coordinate of the robot at startup
-  phys.reset.x  = 922;
-  phys.reset.y  =  85;
-  phys.reset.a  =  90; // Facing south
+  phys.reset.x  = 1068; //922;
+  phys.reset.y  =  180;//85;
+  phys.reset.a  =   90; // Facing south
 
   // 1st exit point
   phys.exit_start.x  = 1400;

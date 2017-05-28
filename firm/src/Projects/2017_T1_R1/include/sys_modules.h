@@ -40,6 +40,10 @@ typedef struct
   // Actuators
   dxl_servo_t grabber_left;   // XL320
   dxl_servo_t grabber_right;  // XL320
+  dxl_servo_t grabber_back_left_left;   // XL320
+  dxl_servo_t grabber_back_left_right;  // XL320
+  dxl_servo_t grabber_back_right_left;   // XL320
+  dxl_servo_t grabber_back_right_right;  // XL320
   dxl_servo_t lander;         // RX28
   asv_servo_t trollet;        // ServoIFace
   asv_servo_t rotator;        // MG995

@@ -32,9 +32,6 @@ extern phys_t phys;
 extern path_t pf;
 extern TaskHandle_t handle_task_avoidance;
 
-// Local functions
-static void motion_move_block_on_avd(wp_t* wp);
-
 /**
 ********************************************************************************
 **
@@ -224,27 +221,21 @@ void ai_task_start(void *params)
   for(;;)
   {
     vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(200));
+
+    if(SW_COLOR)
+    {
       led_set_color(BB_LED_BLUE);
-
-
+      sys_mod_proc_release_back(true);
+      sys_mod_proc_release_back(false);
     } else {
-      //bb_asv_set_pwm_pulse_length(ASV_CHANNEL_FUNNY, ASV_FUNNY_TRIGGER);
-
-      sys_mod_proc_fold();
-      vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(3000));
-      sys_mod_proc_prepare_grab();
-      vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(3000));
-      sys_mod_proc_grab();
-      vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(3000));
-      sys_mod_proc_land();
-      vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(3000));
-
       led_set_color(BB_LED_YELLOW);
+      sys_mod_proc_grab_back(true);
+      sys_mod_proc_grab_back(false);
     }
 
-  }*/
+  }
 
-
+*/
   // Static items of the waypoints
   wp.coord.abs.a = 0;
   wp.offset.x = 0;
@@ -257,65 +248,17 @@ void ai_task_start(void *params)
   // (avoid dead lock)
   xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
 
-/*  motion_move_relative(200, 0);
-
-  while(!motion_is_traj_finished())
-  {
-    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
-  }
-
-  // Go to exit
-  wp.coord.abs = phys.exit_start;
-  wp.type = WP_GOTO_FWD;
-  wp.speed = WP_SPEED_FAST;
-  avd_mask_all(false);
-  motion_add_new_wp(&wp);
-
-  // Block until we reach the target position
-  while(!motion_is_traj_near())
-  {
-    vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
-  }
-
-  avd_mask_all(true);
-
-*/
-
   // Exit
+  // ------------------
+
   avd_mask_all(false);
 
-  wp.type = WP_GOTO_FWD;
-  wp.speed = WP_SPEED_NORMAL;
-  wp.trajectory_must_finish = true;
-  wp.coord.abs.x =  922;
-  wp.coord.abs.y =  285;
-  motion_move_block_on_avd(&wp);
-
+  wp.type = WP_GOTO_BWD;
   wp.speed = WP_SPEED_FAST;
   wp.trajectory_must_finish = false;
-  wp.coord.abs.x = 1200;
-  wp.coord.abs.y =  400;
-  motion_move_block_on_avd(&wp);
-
   wp.coord.abs.x = 1300;
   wp.coord.abs.y = 600;
   motion_move_block_on_avd(&wp);
-
-  /*
-  wp.coord.abs.x = 1000;
-  wp.coord.abs.y = 1000;
-  motion_move_block_on_avd(&wp);
-
-  wp.type = WP_GOTO_BWD;
-  wp.coord.abs.x = 900;
-  wp.coord.abs.y = 250;
-  motion_move_block_on_avd(&wp);
-
-  wp.type = WP_GOTO_FWD;
-  wp.coord.abs.x = 1200;
-  wp.coord.abs.y = 600;
-  motion_move_block_on_avd(&wp);
-*/
 
   wp.coord.abs.x = 1000;
   wp.coord.abs.y = 1000;
@@ -355,14 +298,6 @@ void ai_task_start(void *params)
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
 
-  /*
-  avd_mask_front(false);
-  wp.speed = WP_SPEED_SLOW;
-  wp.type = WP_ORIENT_FRONT;
-  wp.coord.abs.x = 0;
-  wp.coord.abs.y = 900;
-  motion_move_block_on_avd(&wp);
-*/
   wp.speed = WP_SPEED_SLOW;
   wp.type = WP_GOTO_FWD;
   wp.coord.abs.x = 330;
@@ -419,15 +354,6 @@ void ai_task_start(void *params)
   wp.trajectory_must_finish = false;
   motion_move_block_on_avd(&wp);
 
-/*
-  avd_mask_front(false);
-  wp.speed = WP_SPEED_SLOW;
-  wp.type = WP_ORIENT_FRONT;
-  wp.coord.abs.x = 0;
-  wp.coord.abs.y = 800;
-  motion_move_block_on_avd(&wp);
-*/
-
   wp.speed = WP_SPEED_SLOW;
   wp.type = WP_GOTO_FWD;
   wp.coord.abs.x = 325;
@@ -443,31 +369,30 @@ void ai_task_start(void *params)
 
   sys_mod_proc_land();
 
-
   avd_mask_front(true);
   wp.type = WP_GOTO_BWD;
   wp.speed = WP_SPEED_FAST;
   wp.coord.abs.x = 600;
-  wp.coord.abs.y = 900;
+  wp.coord.abs.y = 1000;
   wp.trajectory_must_finish = false;
   motion_move_block_on_avd(&wp);
-
 
   // ------------------
 
   sys_mod_proc_fold();
 
+  /*
   wp.type = WP_GOTO_FWD;
   wp.speed = WP_SPEED_NORMAL;
   wp.coord.abs.x = 650;
   wp.coord.abs.y = 1150;
   motion_move_block_on_avd(&wp);
-
+*/
 
   // 3RD
   // ------------------------
 
-
+#ifdef DO_3RD
   sys_mod_proc_prepare_grab();
 
   avd_mask_front(false);
@@ -487,12 +412,7 @@ void ai_task_start(void *params)
   wp.coord.abs.y = 1080;
   motion_move_block_on_avd(&wp);
 
-/*  wp.speed = WP_SPEED_SLOW;
-  wp.type = WP_ORIENT_FRONT;
-  wp.coord.abs.x = 0;
-  wp.coord.abs.y = 1050;
-  motion_move_block_on_avd(&wp);
-*/
+
   wp.speed = WP_SPEED_SLOW;
   wp.type = WP_GOTO_FWD;
   wp.coord.abs.x = 330;
@@ -518,13 +438,15 @@ void ai_task_start(void *params)
 
   sys_mod_proc_fold();
 
+#endif
+
   // Fusée grab
   // ----------
 
   avd_mask_front(true);
   wp.speed = WP_SPEED_NORMAL;
   wp.type = WP_GOTO_FWD;
-  wp.coord.abs.x = 1120;
+  wp.coord.abs.x = 1110;
   wp.coord.abs.y = 800;
   wp.trajectory_must_finish = false;
   motion_move_block_on_avd(&wp);
@@ -533,16 +455,33 @@ void ai_task_start(void *params)
 
   wp.speed = WP_SPEED_SLOW;
   wp.type = WP_ORIENT_FRONT;
-  wp.coord.abs.x = 1120;
+  wp.coord.abs.x = 1110;
   wp.coord.abs.y = 30;
   motion_move_block_on_avd(&wp);
 
   avd_mask_front(false);
   wp.speed = WP_SPEED_VERY_SLOW;
   wp.type = WP_GOTO_FWD;
-  wp.coord.abs.x = 1120;
+  wp.coord.abs.x = 1110;
   wp.coord.abs.y = 255;
   wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+
+  // Patch
+  extern sys_mod_t sys_mod;
+  dxl_set_position(&sys_mod.grabber_left, DSV_GRABBER_LEFT_POS_CLOSED);
+  dxl_set_position(&sys_mod.grabber_right, DSV_GRABBER_RIGHT_POS_CLOSED);
+
+
+  vTaskDelay(pdMS_TO_TICKS(500));
+
+  avd_mask_front(false);
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_GOTO_BWD;
+  wp.coord.abs.x = 1120;
+  wp.coord.abs.y = 355;
+  wp.trajectory_must_finish = false;
   motion_move_block_on_avd(&wp);
 
   sys_mod_proc_grab();
@@ -551,29 +490,158 @@ void ai_task_start(void *params)
   wp.speed = WP_SPEED_SLOW;
   wp.type = WP_GOTO_BWD;
   wp.coord.abs.x = 1120;
+  wp.coord.abs.y = 600;
+  wp.trajectory_must_finish = false;
+  motion_move_block_on_avd(&wp);
+
+
+
+  /// CHoppage arriere right
+
+  //coords:right grab 1298;191
+   //              back 1140:221
+
+  sys_mod_proc_release_back(match.color == MATCH_COLOR_YELLOW);
+
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_ORIENT_BEHIND;
+  wp.coord.abs.x = 1298;
+  wp.coord.abs.y = 191;
+  motion_move_block_on_avd(&wp);
+
+
+  wp.speed = WP_SPEED_VERY_SLOW;
+  wp.type = WP_GOTO_BWD;
+  wp.coord.abs.x = 1278;
+  wp.coord.abs.y = 191;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+
+  sys_mod_proc_grab_back(match.color == MATCH_COLOR_YELLOW);
+
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_GOTO_FWD;
+  wp.coord.abs.x = 1278;
+  wp.coord.abs.y = 600;
+  wp.trajectory_must_finish = false;
+  motion_move_block_on_avd(&wp);
+
+
+  /// CHoppage arriere left
+
+  //coords:right grab 1298;191
+   //              back 1140:221
+
+  sys_mod_proc_release_back(match.color == MATCH_COLOR_BLUE);
+
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_ORIENT_BEHIND;
+  wp.coord.abs.x = 1140;
+  wp.coord.abs.y = 221;
+  motion_move_block_on_avd(&wp);
+
+
+  wp.speed = WP_SPEED_VERY_SLOW;
+  wp.type = WP_GOTO_BWD;
+  wp.coord.abs.x = 1140;
+  wp.coord.abs.y = 221;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+
+  sys_mod_proc_grab_back(match.color == MATCH_COLOR_BLUE);
+
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_GOTO_FWD;
+  wp.coord.abs.x = 1140;
   wp.coord.abs.y = 700;
   wp.trajectory_must_finish = false;
   motion_move_block_on_avd(&wp);
 
+
+
+
+  // Depose fusée
+  // -------------
+
   avd_mask_front(true);
   wp.speed = WP_SPEED_FAST;
-  wp.type = WP_GOTO_BWD;
+  wp.type = WP_GOTO_FWD;
   wp.coord.abs.x = 500;
   wp.coord.abs.y = 1400;
   motion_move_block_on_avd(&wp);
 
   wp.speed = WP_SPEED_SLOW;
-  wp.type = WP_GOTO_BWD;
-  wp.coord.abs.x = 700;
-  wp.coord.abs.y = 1700;
+  wp.type = WP_GOTO_FWD;
+  wp.coord.abs.x = 730;
+  wp.coord.abs.y = 1735;
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
 
   wp.speed = WP_SPEED_SLOW;
   wp.type = WP_ORIENT_FRONT;
-  wp.coord.abs.x = 900;
-  wp.coord.abs.y = 1500;
+  wp.coord.abs.x = 790;
+  wp.coord.abs.y = 1675;
   motion_move_block_on_avd(&wp);
+
+  /*
+  if(match.color == MATCH_COLOR_BLUE) {
+    sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_RIGHT);
+  } else {
+    sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_LEFT);
+  }
+  */
+
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_GOTO_FWD;
+  wp.coord.abs.x = 790;
+  wp.coord.abs.y = 1675;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_proc_land();
+
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_GOTO_BWD;
+  wp.coord.abs.x = 730;
+  wp.coord.abs.y = 1735;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_proc_fold();
+
+
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_ORIENT_BEHIND;
+  wp.coord.abs.x = 790;
+  wp.coord.abs.y = 1675;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_proc_release_back(false);
+  sys_mod_proc_release_back(true);
+
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_GOTO_BWD;
+  wp.coord.abs.x = 790;
+  wp.coord.abs.y = 1675;
+  motion_move_block_on_avd(&wp);
+
+  // Redepose 1er
+
+  wp.type = WP_GOTO_FWD;
+  wp.coord.abs.x = 730;
+  wp.coord.abs.y = 1735;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_proc_close_back(false);
+  sys_mod_proc_close_back(true);
+
+  wp.type = WP_ORIENT_FRONT;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs.x = 790;
+  wp.coord.abs.y = 1675;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_proc_prepare_grab();
 
   if(match.color == MATCH_COLOR_BLUE) {
     sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_RIGHT);
@@ -581,23 +649,78 @@ void ai_task_start(void *params)
     sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_LEFT);
   }
 
-  wp.speed = WP_SPEED_VERY_SLOW;
+  wp.speed = WP_SPEED_SLOW;
   wp.type = WP_GOTO_FWD;
-  wp.coord.abs.x =  775;
-  wp.coord.abs.y = 1625;
+  wp.coord.abs.x = 790;
+  wp.coord.abs.y = 1675;
   motion_move_block_on_avd(&wp);
 
-  sys_mod_proc_land();
+  sys_mod_proc_grab();
 
-  wp.speed = WP_SPEED_VERY_SLOW;
-  wp.type = WP_GOTO_BWD;
-  wp.coord.abs.x = 700;
-  wp.coord.abs.y = 1700;
-  motion_move_block_on_avd(&wp);
+  vTaskDelay(pdMS_TO_TICKS(500));
 
   sys_mod_proc_fold();
 
+  if(match.color == MATCH_COLOR_BLUE) {
+    sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_RIGHT);
+  } else {
+    sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_LEFT);
+  }
+
+  sys_mod_proc_land();
+
+  // Redepose 2nd
+
+  wp.type = WP_GOTO_BWD;
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.abs.x = 730;
+  wp.coord.abs.y = 1735;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_ORIENT_FRONT;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs.x = 790;
+  wp.coord.abs.y = 1675;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_proc_prepare_grab();
+
+  if(match.color == MATCH_COLOR_BLUE) {
+    sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_LEFT);
+  } else {
+    sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_RIGHT);
+  }
+
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_GOTO_FWD;
+  wp.coord.abs.x = 790;
+  wp.coord.abs.y = 1675;
+  motion_move_block_on_avd(&wp);
+
+
+  sys_mod_proc_grab();
+
+  vTaskDelay(pdMS_TO_TICKS(500));
+
+  sys_mod_proc_fold();
+
+  if(match.color == MATCH_COLOR_BLUE) {
+    sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_LEFT);
+  } else {
+    sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_RIGHT);
+  }
+
+  sys_mod_proc_land();
+
+
   // end
+  // -------------
+
+  wp.type = WP_GOTO_BWD;
+  wp.coord.abs.x = 730;
+  wp.coord.abs.y = 1735;
+  motion_move_block_on_avd(&wp);
+
 
   motion_traj_stop();
 

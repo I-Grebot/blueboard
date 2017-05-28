@@ -141,14 +141,16 @@ void sequencer_task( void *pvParameters )
         match.sw_init = true;
       }
 
+      sequencer_color_sample();
+
       if((SW_START == MATCH_START_INSERTED) ||  // Hardware init
          match.sw_init)                         // Software init
       {
         match.state = MATCH_STATE_INIT;
 
         sequencer_print_match();
-        led_set_mode(BB_LED_STATIC);
-        led_set_color(BB_LED_WHITE);
+        //led_set_mode(BB_LED_STATIC);
+        //led_set_color(BB_LED_WHITE);
       }
       break;
 
@@ -156,28 +158,16 @@ void sequencer_task( void *pvParameters )
     case MATCH_STATE_INIT:
     //-------------------------------------------------------------------------
 
-      // Set some default motion parameters
-      motion_set_speed(SPEED_SLOW_D, SPEED_SLOW_A);
+      // Sample color at init only
+      sequencer_color_sample();
 
-      // Power-up
-      bb_power_up();
-      motion_power_enable();
+      ai_init();
 
       match.state = MATCH_STATE_SELF_CHECK;
 
       sequencer_print_match();
-      led_set_mode(BB_LED_BLINK_FAST);
-      led_set_color(BB_LED_GREEN);
-
-      // Temp
-      extern phys_t phys;
-      motion_set_x(phys.reset.x);
-      motion_set_y(phys.reset.y);
-      motion_set_a(phys.reset.a);
-
-      sys_mod_proc_init();
-      vTaskDelayUntil(&next_wake_time, pdMS_TO_TICKS(2000));
-      sys_mod_proc_fold();
+      //led_set_mode(BB_LED_BLINK_FAST);
+      //led_set_color(BB_LED_GREEN);
 
       break;
 
@@ -185,11 +175,7 @@ void sequencer_task( void *pvParameters )
     case MATCH_STATE_SELF_CHECK:
     //-------------------------------------------------------------------------
 
-      // TODO: define a dedicated task for that
-
-      // Temp for funny
-      bb_asv_set_pwm_pulse_length(ASV_CHANNEL_FUNNY, ASV_FUNNY_OFF);
-      sys_mod_proc_fold();
+      ai_self_test();
 
       match.state = MATCH_STATE_WAIT_START;
 
@@ -217,7 +203,7 @@ void sequencer_task( void *pvParameters )
         }
 
       } else {
-        sequencer_color_sample();
+        //sequencer_color_sample();
         match.timer_msec = 0;
         start_sw_debounced = false;
       }
@@ -233,10 +219,9 @@ void sequencer_task( void *pvParameters )
         match.scored_points = 0;
 
         // Sample the color, just in case the jack was removed during init
-        sequencer_color_sample();
+        //sequencer_color_sample();
 
-        // Initialize AI
-        ai_init();
+        ai_start();
 
         sequencer_print_match();
         led_set_mode(BB_LED_BLINK_SLOW);
