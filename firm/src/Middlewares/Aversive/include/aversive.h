@@ -33,7 +33,7 @@
 #include "types.h"
 
 /* Aversive target configuration */
-#include "aversive_config.h"
+#include "../../../Projects/2018_T1_R1/include/config/aversive_config.h"
 
 /* Some useful constants */
 

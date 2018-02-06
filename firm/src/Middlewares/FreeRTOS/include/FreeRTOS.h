@@ -95,7 +95,7 @@ extern "C" {
 #endif
 
 /* Application specific configuration options. */
-#include "FreeRTOSConfig.h"
+#include "../../../Projects/2018_T1_R1/include/config/FreeRTOSConfig.h"
 
 /* Basic FreeRTOS definitions. */
 #include "projdefs.h"

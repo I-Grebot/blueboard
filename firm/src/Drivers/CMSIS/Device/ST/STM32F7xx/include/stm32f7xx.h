@@ -177,7 +177,7 @@ typedef enum
   */
 
 #ifdef USE_HAL_DRIVER
-  #include "stm32f7xx_hal_conf.h"
+  #include "../../../../../../Projects/2018_T1_R1/include/config/stm32f7xx_hal_conf.h"
 #endif /* USE_HAL_DRIVER */
 
 #ifdef __cplusplus

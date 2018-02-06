@@ -39,7 +39,7 @@
 #include "bb_io_mapping.h"
 
 /* External configuration of the BlueBoard */
-#include "bb_config.h"
+#include "../../../../Projects/2018_T1_R1/include/config/bb_config.h"
 
 /* Components libraries */
 #include "dynamixel.h"

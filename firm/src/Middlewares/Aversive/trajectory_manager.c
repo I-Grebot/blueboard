@@ -37,7 +37,7 @@
 
 #include <trajectory_manager.h>
 
-#include "main.h" // FIXME
+#include "../../Projects/2018_T1_R1/include/main.h" // FIXME
 
 #define M_2PI (2*M_PI)
 
