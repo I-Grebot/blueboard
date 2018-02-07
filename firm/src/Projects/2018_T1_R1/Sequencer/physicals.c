@@ -84,13 +84,13 @@ void phys_init(void)
   // --------------------------------
 
   // Coordinate of the robot at startup
-  phys.reset.x  = 		  180;
-  phys.reset.y  =  		  180;
+  phys.reset.x  = 		  ROBOT_LENGTH-ROBOT_FRONT_TO_CENTER;
+  phys.reset.y  =  		  START_LINE_Y;
   phys.reset.a  =   		0;
 
   // 1st exit point
-  phys.exit_start.x  =   1130;
-  phys.exit_start.y  =    180;
+  phys.exit_start.x  =   	ROBOT_LENGTH-ROBOT_FRONT_TO_CENTER;
+  phys.exit_start.y  =    	600;
   phys.exit_start.a  =      0;
 
   // starting area of the bee

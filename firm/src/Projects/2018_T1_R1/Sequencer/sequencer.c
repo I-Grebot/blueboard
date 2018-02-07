@@ -113,7 +113,7 @@ void sequencer_task( void *pvParameters )
   //avoidance_start();
   path_init();
   phys_init();
-  //tasks_init();
+  tasks_init();
 
   // Sequencer main loop
   for( ;; )
@@ -147,10 +147,7 @@ void sequencer_task( void *pvParameters )
          match.sw_init)                         // Software init
       {
         match.state = MATCH_STATE_INIT;
-
         sequencer_print_match();
-        //led_set_mode(BB_LED_STATIC);
-        //led_set_color(BB_LED_WHITE);
       }
       break;
 
@@ -160,14 +157,11 @@ void sequencer_task( void *pvParameters )
 
       // Sample color at init only
       sequencer_color_sample();
-      motion_power_enable();
-      //ai_init();
+      ai_init();
 
       match.state = MATCH_STATE_SELF_CHECK;
 
       sequencer_print_match();
-      //led_set_mode(BB_LED_BLINK_FAST);
-      //led_set_color(BB_LED_GREEN);
 
       break;
 
@@ -221,7 +215,7 @@ void sequencer_task( void *pvParameters )
         // Sample the color, just in case the jack was removed during init
         //sequencer_color_sample();
 
-        //ai_start();
+        ai_start();
 
         sequencer_print_match();
         led_set_mode(BB_LED_BLINK_SLOW);
@@ -239,7 +233,7 @@ void sequencer_task( void *pvParameters )
         match.state = MATCH_STATE_STOPPED;
 
         // Call AI ending stuff
-        //ai_stop();
+        ai_stop();
 
         sequencer_print_match();
         led_set_color(BB_LED_RED);
@@ -248,7 +242,7 @@ void sequencer_task( void *pvParameters )
       else
       {
         // Main AI management call
-       // ai_manage(notified, sw_notification);
+        ai_manage(notified, sw_notification);
 
         if(!match.paused) {
           match.timer_msec += OS_SEQUENCER_PERIOD_MS;

@@ -137,6 +137,7 @@
 #define BEE_START_Y							1800
 #define	SWITCH_CENTER_X						1130
 #define	SWITCH_CENTER_Y						TABLE_Y_MIN
+#define START_LINE_Y						350
 
 // Robot dimensions in mm
 #define ROBOT_FRONT_TO_CENTER   85 // Distance from the ball bearing to the center
