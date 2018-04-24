@@ -222,37 +222,37 @@ void ai_task_start(void *params)
   wp.offset.y = 0;
   wp.offset.a = 0;
   wp.trajectory_must_finish = true;
-  wp.speed = WP_SPEED_VERY_SLOW;
 
   // Clear avoidance state in case it was triggered during init
   // (avoid dead lock)
- // xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+  avd_mask_all(false);
 
   // Exit
   // ------------------
-
-  //avd_mask_all(false);
+  wp.speed = WP_SPEED_FAST;
   wp.type = WP_GOTO_FWD;
   wp.coord.abs = phys.exit_start;
   motion_move_block_on_avd(&wp);
 
   // push home automation switch
   // ------------------------
-
-  wp.speed = WP_SPEED_VERY_SLOW;
-  wp.type = WP_ORIENT_BEHIND;
+  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_ORIENT_FRONT;
   wp.coord.abs = phys.home_automation_switch;
   motion_move_block_on_avd(&wp);
 
-  wp.type = WP_GOTO_BWD;
- // wp.trajectory_must_finish = false;
-  motion_move_block_on_avd(&wp);
+  sys_mod_set_pusher(DSV_PUSHER_OUT);
 
   wp.type = WP_GOTO_FWD;
-  wp.coord.abs = phys.exit_start;
-  //wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
 
+  wp.type = WP_GOTO_BWD;
+  wp.coord.abs = phys.exit_start;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_set_pusher(DSV_PUSHER_IN);
 
   motion_traj_stop();
 
@@ -268,7 +268,7 @@ void ai_task_start(void *params)
 
     if(!(match.timer_msec % 500)) {
       led = (led+1) % 8;
-      sys_mod_set_led(led);
+ //     sys_mod_set_led(led);
     }
 
   }

@@ -3,8 +3,8 @@
  * I-Grebot
  * -----------------------------------------------------------------------------
  * @file    motion.h
- * @author  Paul
- * @date    2017/04/23
+ * @author  Pierrick
+ * @date    24/04/2018
  * -----------------------------------------------------------------------------
  * @brief
  *    This file contains motion related definitions
@@ -46,7 +46,7 @@
 #define MOTION_MAX_WP_IN_QUEUE    5U // Maximum amount of waypoints in the queue
 
 // Pre-defined speeds
-#define SPEED_FAST_D         1200L // For long motions only
+#define SPEED_FAST_D         1500L // For long motions only
 #define SPEED_FAST_A          500L
 #define SPEED_NORMAL_D        800L // Normal and moderate motions
 #define SPEED_NORMAL_A        300L

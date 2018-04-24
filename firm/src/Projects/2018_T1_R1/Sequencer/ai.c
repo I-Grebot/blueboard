@@ -80,7 +80,7 @@ BaseType_t ai_init(void)
  // bb_asv_set_pwm_pulse_length(ASV_CHANNEL_FUNNY, ASV_FUNNY_OFF);
 
   // Initialize modules system
-  //sys_mod_proc_init();
+  sys_mod_proc_init();
 
   // Open only the back grabber corresponding to our color
   //sys_mod_proc_grab_back(match.color != MATCH_COLOR_GREEN);
@@ -104,6 +104,7 @@ BaseType_t ai_self_test(void)
 {
   /*sys_mod_proc_grab_back(true);
   sys_mod_proc_grab_back(false);*/
+  sys_mod_proc_self_test();
 
   return pdPASS;
 }

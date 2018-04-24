@@ -51,12 +51,12 @@
 
 
  /* Right and Left motors PWM channels */
- #define MOT_CHANNEL_LEFT            BB_MOT_CHANNEL1
- #define MOT_CHANNEL_RIGHT           BB_MOT_CHANNEL2
+ #define MOT_CHANNEL_LEFT            BB_MOT_CHANNEL2
+ #define MOT_CHANNEL_RIGHT           BB_MOT_CHANNEL1
 
  /* Right and Left encoders channels */
- #define ENC_CHANNEL_LEFT            BB_ENC_CHANNEL1
- #define ENC_CHANNEL_RIGHT           BB_ENC_CHANNEL2
+ #define ENC_CHANNEL_LEFT            BB_ENC_CHANNEL2
+ #define ENC_CHANNEL_RIGHT           BB_ENC_CHANNEL1
 
 /**
  ********************************************************************************

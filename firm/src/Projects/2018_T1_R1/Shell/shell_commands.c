@@ -1029,19 +1029,19 @@ static BaseType_t OS_SHL_SubCmd( char *pcWriteBuffer, size_t xWriteBufferLen, co
               else if((!strcasecmp(command, "grab")) && (lParameterNumber == 4)) {
                   //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_SUB_PFX"Grabbing at %d"SHELL_EOL, value1);
                   //pcWriteBuffer += strlen(pcWriteBuffer);
-                  sys_mod_do_grab(NULL, (uint16_t) value1);
+
               }
 
               else if((!strcasecmp(command, "land")) && (lParameterNumber == 5)) {
                   //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_SUB_PFX"Landing at %d, %d"SHELL_EOL, value1, value2);
                   //pcWriteBuffer += strlen(pcWriteBuffer);
-                  sys_mod_do_land(NULL, (uint16_t) value1, (uint16_t) value2);
+
               }
 
               else if((!strcasecmp(command, "fold")) && (lParameterNumber == 3)) {
                   //snprintf( pcWriteBuffer, xWriteBufferLen, SHELL_SUB_PFX"Folding"SHELL_EOL);
                   //pcWriteBuffer += strlen(pcWriteBuffer);
-                  sys_mod_do_fold(NULL);
+
               }
 
               else {

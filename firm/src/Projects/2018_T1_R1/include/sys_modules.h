@@ -39,20 +39,16 @@ typedef enum
 typedef struct
 {
   // Actuators
-  dxl_servo_t grabber_left;   // XL320
-  dxl_servo_t grabber_right;  // XL320
-  dxl_servo_t grabber_back_left_left;   // XL320
-  dxl_servo_t grabber_back_left_right;  // XL320
-  dxl_servo_t grabber_back_right_left;   // XL320
-  dxl_servo_t grabber_back_right_right;  // XL320
-  dxl_servo_t lander;         // RX28
-  asv_servo_t trollet;        // ServoIFace
-  asv_servo_t rotator;        // MG995
+  dxl_servo_t left_arm;       // RX28
+  dxl_servo_t right_arm;      // RX28
+  dxl_servo_t pusher;         // RX28
+  dxl_servo_t index;          // RX28
 
   // Parameters
-  uint16_t grab_pos;
-  uint16_t land_pos;
-  uint16_t land_angle;
+  uint16_t left_arm_pos;
+  uint16_t right_arm_pos;
+  uint16_t pusher_pos;
+  uint16_t index_pos;
 
   // System management
   sys_mode_state_e current_state;

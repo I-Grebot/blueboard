@@ -464,27 +464,16 @@ int8_t path_process(void);
 
 BaseType_t sys_modules_start(void);
 void sys_modules_init(void);
-
-void sys_mod_set_led(uint8_t led);
 void sys_mod_do_init(TaskHandle_t* caller);
 void sys_mod_do_self_test(TaskHandle_t* caller);
-void sys_mod_do_grab(TaskHandle_t* caller, uint16_t grab_pos);
-void sys_mod_do_land(TaskHandle_t* caller, uint16_t land_pos, uint16_t land_angle);
-void sys_mod_do_fold(TaskHandle_t* caller);
-
-void sys_mod_set_trollet_cmd(uint8_t cmd);
 
 BaseType_t sys_mod_proc_init(void);
 BaseType_t sys_mod_proc_self_test(void);
-BaseType_t sys_mod_proc_prepare_grab(void);
-BaseType_t sys_mod_proc_grab(void);
-BaseType_t sys_mod_proc_land(void);
-BaseType_t sys_mod_proc_fold(void);
-
-BaseType_t sys_mod_proc_grab_back(bool left_not_right);
-
-BaseType_t sys_mod_proc_close_back(bool left_not_right);
-BaseType_t sys_mod_proc_release_back(bool left_not_right);
+BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position);
+BaseType_t sys_mod_set_left_arm(uint16_t position);
+BaseType_t sys_mod_set_right_arm(uint16_t position);
+BaseType_t sys_mod_set_index(uint16_t position);
+BaseType_t sys_mod_set_pusher(uint16_t position);
 
 
 // -----------------------------------------------------------------------------

@@ -52,7 +52,7 @@
 #define DXL_STATUS_NO_ERROR             0x0000
 #define DXL_STATUS_ERR_TIMEOUT          0x0100  // Returned packet timeout
 #define DXL_STATUS_ERR_HEADER           0x0200  // Header error
-#define DXL_STATUS_ERR_INSTRUCTION      0x0300  // Returned instruction dos not match
+#define DXL_STATUS_ERR_INSTRUCTION      0x0300  // Returned instruction does not match
 #define DXL_STATUS_ERR_ID               0x0400  // Returned ID does not match
 #define DXL_STATUS_ERR_LENGTH           0x0500  // Packet length error
 #define DXL_STATUS_ERR_CHECKSUM         0x0600  // Packet checksum (or CRC) is wrong
@@ -259,7 +259,9 @@ dxl_status_t dxl_read_int(dxl_servo_t* servo, uint16_t addr, uint32_t* value, si
 dxl_status_t dxl_action(dxl_servo_t* servo);
 
 // Shorthands
+dxl_status_t is_dxl_moving(dxl_servo_t* servo, uint8_t *move);
 dxl_status_t dxl_get_model(dxl_servo_t* servo, uint16_t* model);
+dxl_status_t dxl_get_position(dxl_servo_t* servo, uint16_t* position);
 dxl_status_t dxl_set_torque_enable(dxl_servo_t* servo, uint8_t torque_enable);
 dxl_status_t dxl_set_position(dxl_servo_t* servo, uint16_t new_position);
 dxl_status_t dxl_set_speed(dxl_servo_t* servo, uint16_t new_speed);

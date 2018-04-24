@@ -97,7 +97,7 @@ void sequencer_task( void *pvParameters )
 
   sequencer_init();
 
-  //dsv_init();
+  dsv_init();
   //asv_start();
   //beacons_start();
   motion_cs_start();
@@ -106,11 +106,11 @@ void sequencer_task( void *pvParameters )
   led_start();
 
   // Sub-systems
-  //sys_modules_start();
-  //sys_modules_init();
+ //sys_modules_start();
+  sys_modules_init();
 
   // High-level
-  //avoidance_start();
+  avoidance_start();
   path_init();
   phys_init();
   tasks_init();
@@ -169,7 +169,7 @@ void sequencer_task( void *pvParameters )
     case MATCH_STATE_SELF_CHECK:
     //-------------------------------------------------------------------------
 
-      //ai_self_test();
+      ai_self_test();
 
       match.state = MATCH_STATE_WAIT_START;
 
@@ -213,7 +213,7 @@ void sequencer_task( void *pvParameters )
         match.scored_points = 0;
 
         // Sample the color, just in case the jack was removed during init
-        //sequencer_color_sample();
+        sequencer_color_sample();
 
         ai_start();
 
@@ -252,7 +252,6 @@ void sequencer_task( void *pvParameters )
         if(!(match.timer_msec % 1000)) {
           sequencer_print_match();
         }
-
       }
       break;
 
@@ -267,9 +266,7 @@ void sequencer_task( void *pvParameters )
     // Error, actually
     default:
       break;
-
     } // switch(match)
-
   } // for(;;)
 }
 
@@ -304,7 +301,6 @@ void sequencer_color_sample(void)
   } else {
     led_set_color(BB_LED_YELLOW);
   }
-
 }
 
 // Print current match state
@@ -317,7 +313,11 @@ void sequencer_print_match(void)
       match.timer_msec/1000,
       match.scored_points
       );
-
+  DEBUG_INFO_NOPFX("[POS] %i %i %i"DEBUG_EOL,
+		  robot.cs.pos.pos_s16.x,
+		  robot.cs.pos.pos_s16.y,
+		  robot.cs.pos.pos_s16.a
+		  );
 }
 
 const char* match_state_to_str(match_state_e state)

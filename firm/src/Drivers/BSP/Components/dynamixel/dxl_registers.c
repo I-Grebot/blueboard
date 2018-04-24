@@ -121,6 +121,12 @@ const dxl_register_t* dxl_reg_v4_torque_enable         = dxl_registers +  48;
 const dxl_register_t* dxl_reg_v1_position              = dxl_registers +  32;
 const dxl_register_t* dxl_reg_v4_position              = dxl_registers +  53;
 
+const dxl_register_t* dxl_reg_v1_moving			       = dxl_registers +  41;
+const dxl_register_t* dxl_reg_v4_moving      		   = dxl_registers +  62;
+
+const dxl_register_t* dxl_reg_v1_current_position      = dxl_registers +  35;
+const dxl_register_t* dxl_reg_v4_current_position      = dxl_registers +  56;
+
 const dxl_register_t* dxl_reg_v1_speed                 = dxl_registers +  33;
 const dxl_register_t* dxl_reg_v4_speed                 = dxl_registers +  54;
 

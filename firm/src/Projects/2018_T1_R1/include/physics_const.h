@@ -4,7 +4,7 @@
  * -----------------------------------------------------------------------------
  * @file       physics_const.h
  * @author     Pierrick
- * @date       Jan 27, 2018
+ * @date       24/04/2018
  * @version    V1.0
  * -----------------------------------------------------------------------------
  * @brief
@@ -49,7 +49,7 @@
 /* Encoder wheel gains to compensate for forward/backward rotation
  * (adjust sign) and diameter variations */
 #define PHYS_ROBOT_ENCODER_LEFT_GAIN        ((double)  1.0000)
-#define PHYS_ROBOT_ENCODER_RIGHT_GAIN       ((double) -1.0050)
+#define PHYS_ROBOT_ENCODER_RIGHT_GAIN       ((double)  -1.0000)
 
 /* Centrifugal compensation coefficient. Value TO BE ADJUSTED */
 #define PHYS_ROBOT_CENTRIFUGAL_COEF         ((double)   5.0)
@@ -70,32 +70,32 @@
 */
 
 /* Control System in Distance filters parameters */
-#define PHYS_CS_D_PID_KP                    ((int16_t)   10000)
+#define PHYS_CS_D_PID_KP                    ((int16_t)   3000)
 #define PHYS_CS_D_PID_KI                    ((int16_t)      0)
-#define PHYS_CS_D_PID_KD                    ((int16_t)   1000)
+#define PHYS_CS_D_PID_KD                    ((int16_t)    500)
 #define PHYS_CS_D_PID_MAX_IN                ((int32_t)      0)
-#define PHYS_CS_D_PID_MAX_I                 ((int32_t)   5000)
+#define PHYS_CS_D_PID_MAX_I                 ((int32_t)      0)
 #define PHYS_CS_D_PID_MAX_OUT               ((int32_t)      0)
 #define PHYS_CS_D_PID_OUT_SHIFT             ((uint8_t)     12)
 #define PHYS_CS_D_PID_DRV_FILTER            ((uint8_t)      4)
-#define PHYS_CS_D_QUAD_POS_SPEED            ((uint32_t)  1200)
-#define PHYS_CS_D_QUAD_NEG_SPEED            ((uint32_t)  1200)
-#define PHYS_CS_D_QUAD_POS_ACCEL            ((uint32_t)    40)
-#define PHYS_CS_D_QUAD_NEG_ACCEL            ((uint32_t)    40)
+#define PHYS_CS_D_QUAD_POS_SPEED            ((uint32_t)  7500)
+#define PHYS_CS_D_QUAD_NEG_SPEED            ((uint32_t)  7500)
+#define PHYS_CS_D_QUAD_POS_ACCEL            ((uint32_t)    25)
+#define PHYS_CS_D_QUAD_NEG_ACCEL            ((uint32_t)    25)
 
 /* Control System in Angle filters parameters */
-#define PHYS_CS_A_PID_KP                    ((int16_t)   2500)
+#define PHYS_CS_A_PID_KP                    ((int16_t)   3000)
 #define PHYS_CS_A_PID_KI                    ((int16_t)      0)
-#define PHYS_CS_A_PID_KD                    ((int16_t)   1000)
+#define PHYS_CS_A_PID_KD                    ((int16_t)    250)
 #define PHYS_CS_A_PID_MAX_IN                ((int32_t)      0)
-#define PHYS_CS_A_PID_MAX_I                 ((int32_t)   5000)
+#define PHYS_CS_A_PID_MAX_I                 ((int32_t)      0)
 #define PHYS_CS_A_PID_MAX_OUT               ((int32_t)      0)
 #define PHYS_CS_A_PID_OUT_SHIFT             ((uint8_t)     11)
 #define PHYS_CS_A_PID_DRV_FILTER            ((uint8_t)      4)
-#define PHYS_CS_A_QUAD_POS_SPEED            ((uint32_t)  1200)
-#define PHYS_CS_A_QUAD_NEG_SPEED            ((uint32_t)  1200)
-#define PHYS_CS_A_QUAD_POS_ACCEL            ((uint32_t)    24)
-#define PHYS_CS_A_QUAD_NEG_ACCEL            ((uint32_t)    24)
+#define PHYS_CS_A_QUAD_POS_SPEED            ((uint32_t)  2500)
+#define PHYS_CS_A_QUAD_NEG_SPEED            ((uint32_t)  2500)
+#define PHYS_CS_A_QUAD_POS_ACCEL            ((uint32_t)   50)
+#define PHYS_CS_A_QUAD_NEG_ACCEL            ((uint32_t)   50)
 
 /* Trajectory Manager parameters */
 #define PHYS_TRAJ_D_DEFAULT_SPEED           ((int16_t)    1500)

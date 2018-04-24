@@ -35,36 +35,19 @@ static void sys_modules_task(void *pvParameters);
 void sys_modules_init(void)
 {
   // Initialize the hardware handlers
-  asv_init_servo(&sys_mod.rotator, ASV_CHANNEL_ROTATOR, ASV_ROTATOR_MIN, ASV_ROTATOR_MAX);
-  asv_init_servo(&sys_mod.trollet, ASV_CHANNEL_TROLLET, ASV_TROLLET_MIN, ASV_TROLLET_MAX);
-  dxl_init_servo(&sys_mod.grabber_left, &dsv_chan1.dxl, "XL320");
-  dxl_init_servo(&sys_mod.grabber_right, &dsv_chan1.dxl, "XL320");
-  dxl_init_servo(&sys_mod.grabber_back_left_left, &dsv_chan1.dxl, "XL320");
-  dxl_init_servo(&sys_mod.grabber_back_left_right, &dsv_chan1.dxl, "XL320");
-  dxl_init_servo(&sys_mod.grabber_back_right_left, &dsv_chan1.dxl, "XL320");
-  dxl_init_servo(&sys_mod.grabber_back_right_right, &dsv_chan1.dxl, "XL320");
-  dxl_init_servo(&sys_mod.lander, &dsv_chan2.dxl, "RX-28");
+  dxl_init_servo(&sys_mod.left_arm, &dsv_chan2.dxl, "RX-28");
+  dxl_init_servo(&sys_mod.right_arm, &dsv_chan2.dxl, "RX-28");
+  dxl_init_servo(&sys_mod.index, &dsv_chan2.dxl, "RX-28");
+  dxl_init_servo(&sys_mod.pusher, &dsv_chan2.dxl, "RX-28");
 
-  sys_mod.grabber_left.id = DSV_GRABBER_LEFT_ID;
-  sys_mod.grabber_right.id = DSV_GRABBER_RIGHT_ID;
-  sys_mod.grabber_back_left_left.id = DSV_GRABBER_BACK_LEFT_LEFT_ID;
-  sys_mod.grabber_back_left_right.id = DSV_GRABBER_BACK_LEFT_RIGHT_ID;
-  sys_mod.grabber_back_right_left.id = DSV_GRABBER_BACK_RIGHT_LEFT_ID;
-  sys_mod.grabber_back_right_right.id = DSV_GRABBER_BACK_RIGHT_RIGHT_ID;
-  sys_mod.lander.id = DSV_LANDER_ID;
+  sys_mod.left_arm.id = DSV_LEFT_ARM_ID;
+  sys_mod.right_arm.id = DSV_RIGHT_ARM_ID;
+  sys_mod.index.id = DSV_INDEX_ID;
+  sys_mod.pusher.id = DSV_PUSHER_ID;
 
-  sys_mod.grab_pos = 0;
-  sys_mod.land_pos = 0;
-  sys_mod.land_angle = 0;
   sys_mod.current_state = SYS_MOD_INIT;
-
 }
 
-void sys_mod_set_trollet_cmd(uint8_t cmd)
-{
-  SW_TROLLET_CMD1(cmd & 0x02 ? Bit_SET: Bit_RESET);
-  SW_TROLLET_CMD0(cmd & 0x01 ? Bit_SET: Bit_RESET);
-}
 
 BaseType_t sys_modules_start(void)
 {
@@ -127,21 +110,18 @@ void sys_modules_task(void *pvParameters)
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_GRAB))
         {
           sys_mod.current_state = SYS_MOD_GRAB_READY;
-          sys_mod_proc_prepare_grab();
         }
 
         // Transition to FOLDING
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_FOLD))
         {
           sys_mod.current_state = SYS_MOD_FOLDING;
-          sys_mod_proc_fold();
         }
 
         // Transition to LANDING
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_LAND))
         {
           sys_mod.current_state = SYS_MOD_LANDING;
-          sys_mod_proc_land();
         }
         break;
 
@@ -152,14 +132,12 @@ void sys_modules_task(void *pvParameters)
         if(SW_SYS_MOD_DETECT_VALUE == SW_SYS_MOD_DETECT_ON)
         {
           sys_mod.current_state = SYS_MOD_GRABBING;
-          sys_mod_proc_grab();
         }
 
         // Transition to folding
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_FOLD))
         {
           sys_mod.current_state = SYS_MOD_FOLDING;
-          sys_mod_proc_fold();
         }
         break;
 
@@ -177,7 +155,6 @@ void sys_modules_task(void *pvParameters)
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_LAND))
         {
           sys_mod.current_state = SYS_MOD_LANDING;
-          sys_mod_proc_land();
         }
 
         break;
@@ -227,63 +204,78 @@ BaseType_t sys_mod_proc_init(void)
   DEBUG_INFO("[SYS_MOD] Initializing"DEBUG_EOL);
 
   // Initialize analog servos
-  bb_asv_set_pwm_pulse_length(sys_mod.rotator.channel, ASV_ROTATOR_90);
-  //bb_asv_set_pwm_pulse_length(sys_mod.trollet.channel, ASV_TROLLET_LEFT);
 
   // Initializing digital servos
-  dxl_set_speed(&sys_mod.grabber_left, DSV_GRABBERS_SPEED);
-  dxl_set_speed(&sys_mod.grabber_right, DSV_GRABBERS_SPEED);
-  dxl_set_speed(&sys_mod.grabber_back_left_left, DSV_GRABBERS_SPEED);
-  dxl_set_speed(&sys_mod.grabber_back_left_right, DSV_GRABBERS_SPEED);
-  dxl_set_speed(&sys_mod.grabber_back_right_left, DSV_GRABBERS_SPEED);
-  dxl_set_speed(&sys_mod.grabber_back_right_right, DSV_GRABBERS_SPEED);
-  dxl_set_speed(&sys_mod.lander, DSV_LANDER_SPEED_DOWN);
+  dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW);
+  dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_SLOW);
+  dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED_SLOW);
+  dxl_set_speed(&sys_mod.pusher, DSV_PUSHER_SPEED);
 
-  dxl_set_torque_enable(&sys_mod.grabber_left, 1);
-  dxl_set_torque_enable(&sys_mod.grabber_right, 1);
-  dxl_set_torque_enable(&sys_mod.grabber_back_left_left, 1);
-  dxl_set_torque_enable(&sys_mod.grabber_back_left_right, 1);
-  dxl_set_torque_enable(&sys_mod.grabber_back_right_left, 1);
-  dxl_set_torque_enable(&sys_mod.grabber_back_right_right, 1);
-  dxl_set_torque_enable(&sys_mod.lander, 1);
+  dxl_set_torque_enable(&sys_mod.left_arm, 1);
+  dxl_set_torque_enable(&sys_mod.right_arm, 1);
+  dxl_set_torque_enable(&sys_mod.index, 1);
+  dxl_set_torque_enable(&sys_mod.pusher, 1);
 
-  dxl_set_torque(&sys_mod.grabber_left, DSV_GRABBERS_TORQUE);
-  dxl_set_torque(&sys_mod.grabber_right, DSV_GRABBERS_TORQUE);
-  dxl_set_torque(&sys_mod.grabber_back_left_left, DSV_GRABBERS_TORQUE);
-  dxl_set_torque(&sys_mod.grabber_back_left_right, DSV_GRABBERS_TORQUE);
-  dxl_set_torque(&sys_mod.grabber_back_right_left, DSV_GRABBERS_TORQUE);
-  dxl_set_torque(&sys_mod.grabber_back_right_right, DSV_GRABBERS_TORQUE);
-  dxl_set_position(&sys_mod.lander, DSV_LANDER_TORQUE);
+  dxl_set_torque(&sys_mod.left_arm, DSV_ARMS_TORQUE);
+  dxl_set_torque(&sys_mod.right_arm, DSV_ARMS_TORQUE);
+  dxl_set_torque(&sys_mod.index, DSV_ARMS_TORQUE);
+  dxl_set_torque(&sys_mod.pusher, DSV_ARMS_TORQUE);
 
-  /*
-  dxl_set_position(&sys_mod.grabber_left, DSV_GRABBER_LEFT_POS_OPENED);
-  dxl_set_position(&sys_mod.grabber_right, DSV_GRABBER_RIGHT_POS_OPENED);
-  dxl_set_position(&sys_mod.grabber_back_left_left, DSV_GRABBER_BACK_LEFT_LEFT_POS_OPENED);
-  dxl_set_position(&sys_mod.grabber_back_left_right, DSV_GRABBER_BACK_LEFT_RIGHT_POS_OPENED);
-  dxl_set_position(&sys_mod.grabber_back_right_left, DSV_GRABBER_BACK_RIGHT_LEFT_POS_OPENED);
-  dxl_set_position(&sys_mod.grabber_back_right_right, DSV_GRABBER_BACK_RIGHT_RIGHT_POS_OPENED);
-  */
-
-  dxl_set_position(&sys_mod.lander, DSV_LANDER_POS_UP);
-
-  dxl_set_led(&sys_mod.grabber_left, DXL_LED_CYAN);
-  dxl_set_led(&sys_mod.grabber_right, DXL_LED_CYAN);
-  dxl_set_led(&sys_mod.grabber_back_left_left, DXL_LED_CYAN);
-  dxl_set_led(&sys_mod.grabber_back_left_right, DXL_LED_CYAN);
-  dxl_set_led(&sys_mod.grabber_back_right_left, DXL_LED_CYAN);
-  dxl_set_led(&sys_mod.grabber_back_right_right, DXL_LED_CYAN);
-  dxl_set_led(&sys_mod.lander, DXL_LED_RED);
-
-  sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_RIGHT);
+  dxl_set_position(&sys_mod.left_arm, DSV_LEFT_ARM_POS_UP);
+  dxl_set_position(&sys_mod.right_arm, DSV_RIGHT_ARM_POS_UP);
+  dxl_set_position(&sys_mod.index, DSV_INDEX_POS_CENTER);
+  dxl_set_position(&sys_mod.pusher, DSV_PUSHER_IN);
 
   return pdPASS;
 }
 
-void sys_mod_set_led(uint8_t led)
+BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position)
 {
-  dxl_set_led(&sys_mod.grabber_left, led);
-  dxl_set_led(&sys_mod.grabber_right, led);
+  uint8_t retry=4;
+  uint8_t timout=0;
+  uint16_t return_position;
+  uint8_t move=0;
+  for(retry=4;retry>0;retry--)
+  {
+	  dxl_set_position(servo, position);
+      vTaskDelay(pdMS_TO_TICKS(100));
+	  is_dxl_moving(servo, &move);
+	  vTaskDelay(pdMS_TO_TICKS(100));
+	  if(move>0)
+	  {
+		  for(timout=0;timout<40;timout++)
+		  {
+			  dxl_get_position(servo, &return_position);	// Check position
+			  if(return_position<=position+5 && return_position>=position-5)
+				  return pdPASS;
+			  vTaskDelay(pdMS_TO_TICKS(100));
+		  }
+		  return pdFAIL;
+	  }
+  }
+  return pdFAIL;
 }
+
+BaseType_t sys_mod_set_left_arm(uint16_t position)
+{
+  return sys_mod_set_servo(&sys_mod.left_arm,position);
+}
+
+BaseType_t sys_mod_set_right_arm(uint16_t position)
+{
+  return sys_mod_set_servo(&sys_mod.right_arm,position);
+}
+
+BaseType_t sys_mod_set_index(uint16_t position)
+{
+  return sys_mod_set_servo(&sys_mod.index,position);
+}
+
+BaseType_t sys_mod_set_pusher(uint16_t position)
+{
+  return sys_mod_set_servo(&sys_mod.pusher,position);
+}
+
 
 // Launch a series of self-test actions
 BaseType_t sys_mod_proc_self_test(void)
@@ -292,219 +284,24 @@ BaseType_t sys_mod_proc_self_test(void)
   DEBUG_INFO("[SYS_MOD] Start Self-Test"DEBUG_EOL);
 
   // Test
-  vTaskDelay(pdMS_TO_TICKS(1000));
-
-  return pdPASS;
-}
-
-// Prepare for the grab, position the system in the correct position
-BaseType_t sys_mod_proc_prepare_grab(void)
-{
-  //DEBUG_INFO("[SYS_MOD] Prepare Grab at %u"DEBUG_EOL, sys_mod.grab_pos);
-
-  // Up position
-  dxl_set_speed(&sys_mod.lander, DSV_LANDER_SPEED_UP);
-  dxl_set_position(&sys_mod.lander, DSV_LANDER_POS_UP);
-  bb_asv_set_pwm_pulse_length(sys_mod.rotator.channel, ASV_ROTATOR_0);
-  sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_MIDDLE);
-
-  // Open grabbers
-  dxl_set_position(&sys_mod.grabber_left, DSV_GRABBER_LEFT_POS_OPENED);
-  dxl_set_position(&sys_mod.grabber_right, DSV_GRABBER_RIGHT_POS_OPENED);
-
-  vTaskDelay(pdMS_TO_TICKS(300));
-
-  // Down position
-  dxl_set_speed(&sys_mod.lander, DSV_LANDER_SPEED_DOWN);
-  dxl_set_position(&sys_mod.lander, DSV_LANDER_POS_DOWN);
-
-  // Trollet at requested pos
-  sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_MIDDLE);
-
-  dxl_set_led(&sys_mod.grabber_left, DXL_LED_BLUE);
-  dxl_set_led(&sys_mod.grabber_right, DXL_LED_BLUE);
-
-  return pdPASS;
-}
-
-// Actual action for grabbing a module
-BaseType_t sys_mod_proc_grab(void)
-{
-  //DEBUG_INFO("[SYS_MOD] Detection! Grabbing at %u"DEBUG_EOL, sys_mod.grab_pos);
-
-  dxl_set_led(&sys_mod.grabber_left, DXL_LED_GREEN);
-  dxl_set_led(&sys_mod.grabber_right, DXL_LED_GREEN);
-
-  // Close grabbers
-  dxl_set_position(&sys_mod.grabber_left, DSV_GRABBER_LEFT_POS_CLOSED);
-  dxl_set_position(&sys_mod.grabber_right, DSV_GRABBER_RIGHT_POS_CLOSED);
-
-  // TODO: replace with actual check (read) on correct closure
-  vTaskDelay(pdMS_TO_TICKS(300));
-
-  // Up position
-  dxl_set_speed(&sys_mod.lander, DSV_LANDER_SPEED_UP);
-  dxl_set_position(&sys_mod.lander, DSV_LANDER_POS_UP);
-
-  bb_asv_set_pwm_pulse_length(sys_mod.rotator.channel, ASV_ROTATOR_90);
-
-  return pdPASS;
-}
-
-BaseType_t sys_mod_proc_grab_back(bool left_not_right)
-{
-  dxl_servo_t* grabber_left;
-  dxl_servo_t* grabber_right;
-  uint16_t grab_pos_left;
-  uint16_t grab_pos_right;
-
-  if(left_not_right)
-  {
-    grabber_left = &sys_mod.grabber_back_left_left;
-    grabber_right = &sys_mod.grabber_back_left_right;
-    grab_pos_left = DSV_GRABBER_BACK_LEFT_LEFT_POS_CLOSED;
-    grab_pos_right = DSV_GRABBER_BACK_LEFT_RIGHT_POS_CLOSED;
-
-  } else {
-    grabber_left = &sys_mod.grabber_back_right_left;
-    grabber_right = &sys_mod.grabber_back_right_right;
-    grab_pos_left = DSV_GRABBER_BACK_RIGHT_LEFT_POS_CLOSED;
-    grab_pos_right = DSV_GRABBER_BACK_RIGHT_RIGHT_POS_CLOSED;
-  }
-
-  dxl_set_led(grabber_left, DXL_LED_GREEN);
-  dxl_set_led(grabber_right, DXL_LED_GREEN);
-
-  // Close grabbers
-  dxl_set_position(grabber_left, grab_pos_left);
-  dxl_set_position(grabber_right, grab_pos_right);
-
-  vTaskDelay(pdMS_TO_TICKS(300));
-}
-
-
-BaseType_t sys_mod_proc_close_back(bool left_not_right)
-{
-  dxl_servo_t* grabber_left;
-  dxl_servo_t* grabber_right;
-  uint16_t grab_pos_left;
-  uint16_t grab_pos_right;
-
-  if(left_not_right)
-  {
-    grabber_left = &sys_mod.grabber_back_left_left;
-    grabber_right = &sys_mod.grabber_back_left_right;
-    grab_pos_left = DSV_GRABBER_BACK_LEFT_LEFT_POS_CLOSED_FULL;
-    grab_pos_right = DSV_GRABBER_BACK_LEFT_RIGHT_POS_CLOSED_FULL;
-
-  } else {
-    grabber_left = &sys_mod.grabber_back_right_left;
-    grabber_right = &sys_mod.grabber_back_right_right;
-    grab_pos_left = DSV_GRABBER_BACK_RIGHT_LEFT_POS_CLOSED_FULL;
-    grab_pos_right = DSV_GRABBER_BACK_RIGHT_RIGHT_POS_CLOSED_FULL;
-  }
-
-  dxl_set_led(grabber_left, DXL_LED_BLUE);
-  dxl_set_led(grabber_right, DXL_LED_BLUE);
-
-  // Close grabbers
-  dxl_set_position(grabber_left, grab_pos_left);
-  vTaskDelay(pdMS_TO_TICKS(300));
-  dxl_set_position(grabber_right, grab_pos_right);
-  vTaskDelay(pdMS_TO_TICKS(300));
-}
-
-BaseType_t sys_mod_proc_release_back(bool left_not_right)
-{
-  dxl_servo_t* grabber_left;
-  dxl_servo_t* grabber_right;
-  uint16_t grab_pos_left;
-  uint16_t grab_pos_right;
-
-  if(left_not_right)
-  {
-    grabber_left = &sys_mod.grabber_back_left_left;
-    grabber_right = &sys_mod.grabber_back_left_right;
-    grab_pos_left = DSV_GRABBER_BACK_LEFT_LEFT_POS_OPENED;
-    grab_pos_right = DSV_GRABBER_BACK_LEFT_RIGHT_POS_OPENED;
-  } else {
-    grabber_left = &sys_mod.grabber_back_right_left;
-    grabber_right = &sys_mod.grabber_back_right_right;
-    grab_pos_left = DSV_GRABBER_BACK_RIGHT_LEFT_POS_OPENED;
-    grab_pos_right = DSV_GRABBER_BACK_RIGHT_RIGHT_POS_OPENED;
-  }
-
-
-  dxl_set_led(grabber_left, DXL_LED_YELLOW);
-  dxl_set_led(grabber_right, DXL_LED_YELLOW);
-
-  // Open grabbers
-  dxl_set_position(grabber_left, grab_pos_left);
-  dxl_set_position(grabber_right, grab_pos_right);
-
-  vTaskDelay(pdMS_TO_TICKS(300));
-}
-
-// Actual actions for landing a module
-BaseType_t sys_mod_proc_land(void)
-{
-  //DEBUG_INFO("[SYS_MOD] Landing at %u, %u"DEBUG_EOL, sys_mod.land_pos, sys_mod.land_angle);
-
-  dxl_set_led(&sys_mod.grabber_left, DXL_LED_YELLOW);
-  dxl_set_led(&sys_mod.grabber_right, DXL_LED_YELLOW);
-
-  // Turn to requested angle
-  //bb_asv_set_pwm_pulse_length(sys_mod.rotator.channel, sys_mod.land_angle? ASV_ROTATOR_0:ASV_ROTATOR_90);
-
-  // Up position
-  dxl_set_speed(&sys_mod.lander, DSV_LANDER_SPEED_UP);
-  dxl_set_position(&sys_mod.lander, DSV_LANDER_POS_UP);
-
-  vTaskDelay(pdMS_TO_TICKS(300));
-
-  // Horizontal position
-  bb_asv_set_pwm_pulse_length(sys_mod.rotator.channel, ASV_ROTATOR_90);
-
-  vTaskDelay(pdMS_TO_TICKS(300));
-
-  // Trollet at requested pos
-  //bb_asv_set_pwm_pulse_length(sys_mod.trollet.channel, sys_mod.grab_pos);
-
-  // Open grabbers
-  dxl_set_position(&sys_mod.grabber_left, DSV_GRABBER_LEFT_POS_OPENED);
-  dxl_set_position(&sys_mod.grabber_right, DSV_GRABBER_RIGHT_POS_OPENED);
-
-  vTaskDelay(pdMS_TO_TICKS(300));
-
-  return pdPASS;
-}
-
-// Actions for folding the sub-system
-BaseType_t sys_mod_proc_fold(void)
-{
-  DEBUG_INFO("[SYS_MOD] Folding"DEBUG_EOL);
-
-  dxl_set_led(&sys_mod.grabber_left, DXL_LED_MAGENTA);
-  dxl_set_led(&sys_mod.grabber_right, DXL_LED_MAGENTA);
-
-  sys_mod_set_trollet_cmd(SW_TROLLET_GOTO_MIDDLE);
-
-  // Up position
-  dxl_set_speed(&sys_mod.lander, DSV_LANDER_SPEED_UP);
-  dxl_set_position(&sys_mod.lander, DSV_LANDER_POS_UP);
-
-  vTaskDelay(pdMS_TO_TICKS(500));
-
-  // Close grabbers
-  dxl_set_position(&sys_mod.grabber_left, DSV_GRABBER_LEFT_POS_CLOSED);
-  dxl_set_position(&sys_mod.grabber_right, DSV_GRABBER_RIGHT_POS_CLOSED);
-
-  vTaskDelay(pdMS_TO_TICKS(500));
-
-  bb_asv_set_pwm_pulse_length(sys_mod.rotator.channel, ASV_ROTATOR_90);
-
-  // TODO: replace with actual check (read) on correct closure
-  vTaskDelay(pdMS_TO_TICKS(1000));
+  sys_mod_set_index(DSV_INDEX_POS_LEFT);
+  sys_mod_set_left_arm(DSV_LEFT_ARM_POS_DOWN);
+  sys_mod_set_index(DSV_INDEX_POS_RIGHT);
+  sys_mod_set_right_arm(DSV_RIGHT_ARM_POS_DOWN);
+  sys_mod_set_index(DSV_INDEX_POS_CENTER);
+  sys_mod_set_pusher(DSV_PUSHER_OUT);
+  dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED_FAST);
+  vTaskDelay(pdMS_TO_TICKS(200));
+  dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_FAST);
+  vTaskDelay(pdMS_TO_TICKS(200));
+  dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_FAST);
+  vTaskDelay(pdMS_TO_TICKS(200));
+  sys_mod_set_index(DSV_INDEX_POS_LEFT);
+  sys_mod_set_left_arm(DSV_LEFT_ARM_POS_UP);
+  sys_mod_set_index(DSV_INDEX_POS_RIGHT);
+  sys_mod_set_right_arm(DSV_RIGHT_ARM_POS_UP);
+  sys_mod_set_index(DSV_INDEX_POS_CENTER);
+  sys_mod_set_pusher(DSV_PUSHER_IN);
 
   return pdPASS;
 }
@@ -524,25 +321,4 @@ void sys_mod_do_self_test(TaskHandle_t* caller)
 {
   sys_mod.calling_task = caller;
   xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_SELF_TEST, eSetBits);
-}
-
-void sys_mod_do_grab(TaskHandle_t* caller, uint16_t grab_pos)
-{
-  sys_mod.calling_task = caller;
-  sys_mod.grab_pos = grab_pos;
-  xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_GRAB, eSetBits);
-}
-
-void sys_mod_do_land(TaskHandle_t* caller, uint16_t land_pos, uint16_t land_angle)
-{
-  sys_mod.calling_task = caller;
-  sys_mod.land_pos = land_pos;
-  sys_mod.land_angle = land_angle;
-  xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_LAND, eSetBits);
-}
-
-void sys_mod_do_fold(TaskHandle_t* caller)
-{
-  sys_mod.calling_task = caller;
-  xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_FOLD, eSetBits);
 }

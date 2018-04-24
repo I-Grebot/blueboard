@@ -133,53 +133,43 @@
 #define DSV_TX_QUEUE_SIZE   64
 
 // Timeouts
-#define DSV_RX_TIMEOUT      pdMS_TO_TICKS( 10 ) // Must be at least longest TX + Return-time delay
-#define DSV_TX_TIMEOUT      pdMS_TO_TICKS(  5 )
+#define DSV_RX_TIMEOUT      pdMS_TO_TICKS( 50) // Must be at least longest TX + Return-time delay
+#define DSV_TX_TIMEOUT      pdMS_TO_TICKS( 50 )
 
 // Servos IDs
-#define DSV_GRABBER_LEFT_ID     43
-#define DSV_GRABBER_RIGHT_ID    60
-#define DSV_LANDER_ID           50
-
-#define DSV_GRABBER_BACK_LEFT_LEFT_ID       23
-#define DSV_GRABBER_BACK_LEFT_RIGHT_ID      40
-#define DSV_GRABBER_BACK_RIGHT_LEFT_ID      30
-#define DSV_GRABBER_BACK_RIGHT_RIGHT_ID     50
+#define DSV_LEFT_ARM_ID     30
+#define DSV_RIGHT_ARM_ID    40
+#define DSV_INDEX_ID        50
+#define DSV_PUSHER_ID       10
 
 // Positions
-#define DSV_GRABBER_LEFT_POS_OPENED             625
-#define DSV_GRABBER_LEFT_POS_CLOSED             391
-#define DSV_GRABBER_RIGHT_POS_OPENED            389
-#define DSV_GRABBER_RIGHT_POS_CLOSED            632
+#define DSV_LEFT_ARM_POS_DOWN                   200
+#define DSV_LEFT_ARM_POS_UP                     510
 
-#define DSV_GRABBER_BACK_LEFT_LEFT_POS_OPENED    479//625
-#define DSV_GRABBER_BACK_LEFT_LEFT_POS_CLOSED    687//390
+#define DSV_RIGHT_ARM_POS_DOWN                  800
+#define DSV_RIGHT_ARM_POS_UP                    475
 
-#define DSV_GRABBER_BACK_LEFT_LEFT_POS_CLOSED_FULL    858//390
+#define DSV_INDEX_POS_RIGHT                     650
+#define DSV_INDEX_POS_CENTER                    400
+#define DSV_INDEX_POS_LEFT                      150
 
-#define DSV_GRABBER_BACK_LEFT_RIGHT_POS_OPENED   750//390
-#define DSV_GRABBER_BACK_LEFT_RIGHT_POS_CLOSED   538//625
-#define DSV_GRABBER_BACK_LEFT_RIGHT_POS_CLOSED_FULL 401
+#define DSV_PUSHER_OUT							525
+#define DSV_PUSHER_IN							475
 
-#define DSV_GRABBER_BACK_RIGHT_LEFT_POS_OPENED   273//625
-#define DSV_GRABBER_BACK_RIGHT_LEFT_POS_CLOSED   492//390
-#define DSV_GRABBER_BACK_RIGHT_LEFT_POS_CLOSED_FULL   659//390
-
-#define DSV_GRABBER_BACK_RIGHT_RIGHT_POS_OPENED  750//390
-#define DSV_GRABBER_BACK_RIGHT_RIGHT_POS_CLOSED  530//625
-#define DSV_GRABBER_BACK_RIGHT_RIGHT_POS_CLOSED_FULL  391//625
-
-#define DSV_LANDER_POS_UP                       735
-#define DSV_LANDER_POS_DOWN                     520
+#define DSV_LANDER_POS_DOWN					    800
+#define DSV_LANDER_POS_UP					    475
 
 // Speeds
-#define DSV_GRABBERS_SPEED                     1023
-#define DSV_LANDER_SPEED_UP                    1023
-#define DSV_LANDER_SPEED_DOWN                  1023
+#define DSV_ARMS_SPEED_FAST                     1023
+#define DSV_ARMS_SPEED_SLOW                      100
+#define DSV_INDEX_SPEED_FAST                    1023
+#define DSV_INDEX_SPEED_SLOW                     100
+#define DSV_PUSHER_SPEED                         300
 
 // Torques
-#define DSV_GRABBERS_TORQUE                     800
-#define DSV_LANDER_TORQUE                      1000
+#define DSV_ARMS_TORQUE                          500
+#define DSV_INDEX_TORQUE                         500
+#define DSV_PUSHER_TORQUE                        500
 
 
 /**

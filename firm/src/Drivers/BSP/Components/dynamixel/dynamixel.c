@@ -233,6 +233,20 @@ dxl_status_t dxl_action(dxl_servo_t* servo)
 **
 ********************************************************************************
 */
+dxl_status_t is_dxl_moving(dxl_servo_t* servo, uint8_t *move)
+{
+    extern const dxl_register_t* dxl_reg_v1_moving;
+    extern const dxl_register_t* dxl_reg_v4_moving;
+    dxl_register_t* reg;
+
+    if(servo->model->reg_table == DXL_REG4)
+      reg = dxl_reg_v4_moving;
+    else
+      reg = dxl_reg_v1_moving;
+
+    return dxl_read_int(servo, reg->address, move, reg->size);
+}
+
 
 dxl_status_t dxl_get_model(dxl_servo_t* servo, uint16_t* model)
 {
@@ -240,6 +254,19 @@ dxl_status_t dxl_get_model(dxl_servo_t* servo, uint16_t* model)
     return dxl_read_int(servo, dxl_reg_model_number->address, model, dxl_reg_model_number->size);
 }
 
+dxl_status_t dxl_get_position(dxl_servo_t* servo, uint16_t* position)
+{
+    extern const dxl_register_t* dxl_reg_v1_current_position;
+    extern const dxl_register_t* dxl_reg_v4_current_position;
+    dxl_register_t* reg;
+
+    if(servo->model->reg_table == DXL_REG4)
+      reg = dxl_reg_v4_current_position;
+    else
+      reg = dxl_reg_v1_current_position;
+
+    return dxl_read_int(servo, reg->address, position, reg->size);
+}
 
 dxl_status_t dxl_set_torque_enable(dxl_servo_t* servo, uint8_t torque_enable)
 {

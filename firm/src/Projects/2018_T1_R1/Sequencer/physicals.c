@@ -4,7 +4,7 @@
  * -----------------------------------------------------------------------------
  * @file       physicals.c
  * @author     Pierrick
- * @date       31/01/2018
+ * @date       21/04/2018
  * -----------------------------------------------------------------------------
  * @brief
  *   Management of physicals elements
@@ -84,24 +84,24 @@ void phys_init(void)
   // --------------------------------
 
   // Coordinate of the robot at startup
-  phys.reset.x  = 		  ROBOT_LENGTH-ROBOT_FRONT_TO_CENTER;
-  phys.reset.y  =  		  START_LINE_Y;
-  phys.reset.a  =   		0;
+  phys.reset.x  = 		  	ROBOT_LENGTH-ROBOT_FRONT_TO_CENTER;
+  phys.reset.y  =  		  	START_LINE_Y;
+  phys.reset.a  =   		0;// facing opponent zone
 
   // 1st exit point
-  phys.exit_start.x  =   	ROBOT_LENGTH-ROBOT_FRONT_TO_CENTER;
-  phys.exit_start.y  =    	600;
-  phys.exit_start.a  =      0;
+  phys.exit_start.x  = 		SWITCH_CENTER_X;
+  phys.exit_start.y  = 		START_LINE_Y;
+  phys.exit_start.a  = 		0;
 
   // starting area of the bee
-  phys.beehive.x =  BEE_START_X;
-  phys.beehive.y = 	BEE_START_Y;
-  phys.beehive.a =    		  0;// facing north
+  phys.beehive.x =  		BEE_START_X;
+  phys.beehive.y = 			BEE_START_Y;
+  phys.beehive.a =    		0;
 
   // Coordinate for shooting ores in the basket
   phys.home_automation_switch.x = 	SWITCH_CENTER_X;
   phys.home_automation_switch.y = 	SWITCH_CENTER_Y + ROBOT_RADIUS;
-  phys.home_automation_switch.a =  	90;// facing west
+  phys.home_automation_switch.a =  	90;
 
   // Offsets of the Robot's actuators / systems
   // ------------------------------------------
@@ -139,10 +139,6 @@ void phys_init(void)
 void phys_update_color_pois(void)
 {
   phys_update_with_color(&phys.reset);
-  phys_update_with_color(&phys.exit_start);
-  phys_update_with_color(&phys.beehive);
-  phys_update_with_color(&phys.home_automation_switch);
-  phys_update_with_color(&phys.wastewater_recuperator);
   phys_update_with_color(&robot.teammate_pos);
   phys_update_with_color(&robot.opp1_pos);
   phys_update_with_color(&robot.opp2_pos);
