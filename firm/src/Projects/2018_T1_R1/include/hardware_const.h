@@ -153,8 +153,8 @@
 #define DSV_INDEX_POS_CENTER                    400
 #define DSV_INDEX_POS_LEFT                      150
 
-#define DSV_PUSHER_OUT							525
-#define DSV_PUSHER_IN							475
+#define DSV_PUSHER_OUT							490
+#define DSV_PUSHER_IN							420
 
 #define DSV_LANDER_POS_DOWN					    800
 #define DSV_LANDER_POS_UP					    475

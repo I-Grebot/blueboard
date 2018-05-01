@@ -129,24 +129,24 @@
 #define TABLE_HEIGHT (TABLE_Y_MAX - TABLE_Y_MIN)
 
 // Playground elements
-#define WASTEWATER_RECUPERATOR_X		 	 100
+#define WASTEWATER_RECUPERATOR_X		     ROBOT_FRONT_TO_CENTER
 #define WASTEWATER_RECUPERATOR_Y		 	 840
 #define MIXED_WASTEWATER_RECUPERATOR_DEPTH	 106
 #define MIXED_WASTEWATER_RECUPERATOR_WIDTH	  54
-#define BEE_START_X						 	 200
+#define BEE_START_X						 	 300
 #define BEE_START_Y							1800
 #define	SWITCH_CENTER_X						1130
 #define	SWITCH_CENTER_Y						TABLE_Y_MIN
 #define START_LINE_Y						350
 
 // Robot dimensions in mm
-#define ROBOT_FRONT_TO_CENTER   85 // Distance from the ball bearing to the center
-#define ROBOT_LENGTH            130 // Distance from the front to the back
+#define ROBOT_FRONT_TO_CENTER   92 // Distance from the ball bearing to the center
+#define ROBOT_LENGTH            187 // Distance from the front to the back
 #define ROBOT_BACK_TO_CENTER  (ROBOT_LENGTH - ROBOT_FRONT_TO_CENTER)
-#define ROBOT_BASE_WIDTH        250 // Distance between the two encoder wheels
-#define ROBOT_RADIUS            170 // In Idle position the robot can fit in a cylinder of this radius.
+#define ROBOT_BASE_WIDTH        271 // Distance between the two encoder wheels
+#define ROBOT_RADIUS            172 // In Idle position the robot can fit in a cylinder of this radius.
 
-#define TRAJECTORY_NEAR_WINDOW_D  200
+#define TRAJECTORY_NEAR_WINDOW_D  100
 #define TRAJECTORY_NEAR_WINDOW_A  10
 
 /**

@@ -235,7 +235,7 @@ BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position)
   uint8_t timout=0;
   uint16_t return_position;
   uint8_t move=0;
-  for(retry=4;retry>0;retry--)
+  for(retry=10;retry>0;retry--)
   {
 	  dxl_set_position(servo, position);
       vTaskDelay(pdMS_TO_TICKS(100));
@@ -284,18 +284,19 @@ BaseType_t sys_mod_proc_self_test(void)
   DEBUG_INFO("[SYS_MOD] Start Self-Test"DEBUG_EOL);
 
   // Test
-  sys_mod_set_index(DSV_INDEX_POS_LEFT);
-  sys_mod_set_left_arm(DSV_LEFT_ARM_POS_DOWN);
-  sys_mod_set_index(DSV_INDEX_POS_RIGHT);
-  sys_mod_set_right_arm(DSV_RIGHT_ARM_POS_DOWN);
-  sys_mod_set_index(DSV_INDEX_POS_CENTER);
-  sys_mod_set_pusher(DSV_PUSHER_OUT);
+  vTaskDelay(pdMS_TO_TICKS(200));
   dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED_FAST);
   vTaskDelay(pdMS_TO_TICKS(200));
   dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_FAST);
   vTaskDelay(pdMS_TO_TICKS(200));
   dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_FAST);
   vTaskDelay(pdMS_TO_TICKS(200));
+  sys_mod_set_index(DSV_INDEX_POS_LEFT);
+  sys_mod_set_left_arm(DSV_LEFT_ARM_POS_DOWN);
+  sys_mod_set_index(DSV_INDEX_POS_RIGHT);
+  sys_mod_set_right_arm(DSV_RIGHT_ARM_POS_DOWN);
+  sys_mod_set_index(DSV_INDEX_POS_CENTER);
+  sys_mod_set_pusher(DSV_PUSHER_OUT);
   sys_mod_set_index(DSV_INDEX_POS_LEFT);
   sys_mod_set_left_arm(DSV_LEFT_ARM_POS_UP);
   sys_mod_set_index(DSV_INDEX_POS_RIGHT);

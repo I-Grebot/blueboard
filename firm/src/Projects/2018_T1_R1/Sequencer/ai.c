@@ -104,7 +104,8 @@ BaseType_t ai_self_test(void)
 {
   /*sys_mod_proc_grab_back(true);
   sys_mod_proc_grab_back(false);*/
-  sys_mod_proc_self_test();
+  //sys_mod_proc_self_test();
+  ai_task_stall_at_start();
 
   return pdPASS;
 }

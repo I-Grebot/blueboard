@@ -71,6 +71,10 @@ void phys_init(void)
   phys.wastewater_recuperator.y =  WASTEWATER_RECUPERATOR_Y;
   phys.wastewater_recuperator.a =  0;
 
+  phys.cube_deposit.x = 690;
+  phys.cube_deposit.y = 170+ROBOT_FRONT_TO_CENTER;
+  phys.cube_deposit.a = -90;
+
   // Recuperator containing half green half orange
   phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x  =  610  ;
   phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].y  =  TABLE_Y_MAX - MIXED_WASTEWATER_RECUPERATOR_DEPTH - ROBOT_RADIUS;
@@ -100,7 +104,7 @@ void phys_init(void)
 
   // Coordinate for shooting ores in the basket
   phys.home_automation_switch.x = 	SWITCH_CENTER_X;
-  phys.home_automation_switch.y = 	SWITCH_CENTER_Y + ROBOT_RADIUS;
+  phys.home_automation_switch.y = 	ROBOT_FRONT_TO_CENTER-20;
   phys.home_automation_switch.a =  	90;
 
   // Offsets of the Robot's actuators / systems

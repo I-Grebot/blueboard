@@ -69,6 +69,7 @@ typedef struct {
   poi_t exit_start;         			// Exit coordinate
   poi_t beehive;    					// starting area of the bee
   poi_t home_automation_switch;  		// Coordinate for shooting ores in the basket
+  poi_t cube_deposit;
 
   // Path-finder static polygons
   path_poly_t* pf_opp_start_zone;

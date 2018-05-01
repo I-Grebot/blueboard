@@ -418,6 +418,7 @@ void ai_on_suspend_policy(task_t* task);
 void ai_on_failure_policy(task_t* task);
 
 // AI tasks
+void ai_task_stall_at_start(void);
 void ai_task_start(void *params);
 
 

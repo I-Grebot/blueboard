@@ -199,6 +199,83 @@ BaseType_t ai_move_with_pf(wp_t* wp)
 // -----------------------------------------------------------------------------
 
 
+void ai_task_stall_at_start(void)
+{
+	  // A waypoint for our motions
+	  wp_t wp;
+
+	  // Static items of the waypoints
+	  wp.coord.abs.a = 0;
+	  wp.offset.x = 0;
+	  wp.offset.y = 0;
+	  wp.offset.a = 0;
+	  wp.trajectory_must_finish = true;
+
+	  // Clear avoidance state in case it was triggered during init
+	  // (avoid dead lock)
+	  avd_mask_all(false);
+
+	  // Stall at start
+	  // ------------------
+	  wp.speed = WP_SPEED_SLOW;
+	  wp.type = WP_MOVE_REL;
+	  wp.coord.rel.d = -150;
+	  wp.coord.rel.a = 0;
+	  wp.trajectory_must_finish = false;
+	  motion_move_block_on_avd(&wp);				// stall x at start
+	  vTaskDelay(pdMS_TO_TICKS(1000));
+	  motion_traj_stop();
+	  if(match.color == MATCH_COLOR_GREEN)
+	  {
+		  motion_set_x((int16_t)ROBOT_BACK_TO_CENTER);
+		  motion_set_a(0);
+	  }
+	  else
+	  {
+		  motion_set_x((int16_t)(TABLE_X_MAX-ROBOT_BACK_TO_CENTER));
+		  motion_set_a(180);
+	  }
+
+	  wp.speed = WP_SPEED_SLOW;
+	  wp.type = WP_MOVE_REL;
+	  wp.coord.rel.d = 100;
+	  wp.coord.rel.a = 0;
+	  wp.trajectory_must_finish = true;
+	  motion_move_block_on_avd(&wp);
+
+	  wp.speed = WP_SPEED_SLOW;
+	  wp.type = WP_MOVE_REL;
+	  wp.coord.rel.d = 0;
+	  wp.coord.rel.a = 90;
+	  wp.trajectory_must_finish = true;
+	  motion_move_block_on_avd(&wp);
+
+	  wp.speed = WP_SPEED_SLOW;
+	  wp.type = WP_MOVE_REL;
+	  wp.coord.rel.d = -200;
+	  wp.coord.rel.a = 0;
+	  wp.trajectory_must_finish = false;
+	  motion_move_block_on_avd(&wp);				// stall y at start
+	  vTaskDelay(pdMS_TO_TICKS(1000));
+	  motion_traj_stop();
+	  motion_set_y((int16_t)ROBOT_BACK_TO_CENTER);
+	  motion_set_a(90);
+
+	  wp.speed = WP_SPEED_SLOW;
+	  wp.type = WP_MOVE_REL;
+	  wp.coord.rel.d = 350;
+	  wp.coord.rel.a = 0;
+	  wp.trajectory_must_finish = true;
+	  motion_move_block_on_avd(&wp);
+
+	  wp.speed = WP_SPEED_SLOW;
+	  wp.type = WP_MOVE_REL;
+	  wp.coord.rel.d = 0;
+	  wp.coord.rel.a = -90;
+	  wp.trajectory_must_finish = true;
+	  motion_move_block_on_avd(&wp);
+}
+
 void ai_task_start(void *params)
 {
   // A waypoint for our motions
@@ -228,6 +305,7 @@ void ai_task_start(void *params)
   xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
   avd_mask_all(false);
 
+
   // Exit
   // ------------------
   wp.speed = WP_SPEED_FAST;
@@ -242,17 +320,168 @@ void ai_task_start(void *params)
   wp.coord.abs = phys.home_automation_switch;
   motion_move_block_on_avd(&wp);
 
-  sys_mod_set_pusher(DSV_PUSHER_OUT);
-
   wp.type = WP_GOTO_FWD;
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.abs = phys.home_automation_switch;
+  wp.trajectory_must_finish = false;
   motion_move_block_on_avd(&wp);
+  vTaskDelay(pdMS_TO_TICKS(1500));
+  motion_traj_stop();
+  motion_set_y((int16_t)ROBOT_FRONT_TO_CENTER);	// stall y
+  motion_set_a(-90);
+
+  sys_mod_set_pusher(DSV_PUSHER_OUT);
+  vTaskDelay(pdMS_TO_TICKS(500));				// push automation switch
+  sys_mod_set_pusher(DSV_PUSHER_IN);
 
   wp.type = WP_GOTO_BWD;
+  wp.speed = WP_SPEED_SLOW;
   wp.coord.abs = phys.exit_start;
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
 
-  sys_mod_set_pusher(DSV_PUSHER_IN);
+  wp.speed = WP_SPEED_NORMAL;
+  wp.type = WP_GOTO_BWD;
+  wp.coord.abs.a = 90;
+  wp.coord.abs.x = SWITCH_CENTER_X;
+  wp.coord.abs.y = TABLE_Y_MAX/2;
+  wp.trajectory_must_finish = false;
+  motion_move_block_on_avd(&wp);
+  while(!motion_is_traj_near());
+
+  wp.type = WP_GOTO_BWD;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs = phys.beehive;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_ORIENT_BEHIND;				// we are at the hive, need to stall
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.abs.x = BEE_START_X;
+  wp.coord.abs.y = TABLE_Y_MAX;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_GOTO_BWD;
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.abs.a = -90;
+  wp.coord.abs.x = BEE_START_X;
+  wp.coord.abs.y = TABLE_Y_MAX;
+  wp.trajectory_must_finish = false;
+  motion_move_block_on_avd(&wp);
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  motion_traj_stop();											// stall y
+  motion_set_y((int16_t)(TABLE_Y_MAX-ROBOT_BACK_TO_CENTER));
+  motion_set_a(-90);
+
+  wp.type = WP_MOVE_REL;
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.rel.d = ROBOT_RADIUS+15-ROBOT_BACK_TO_CENTER;
+  wp.coord.rel.a = 0;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_MOVE_REL;
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.rel.d = 0;
+  wp.coord.rel.a = 90;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_MOVE_REL;
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.rel.d = -200;
+  wp.coord.rel.a = 0;
+  wp.trajectory_must_finish = false;
+  motion_move_block_on_avd(&wp);
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  motion_traj_stop();
+  if(match.color == MATCH_COLOR_GREEN)
+  {
+	  motion_set_x((int16_t)ROBOT_BACK_TO_CENTER);
+	  motion_set_a(0);
+  }
+  else
+  {
+	  motion_set_x((int16_t)(TABLE_X_MAX-ROBOT_BACK_TO_CENTER));
+	  motion_set_a(180);
+  }
+
+  if(match.color == MATCH_COLOR_GREEN)
+	  sys_mod_set_right_arm(DSV_RIGHT_ARM_POS_DOWN);
+  else
+	  sys_mod_set_left_arm(DSV_LEFT_ARM_POS_DOWN);
+
+  wp.type = WP_GOTO_FWD;
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.abs = phys.beehive;
+  wp.coord.abs.x = ROBOT_BACK_TO_CENTER+300;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  if(match.color == MATCH_COLOR_GREEN)
+	  sys_mod_set_right_arm(DSV_RIGHT_ARM_POS_UP);
+  else
+	  sys_mod_set_left_arm(DSV_LEFT_ARM_POS_UP);
+
+  vTaskDelay(pdMS_TO_TICKS(500));
+
+  wp.type = WP_ORIENT_FRONT;				// go for the cube
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs = phys.construction_cubes[PHYS_ID_CUBES_SG];
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_GOTO_FWD;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs = phys.construction_cubes[PHYS_ID_CUBES_SG];
+  wp.trajectory_must_finish = false;
+  motion_move_block_on_avd(&wp);
+  while(!motion_is_traj_near());
+
+  wp.type = WP_GOTO_FWD;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs = phys.cube_deposit;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_MOVE_REL;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.rel.d = -150;
+  wp.coord.rel.a = 0;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_ORIENT_FRONT;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs.x = motion_get_x();
+  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_GOTO_FWD;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs.x = motion_get_x();
+  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_ORIENT_FRONT;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs = phys.wastewater_recuperator;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_set_index(DSV_INDEX_POS_RIGHT);
+
+  wp.type = WP_GOTO_FWD;
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.abs = phys.wastewater_recuperator;
+  wp.trajectory_must_finish = false;
+  motion_move_block_on_avd(&wp);
+  vTaskDelay(pdMS_TO_TICKS(1500));
+
+  sys_mod_set_index(DSV_INDEX_POS_LEFT);
 
   motion_traj_stop();
 
