@@ -194,10 +194,11 @@
 // Modules system notifiers
 #define OS_NOTIFY_SYS_MOD_INIT        0x00000001    // Initialize the modules system
 #define OS_NOTIFY_SYS_MOD_SELF_TEST   0x00000002    // Launch self-test procedure
-#define OS_NOTIFY_SYS_MOD_FOLD        0x00000010    // Initiate procedure to fold state
-#define OS_NOTIFY_SYS_MOD_GRAB        0x00000020    // Initiate procedure to grab state
-#define OS_NOTIFY_SYS_MOD_LAND        0x00000040    // Initiate procedure to land state
-
+#define OS_NOTIFY_SYS_MOD_LEFT_ARM    0x00000010    // Initiate procedure to move left arm
+#define OS_NOTIFY_SYS_MOD_RIGHT_ARM   0x00000020    // Initiate procedure to move right arm
+#define OS_NOTIFY_SYS_MOD_PUSH        0x00000040    // Initiate procedure to push the switch
+#define OS_NOTIFY_SYS_MOD_OPEN        0x00000080    // Initiate procedure to open water recuperator
+#define OS_NOTIFY_SYS_MOD_SHOOT       0x00000100    // Initiate procedure to shoot
 
 /**
 ********************************************************************************
@@ -347,6 +348,10 @@ void motion_goto_forward(double pos_x, double pos_y);
 void motion_goto_backward(double pos_x, double pos_y);
 void motion_turnto_front(double pos_x, double pos_y);
 void motion_turnto_behind(double pos_x, double pos_y);
+void motion_stall_front_x(int16_t pos_x, int16_t pos_a);
+void motion_stall_back_x(int16_t pos_x, int16_t pos_a);
+void motion_stall_front_y(int16_t pos_y, int16_t pos_a);
+void motion_stall_back_y(int16_t pos_y, int16_t pos_a);
 
 void motion_clear_all_wp(void);
 BaseType_t motion_add_new_wp(wp_t *waypoint);
@@ -467,14 +472,16 @@ BaseType_t sys_modules_start(void);
 void sys_modules_init(void);
 void sys_mod_do_init(TaskHandle_t* caller);
 void sys_mod_do_self_test(TaskHandle_t* caller);
+void sys_mod_set_color(uint8_t color);
 
 BaseType_t sys_mod_proc_init(void);
 BaseType_t sys_mod_proc_self_test(void);
 BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position);
-BaseType_t sys_mod_set_left_arm(uint16_t position);
-BaseType_t sys_mod_set_right_arm(uint16_t position);
-BaseType_t sys_mod_set_index(uint16_t position);
-BaseType_t sys_mod_set_pusher(uint16_t position);
+void sys_mod_do_left_arm(TaskHandle_t* caller, uint16_t position);
+void sys_mod_do_right_arm(TaskHandle_t* caller, uint16_t position);
+void sys_mod_do_open(TaskHandle_t* caller);
+void sys_mod_do_push(TaskHandle_t* caller);
+void sys_mod_do_index(TaskHandle_t* caller, uint16_t position);
 
 
 // -----------------------------------------------------------------------------

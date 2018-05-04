@@ -107,8 +107,8 @@
 /* Blocking detection filter constants */
 #define PHYS_BD_K1                          ((int32_t)      5)
 #define PHYS_BD_K2                          ((int32_t)     40)
-#define PHYS_BD_THR                         ((uint32_t)  4000)
-#define PHYS_BD_CPT                         ((uint32_t)   100)
+#define PHYS_BD_THR                         ((uint32_t)   200)
+#define PHYS_BD_CPT                         ((uint32_t)    20)
 #define PHYS_BD_SPD                         ((uint16_t)   150)
 
 /**
@@ -129,14 +129,13 @@
 #define TABLE_HEIGHT (TABLE_Y_MAX - TABLE_Y_MIN)
 
 // Playground elements
-#define WASTEWATER_RECUPERATOR_X		     ROBOT_FRONT_TO_CENTER
 #define WASTEWATER_RECUPERATOR_Y		 	 840
 #define MIXED_WASTEWATER_RECUPERATOR_DEPTH	 106
 #define MIXED_WASTEWATER_RECUPERATOR_WIDTH	  54
 #define BEE_START_X						 	 300
 #define BEE_START_Y							1800
 #define	SWITCH_CENTER_X						1130
-#define	SWITCH_CENTER_Y						TABLE_Y_MIN
+#define	SWITCH_CENTER_Y						ROBOT_FRONT_TO_CENTER
 #define START_LINE_Y						350
 
 // Robot dimensions in mm

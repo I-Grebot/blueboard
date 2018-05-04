@@ -165,6 +165,41 @@ void motion_turnto_behind(double pos_x, double pos_y)
   trajectory_turnto_xy_behind(&robot.cs.traj, pos_x, pos_y);
 }
 
+void motion_stall(int16_t d)
+{
+	trajectory_only_d_rel(&robot.cs.traj,d);
+	while(!(bd_get(&robot.cs.bd_a)||bd_get(&robot.cs.bd_d)));
+	motion_traj_hard_stop();
+}
+
+void motion_stall_front_x(int16_t pos_x, int16_t pos_a)
+{
+	motion_stall(200);
+	motion_set_x(pos_x);
+	motion_set_a(pos_a);
+}
+
+void motion_stall_back_x(int16_t pos_x, int16_t pos_a)
+{
+	motion_stall(-200);
+	motion_set_x(pos_x);
+	motion_set_a(pos_a);
+}
+
+void motion_stall_front_y(int16_t pos_y, int16_t pos_a)
+{
+	motion_stall(200);
+	motion_set_y(pos_y);
+	motion_set_a(pos_a);
+}
+
+void motion_stall_back_y(int16_t pos_y, int16_t pos_a)
+{
+	motion_stall(-200);
+	motion_set_y(pos_y);
+	motion_set_a(pos_a);
+}
+
 /* -----------------------------------------------------------------------------
  * Waypoint management
  * -----------------------------------------------------------------------------
@@ -215,9 +250,11 @@ void motion_execute_wp(wp_t *waypoint)
       motion_set_speed(SPEED_SLOW_D, SPEED_SLOW_A);
       break;
     case WP_SPEED_VERY_SLOW:
+        motion_set_speed(SPEED_VERY_SLOW_D, SPEED_VERY_SLOW_A);
+        break;
     default: // this is quite an error
       DEBUG_ERROR("Unrecognized waypoint speed"DEBUG_EOL);
-      motion_set_speed(SPEED_VERY_SLOW_D, SPEED_VERY_SLOW_A);
+        motion_set_speed(SPEED_VERY_SLOW_D, SPEED_VERY_SLOW_A);
       break;
   }
 
@@ -247,10 +284,20 @@ void motion_execute_wp(wp_t *waypoint)
     case WP_ORIENT_FRONT:
       motion_turnto_front(waypoint->coord.abs.x, waypoint->coord.abs.y);
       break;
-
+    case WP_STALL_FRONT_X:
+      motion_stall_front_x(waypoint->coord.abs.x, waypoint->coord.abs.a);
+      break;
+    case WP_STALL_BACK_X:
+      motion_stall_back_x(waypoint->coord.abs.x, waypoint->coord.abs.a);
+      break;
+    case WP_STALL_FRONT_Y:
+      motion_stall_front_y(waypoint->coord.abs.y, waypoint->coord.abs.a);
+      break;
+    case WP_STALL_BACK_Y:
+      motion_stall_back_y(waypoint->coord.abs.y, waypoint->coord.abs.a);
+      break;
     default:
       DEBUG_ERROR("Unrecognized waypoint type"DEBUG_EOL);
       break;
   } // switch
-
 }

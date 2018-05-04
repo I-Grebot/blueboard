@@ -63,14 +63,14 @@
 */
 
 // Command for the trollet
-#define SW_TROLLET_CMD0   END8_WRITE
-#define SW_TROLLET_CMD1   END7_WRITE
+#define SW_SHOOTER_CMD0   END8_WRITE
+#define SW_SHOOTER_CMD1   END7_WRITE
 
 // Commands decoding
-#define SW_TROLLET_NOP          3U // matches default GPIO config with a pull-down
-#define SW_TROLLET_GOTO_LEFT    2U
-#define SW_TROLLET_GOTO_MIDDLE  1U
-#define SW_TROLLET_GOTO_RIGHT   0U // also triggers auto init
+#define SW_SHOOTER_WAIT         3U // matches default GPIO config with a pull-down
+#define SW_SHOOTER_INIT         2U
+#define SW_SHOOTER_SHOOT_HIGH   1U
+#define SW_SHOOTER_SHOOT_LOW    0U
 
 /**
 ********************************************************************************
@@ -88,10 +88,6 @@
 #define SW_AVD_BACK_CENTER_VALUE     IND2_VALUE
 #define SW_AVD_BACK_RIGHT_VALUE      IND3_VALUE
 #define SW_AVD_ON                    true
-
-// Modules System
-#define SW_SYS_MOD_DETECT_VALUE      IND8_VALUE
-#define SW_SYS_MOD_DETECT_ON         true
 
 /**
 ********************************************************************************
@@ -139,38 +135,41 @@
 // Servos IDs
 #define DSV_LEFT_ARM_ID     30
 #define DSV_RIGHT_ARM_ID    40
-#define DSV_INDEX_ID        50
+#define DSV_OPENER_ID       50
 #define DSV_PUSHER_ID       10
+#define DSV_INDEX_ID        22
 
 // Positions
-#define DSV_LEFT_ARM_POS_DOWN                   200
-#define DSV_LEFT_ARM_POS_UP                     510
+#define DSV_LEFT_ARM_POS_DOWN                    200
+#define DSV_LEFT_ARM_POS_UP                      510
 
-#define DSV_RIGHT_ARM_POS_DOWN                  800
-#define DSV_RIGHT_ARM_POS_UP                    475
+#define DSV_RIGHT_ARM_POS_DOWN                   800
+#define DSV_RIGHT_ARM_POS_UP                     475
 
-#define DSV_INDEX_POS_RIGHT                     650
-#define DSV_INDEX_POS_CENTER                    400
-#define DSV_INDEX_POS_LEFT                      150
+#define DSV_OPENER_POS_RIGHT                     650
+#define DSV_OPENER_POS_CENTER                    400
+#define DSV_OPENER_POS_LEFT                      150
 
-#define DSV_PUSHER_OUT							490
-#define DSV_PUSHER_IN							420
+#define DSV_PUSHER_OUT						 	 540
+#define DSV_PUSHER_IN						 	 360
 
-#define DSV_LANDER_POS_DOWN					    800
-#define DSV_LANDER_POS_UP					    475
+#define DSV_INDEX_POS_GET					     350
+#define DSV_INDEX_POS_SET				         650
+
 
 // Speeds
 #define DSV_ARMS_SPEED_FAST                     1023
-#define DSV_ARMS_SPEED_SLOW                      100
-#define DSV_INDEX_SPEED_FAST                    1023
-#define DSV_INDEX_SPEED_SLOW                     100
+#define DSV_ARMS_SPEED_SLOW                      300
+#define DSV_OPENER_SPEED_FAST                   1023
+#define DSV_OPENER_SPEED_SLOW                    300
 #define DSV_PUSHER_SPEED                         300
+#define DSV_INDEX_SPEED                          500
 
 // Torques
 #define DSV_ARMS_TORQUE                          500
+#define DSV_OPENER_TORQUE                        500
+#define DSV_PUSHER_TORQUE                        250
 #define DSV_INDEX_TORQUE                         500
-#define DSV_PUSHER_TORQUE                        500
-
 
 /**
 ********************************************************************************

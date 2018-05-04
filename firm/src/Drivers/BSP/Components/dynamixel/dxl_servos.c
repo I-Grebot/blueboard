@@ -15,6 +15,7 @@
  */
 
 #include "dynamixel.h"
+#include "../../../Projects/2018_T1_R1/include/debug.h"
 
 
 const dxl_servo_model_t dxl_servo_models[] = {
@@ -73,21 +74,14 @@ const dxl_servo_model_t* dxl_find_servo_model_by_name(const char* name)
 {
     dxl_servo_model_t* model = dxl_servo_models;
     uint16_t model_idx;
-    // FIXME
-/*
-    for(model_idx = 0;
-        model_idx < dxl_nb_servo_models;
-        model_idx++, model++)
+
+    for(model_idx = 0; model_idx < dxl_nb_servo_models; model_idx++, model++)
     {
         if(!strcasecmp(name, model->name)) {
             return model;
         }
     }
-
-    return NULL;*/
-
-    return dxl_servo_models + 6;
-
+    return NULL;
 }
 
 const dxl_servo_model_t* dxl_find_servo_model_by_id(uint32_t id)

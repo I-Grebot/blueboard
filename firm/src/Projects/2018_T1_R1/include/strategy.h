@@ -65,11 +65,12 @@ typedef struct {
   poi_t offset_center;      			// Center of the robot
 
   // Important waypoints
-  poi_t reset;              			// Location of the robot after reset (blue)
-  poi_t exit_start;         			// Exit coordinate
-  poi_t beehive;    					// starting area of the bee
-  poi_t home_automation_switch;  		// Coordinate for shooting ores in the basket
-  poi_t cube_deposit;
+  poi_t reset;              			// Location of the robot after reset (green)
+  poi_t exit_start;         			// Exit coordinate (green)
+  poi_t beehive;    					// starting area of the bee (green)
+  poi_t home_automation_switch;  		// Coordinate of the home automation switch (green)
+  poi_t cube_deposit;					// About the middle of the cube's deposit (green)
+  poi_t water_tower;					// Coordinate of the water tower (green)
 
   // Path-finder static polygons
   path_poly_t* pf_opp_start_zone;
@@ -87,16 +88,16 @@ typedef struct {
 // IDs for each object
 
 // Mono modules on the table
-#define PHYS_ID_CUBES_WG   0		// WEST GREEN SIDE
+#define PHYS_ID_CUBES_WG   0		// WEST  (GREEN SIDE)
 #define PHYS_ID_CUBES_SG   1		// SOUTH (GREEN SIDE)
-#define PHYS_ID_CUBES_EG   2		// EAST GREEN SIDE
-#define PHYS_ID_CUBES_WO   3		// WEST ORANGE SIDE
+#define PHYS_ID_CUBES_EG   2		// EAST  (GREEN SIDE)
+#define PHYS_ID_CUBES_WO   3		// WEST  (ORANGE SIDE)
 #define PHYS_ID_CUBES_NO   4		// NORTH (ORANGE SIDE)
-#define PHYS_ID_CUBES_EO   5		// EAST ORANGE SIDE
+#define PHYS_ID_CUBES_EO   5		// EAST  (ORANGE SIDE)
 
 // Wastewater recuperator
-#define PHYS_ID_MIXED_G   0			// Mixed wastewater on green side
-#define PHYS_ID_MIXED_O   1			// Mixed wastewater on orange side
+#define PHYS_ID_MIXED_G   0			// Mixed wastewater on our side
+#define PHYS_ID_MIXED_O   1			// Mixed wastewater on opponent side
 
 // -----------------------------------------------------------------------------
 // MAIN ROBOT & MATCH DEFINITIONS

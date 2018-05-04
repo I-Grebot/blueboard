@@ -41,7 +41,7 @@ void dxl_init_itf(dxl_interface_t* itf, uint8_t itf_idx)
 
 
     itf->return_level = DXL_STATUS_EVERYTHING;
-    itf->return_delay_ms = 1;
+    itf->return_delay_ms = 100;
 
     // Protocol-dependent values
     if(itf->protocol == DXL_V1) {

@@ -106,8 +106,7 @@ void sequencer_task( void *pvParameters )
   led_start();
 
   // Sub-systems
- //sys_modules_start();
-  sys_modules_init();
+  sys_modules_start();
 
   // High-level
   avoidance_start();
@@ -127,7 +126,6 @@ void sequencer_task( void *pvParameters )
     // We are barely alive, but at least we got this far
     case MATCH_STATE_RESET:
     //-------------------------------------------------------------------------
-
       match.state = MATCH_STATE_READY;
       sequencer_print_match();
       break;
@@ -135,7 +133,6 @@ void sequencer_task( void *pvParameters )
     // Start to do some actual business
     case MATCH_STATE_READY:
     //-------------------------------------------------------------------------
-
       if(notified && (sw_notification & OS_NOTIFY_INIT_START))
       {
         match.sw_init = true;
@@ -143,7 +140,7 @@ void sequencer_task( void *pvParameters )
 
       sequencer_color_sample();
 
-      if((SW_START == MATCH_START_INSERTED) ||  // Hardware init
+      if((SW_START == MATCH_START_REMOVED) ||  // Hardware init
          match.sw_init)                         // Software init
       {
         match.state = MATCH_STATE_INIT;
@@ -155,14 +152,13 @@ void sequencer_task( void *pvParameters )
     case MATCH_STATE_INIT:
     //-------------------------------------------------------------------------
 
-      // Sample color at init only
       sequencer_color_sample();
-      ai_init();
-
-      match.state = MATCH_STATE_SELF_CHECK;
-
-      sequencer_print_match();
-
+      if((SW_START == MATCH_START_INSERTED))
+      {
+          ai_init();
+    	  match.state = MATCH_STATE_SELF_CHECK;
+          sequencer_print_match();
+      }
       break;
 
     // I'am a big boy now
@@ -197,7 +193,7 @@ void sequencer_task( void *pvParameters )
         }
 
       } else {
-        //sequencer_color_sample();
+        sequencer_color_sample();
         match.timer_msec = 0;
         start_sw_debounced = false;
       }
@@ -210,7 +206,7 @@ void sequencer_task( void *pvParameters )
         match.state = MATCH_STATE_RUN;
 
         match.timer_msec = 0;
-        match.scored_points = 0;
+        match.scored_points = 5+5;	// start with 5pts for the bee and 5pts for the automation pannel
 
         // Sample the color, just in case the jack was removed during init
         sequencer_color_sample();
@@ -238,6 +234,7 @@ void sequencer_task( void *pvParameters )
         sequencer_print_match();
         led_set_color(BB_LED_RED);
         led_set_mode(BB_LED_STATIC);
+        sys_mod_set_color((uint8_t)match.state);					// XL_320 set red
       }
       else
       {
@@ -301,6 +298,9 @@ void sequencer_color_sample(void)
   } else {
     led_set_color(BB_LED_YELLOW);
   }
+
+  if(match.state > MATCH_STATE_INIT)
+    sys_mod_set_color(match.color);
 }
 
 // Print current match state

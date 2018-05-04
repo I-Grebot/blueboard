@@ -125,9 +125,9 @@ void dsv_init(void)
 
     // TEMP
      /* Initialize XL-320 Library */
-     xl_320_init(XL_320_TX_ONLY);
-     xl_320_set_hw_send(dsv_put);
-     //xl_320_set_hw_switch(dsv_switch);
+     xl_320_init(XL_320_TXRX_ONE_PIN);
+     //xl_320_set_hw_send(dsv_put);
+     //xl_320_set_hw_switch(bb_dsv_switch(dsv_chan1.dxl.itf_idx));
 
     // Initialize test servos
     dxl_init_servo(&servo1, &dsv_chan2.dxl, "RX-28");

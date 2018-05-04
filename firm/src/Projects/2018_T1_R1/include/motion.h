@@ -89,8 +89,8 @@ typedef struct
   struct quadramp_filter qr_d;
 
   /* Blocking detection */
-  struct blocking_detection bd_l;
-  struct blocking_detection bd_r;
+  struct blocking_detection bd_a;
+  struct blocking_detection bd_d;
 
   /* Control variables */
   int32_t pwm_l;
@@ -116,7 +116,11 @@ typedef enum
   WP_GOTO_BWD,
   WP_MOVE_REL,
   WP_ORIENT_FRONT,
-  WP_ORIENT_BEHIND
+  WP_ORIENT_BEHIND,
+  WP_STALL_FRONT_X,
+  WP_STALL_BACK_X,
+  WP_STALL_FRONT_Y,
+  WP_STALL_BACK_Y
 } wp_type_e;
 
 /* Waypoint nominal speed */

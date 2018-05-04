@@ -28,11 +28,6 @@ typedef enum
   SYS_MOD_INIT,       // Initializing system
   SYS_MOD_SELF_TEST,  // Performing self-test
   SYS_MOD_READY,      // Ready to run
-  SYS_MOD_GRAB_READY, // Modules System is ready to grab and will do so upon detection
-  SYS_MOD_GRABBING,   // Grabbing an object
-  SYS_MOD_LOADED,     // A module is loaded
-  SYS_MOD_LANDING,    // Landing the module
-  SYS_MOD_FOLDING,    // Fold the system
   SYS_MOD_ERROR       // When something terrible happened
 } sys_mode_state_e;
 
@@ -42,12 +37,14 @@ typedef struct
   dxl_servo_t left_arm;       // RX28
   dxl_servo_t right_arm;      // RX28
   dxl_servo_t pusher;         // RX28
-  dxl_servo_t index;          // RX28
+  dxl_servo_t opener;         // RX28
+  dxl_servo_t index;          // XL320
 
   // Parameters
   uint16_t left_arm_pos;
   uint16_t right_arm_pos;
   uint16_t pusher_pos;
+  uint16_t opener_pos;
   uint16_t index_pos;
 
   // System management

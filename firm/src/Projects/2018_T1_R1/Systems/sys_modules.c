@@ -30,24 +30,29 @@ static TaskHandle_t handle_task_sys_modules;
 // Local private functions
 static void sys_modules_task(void *pvParameters);
 
-
-
 void sys_modules_init(void)
 {
   // Initialize the hardware handlers
   dxl_init_servo(&sys_mod.left_arm, &dsv_chan2.dxl, "RX-28");
   dxl_init_servo(&sys_mod.right_arm, &dsv_chan2.dxl, "RX-28");
-  dxl_init_servo(&sys_mod.index, &dsv_chan2.dxl, "RX-28");
   dxl_init_servo(&sys_mod.pusher, &dsv_chan2.dxl, "RX-28");
+  dxl_init_servo(&sys_mod.opener, &dsv_chan2.dxl, "RX-28");
+  dxl_init_servo(&sys_mod.index, &dsv_chan1.dxl, "XL320");
 
   sys_mod.left_arm.id = DSV_LEFT_ARM_ID;
   sys_mod.right_arm.id = DSV_RIGHT_ARM_ID;
-  sys_mod.index.id = DSV_INDEX_ID;
+  sys_mod.opener.id = DSV_OPENER_ID;
   sys_mod.pusher.id = DSV_PUSHER_ID;
+  sys_mod.index.id = DSV_INDEX_ID;
 
-  sys_mod.current_state = SYS_MOD_INIT;
+  sys_mod.current_state = SYS_MOD_RESET;
 }
 
+void sys_mod_set_shoot_cmd(uint8_t cmd)
+{
+  SW_SHOOTER_CMD0(cmd & 0x02 ? Bit_SET: Bit_RESET);
+  SW_SHOOTER_CMD1(cmd & 0x01 ? Bit_SET: Bit_RESET);
+}
 
 BaseType_t sys_modules_start(void)
 {
@@ -60,7 +65,6 @@ void sys_modules_task(void *pvParameters)
 {
   BaseType_t notified;
   uint32_t sw_notification;
-  TickType_t next_wake_time = xTaskGetTickCount();
 
   sys_modules_init();
 
@@ -106,83 +110,34 @@ void sys_modules_task(void *pvParameters)
 
       case SYS_MOD_READY:
 
-        // Transition to GRAB_READY
-        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_GRAB))
+        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_LEFT_ARM))
         {
-          sys_mod.current_state = SYS_MOD_GRAB_READY;
+        	sys_mod_set_servo(&sys_mod.left_arm,sys_mod.left_arm_pos);
         }
 
-        // Transition to FOLDING
-        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_FOLD))
+        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_RIGHT_ARM))
         {
-          sys_mod.current_state = SYS_MOD_FOLDING;
+        	sys_mod_set_servo(&sys_mod.right_arm,sys_mod.right_arm_pos);
         }
 
-        // Transition to LANDING
-        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_LAND))
+        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_PUSH))
         {
-          sys_mod.current_state = SYS_MOD_LANDING;
-        }
-        break;
-
-
-      case SYS_MOD_GRAB_READY:
-
-        // Transition to grabbing
-        if(SW_SYS_MOD_DETECT_VALUE == SW_SYS_MOD_DETECT_ON)
-        {
-          sys_mod.current_state = SYS_MOD_GRABBING;
+        	if(sys_mod.pusher_pos==DSV_PUSHER_IN)
+        		sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_OUT);
+        	else
+        		sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
         }
 
-        // Transition to folding
-        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_FOLD))
+        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_OPEN))
         {
-          sys_mod.current_state = SYS_MOD_FOLDING;
+        	if(sys_mod.opener_pos==DSV_OPENER_POS_RIGHT)
+        		sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
+        	else
+        		sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
         }
         break;
 
-
-      case SYS_MOD_GRABBING:
-        sys_mod.current_state = SYS_MOD_LOADED;
-        DEBUG_INFO("[SYS_MOD] Loaded"DEBUG_EOL);
-
-        break;
-
-
-      case SYS_MOD_LOADED:
-
-        // Transition to LANDING
-        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_LAND))
-        {
-          sys_mod.current_state = SYS_MOD_LANDING;
-        }
-
-        break;
-
-
-      case SYS_MOD_LANDING:
-
-        //...
-        // TODO
-        //...
-        sys_mod.current_state = SYS_MOD_READY;
-        DEBUG_INFO("[SYS_MOD] Ready"DEBUG_EOL);
-
-        break;
-
-
-      case SYS_MOD_FOLDING:
-
-        //...
-        // TODO
-        //...
-        sys_mod.current_state = SYS_MOD_READY;
-        DEBUG_INFO("[SYS_MOD] Ready"DEBUG_EOL);
-
-        break;
-
-
-      default:
+     default:
         sys_mod.current_state = SYS_MOD_ERROR;
         DEBUG_CRITICAL("[SYS_MOD] Error: running into an unknown state!"DEBUG_EOL);
         break;
@@ -206,76 +161,51 @@ BaseType_t sys_mod_proc_init(void)
   // Initialize analog servos
 
   // Initializing digital servos
-  dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW);
-  dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_SLOW);
-  dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED_SLOW);
-  dxl_set_speed(&sys_mod.pusher, DSV_PUSHER_SPEED);
+  while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.pusher, DSV_PUSHER_SPEED)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED)!=DXL_STATUS_NO_ERROR);
 
-  dxl_set_torque_enable(&sys_mod.left_arm, 1);
-  dxl_set_torque_enable(&sys_mod.right_arm, 1);
-  dxl_set_torque_enable(&sys_mod.index, 1);
-  dxl_set_torque_enable(&sys_mod.pusher, 1);
+  while(dxl_set_torque_enable(&sys_mod.left_arm, 1)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque_enable(&sys_mod.right_arm, 1)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque_enable(&sys_mod.opener, 1)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque_enable(&sys_mod.pusher, 1)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque_enable(&sys_mod.index, 1)!=DXL_STATUS_NO_ERROR);
 
-  dxl_set_torque(&sys_mod.left_arm, DSV_ARMS_TORQUE);
-  dxl_set_torque(&sys_mod.right_arm, DSV_ARMS_TORQUE);
-  dxl_set_torque(&sys_mod.index, DSV_ARMS_TORQUE);
-  dxl_set_torque(&sys_mod.pusher, DSV_ARMS_TORQUE);
+  while(dxl_set_torque(&sys_mod.left_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque(&sys_mod.right_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque(&sys_mod.opener, DSV_OPENER_TORQUE)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque(&sys_mod.pusher, DSV_PUSHER_TORQUE)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque(&sys_mod.index, DSV_INDEX_TORQUE)!=DXL_STATUS_NO_ERROR);
 
-  dxl_set_position(&sys_mod.left_arm, DSV_LEFT_ARM_POS_UP);
-  dxl_set_position(&sys_mod.right_arm, DSV_RIGHT_ARM_POS_UP);
-  dxl_set_position(&sys_mod.index, DSV_INDEX_POS_CENTER);
-  dxl_set_position(&sys_mod.pusher, DSV_PUSHER_IN);
+  while(dxl_set_position(&sys_mod.left_arm, DSV_LEFT_ARM_POS_UP)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_position(&sys_mod.right_arm, DSV_RIGHT_ARM_POS_UP)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_position(&sys_mod.opener, DSV_OPENER_POS_CENTER)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_position(&sys_mod.pusher, DSV_PUSHER_IN)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_position(&sys_mod.index, DSV_INDEX_POS_GET)!=DXL_STATUS_NO_ERROR);
+
+  // Initialize ServoIFace
+  sys_mod_set_shoot_cmd(SW_SHOOTER_WAIT);
 
   return pdPASS;
 }
 
 BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position)
 {
-  uint8_t retry=4;
+  uint16_t return_position=0;
   uint8_t timout=0;
-  uint16_t return_position;
-  uint8_t move=0;
-  for(retry=10;retry>0;retry--)
+  while(dxl_set_position(servo, position)!=DXL_STATUS_NO_ERROR);
+  for(timout=0;timout<40;timout++)
   {
-	  dxl_set_position(servo, position);
-      vTaskDelay(pdMS_TO_TICKS(100));
-	  is_dxl_moving(servo, &move);
-	  vTaskDelay(pdMS_TO_TICKS(100));
-	  if(move>0)
-	  {
-		  for(timout=0;timout<40;timout++)
-		  {
-			  dxl_get_position(servo, &return_position);	// Check position
-			  if(return_position<=position+5 && return_position>=position-5)
-				  return pdPASS;
-			  vTaskDelay(pdMS_TO_TICKS(100));
-		  }
-		  return pdFAIL;
-	  }
+	  dxl_get_position(servo, &return_position);	// Check position
+	  if((return_position<=position+5) && (return_position>=position-5))
+		return pdPASS;
+	  else
+	    vTaskDelay(pdMS_TO_TICKS(100));
   }
   return pdFAIL;
 }
-
-BaseType_t sys_mod_set_left_arm(uint16_t position)
-{
-  return sys_mod_set_servo(&sys_mod.left_arm,position);
-}
-
-BaseType_t sys_mod_set_right_arm(uint16_t position)
-{
-  return sys_mod_set_servo(&sys_mod.right_arm,position);
-}
-
-BaseType_t sys_mod_set_index(uint16_t position)
-{
-  return sys_mod_set_servo(&sys_mod.index,position);
-}
-
-BaseType_t sys_mod_set_pusher(uint16_t position)
-{
-  return sys_mod_set_servo(&sys_mod.pusher,position);
-}
-
 
 // Launch a series of self-test actions
 BaseType_t sys_mod_proc_self_test(void)
@@ -284,25 +214,26 @@ BaseType_t sys_mod_proc_self_test(void)
   DEBUG_INFO("[SYS_MOD] Start Self-Test"DEBUG_EOL);
 
   // Test
-  vTaskDelay(pdMS_TO_TICKS(200));
-  dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED_FAST);
-  vTaskDelay(pdMS_TO_TICKS(200));
-  dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_FAST);
-  vTaskDelay(pdMS_TO_TICKS(200));
-  dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_FAST);
-  vTaskDelay(pdMS_TO_TICKS(200));
-  sys_mod_set_index(DSV_INDEX_POS_LEFT);
-  sys_mod_set_left_arm(DSV_LEFT_ARM_POS_DOWN);
-  sys_mod_set_index(DSV_INDEX_POS_RIGHT);
-  sys_mod_set_right_arm(DSV_RIGHT_ARM_POS_DOWN);
-  sys_mod_set_index(DSV_INDEX_POS_CENTER);
-  sys_mod_set_pusher(DSV_PUSHER_OUT);
-  sys_mod_set_index(DSV_INDEX_POS_LEFT);
-  sys_mod_set_left_arm(DSV_LEFT_ARM_POS_UP);
-  sys_mod_set_index(DSV_INDEX_POS_RIGHT);
-  sys_mod_set_right_arm(DSV_RIGHT_ARM_POS_UP);
-  sys_mod_set_index(DSV_INDEX_POS_CENTER);
-  sys_mod_set_pusher(DSV_PUSHER_IN);
+  while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
+  sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_SET);
+  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
+  sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_DOWN);
+  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
+  sys_mod_set_servo(&sys_mod.right_arm,DSV_RIGHT_ARM_POS_DOWN);
+  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_CENTER);
+  sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_OUT);
+  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
+  sys_mod_set_servo(&sys_mod.left_arm,sys_mod.left_arm_pos=DSV_LEFT_ARM_POS_UP);
+  sys_mod_set_servo(&sys_mod.opener,sys_mod.opener_pos=DSV_OPENER_POS_RIGHT);
+  sys_mod_set_servo(&sys_mod.right_arm,sys_mod.right_arm_pos=DSV_RIGHT_ARM_POS_UP);
+  sys_mod_set_servo(&sys_mod.pusher,sys_mod.pusher_pos=DSV_PUSHER_IN);
+  sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_GET);
+
+  sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
+
+
 
   return pdPASS;
 }
@@ -322,4 +253,51 @@ void sys_mod_do_self_test(TaskHandle_t* caller)
 {
   sys_mod.calling_task = caller;
   xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_SELF_TEST, eSetBits);
+}
+
+void sys_mod_do_left_arm(TaskHandle_t* caller, uint16_t position)
+{
+	sys_mod.calling_task = caller;
+	sys_mod.left_arm_pos = position;
+	xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_LEFT_ARM, eSetBits);
+}
+
+void sys_mod_do_right_arm(TaskHandle_t* caller, uint16_t position)
+{
+	sys_mod.calling_task = caller;
+	sys_mod.right_arm_pos = position;
+	xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_RIGHT_ARM, eSetBits);
+}
+
+void sys_mod_do_open(TaskHandle_t* caller)
+{
+	sys_mod.calling_task = caller;
+	xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_OPEN, eSetBits);
+}
+
+void sys_mod_do_push(TaskHandle_t* caller)
+{
+	sys_mod.calling_task = caller;
+	xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_PUSH, eSetBits);
+}
+
+void sys_mod_do_index(TaskHandle_t* caller, uint16_t position)
+{
+	sys_mod_set_servo(&sys_mod.index,position);
+}
+
+void sys_mod_set_color(uint8_t color)
+{
+	switch(color)
+	{
+	  case MATCH_COLOR_GREEN :
+		while(dxl_set_led(&sys_mod.index,DXL_LED_GREEN)!=DXL_STATUS_NO_ERROR);
+	    break;
+	  case MATCH_COLOR_ORANGE :
+		while(dxl_set_led(&sys_mod.index,DXL_LED_YELLOW)!=DXL_STATUS_NO_ERROR);
+	    break;
+	  default:
+		while(dxl_set_led(&sys_mod.index,DXL_LED_RED)!=DXL_STATUS_NO_ERROR);
+		break;
+	}
 }

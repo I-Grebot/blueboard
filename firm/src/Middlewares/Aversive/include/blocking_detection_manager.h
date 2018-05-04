@@ -25,8 +25,8 @@
 #ifndef BLOCKING_DETECTION_MANAGER_H_
 #define BLOCKING_DETECTION_MANAGER_H_
 
-/* display debug every 128 calls of manage if defined */
-#define BD_DEBUG 128
+/* display debug every 200 calls of manage if defined */
+//#define BD_DEBUG 200
 
 #include <control_system_manager.h>
 

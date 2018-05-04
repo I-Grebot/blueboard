@@ -60,7 +60,6 @@ void bb_dio_init(void)
     GPIO_InitStructure.GPIO_Pin = END5_PIN;
     GPIO_Init(END5_GPIO_PORT, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_Pin = END6_PIN;
     GPIO_Init(END6_GPIO_PORT, &GPIO_InitStructure);
 

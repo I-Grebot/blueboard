@@ -34,6 +34,7 @@ extern av_t av;
 
 
 extern TaskHandle_t handle_task_avoidance;
+extern TaskHandle_t handle_task_sequencer;
 
 /**
 ********************************************************************************
@@ -76,25 +77,8 @@ BaseType_t ai_init(void)
   motion_set_y(phys.reset.y);
   motion_set_a(phys.reset.a);
 
-  // Prepare funny
- // bb_asv_set_pwm_pulse_length(ASV_CHANNEL_FUNNY, ASV_FUNNY_OFF);
-
   // Initialize modules system
-  sys_mod_proc_init();
-
-  // Open only the back grabber corresponding to our color
-  //sys_mod_proc_grab_back(match.color != MATCH_COLOR_GREEN);
-  //sys_mod_proc_release_back(match.color == MATCH_COLOR_GREEN);
-
-  // Wait 3 sec before going to start zone
-  vTaskDelay(pdMS_TO_TICKS(3000));
-
-  // GOTO start zone
-  // (Avoidance is OFF)
-
-  //sys_mod_proc_close_back(true);
-  //sys_mod_proc_close_back(false);
-  //sys_mod_proc_fold();
+  sys_mod_do_init(&handle_task_sequencer);
 
   return pdPASS;
 }
@@ -102,10 +86,8 @@ BaseType_t ai_init(void)
 // Self-Test procedure
 BaseType_t ai_self_test(void)
 {
-  /*sys_mod_proc_grab_back(true);
-  sys_mod_proc_grab_back(false);*/
-  //sys_mod_proc_self_test();
-  ai_task_stall_at_start();
+	sys_mod_do_self_test(&handle_task_sequencer);
+    ai_task_stall_at_start();
 
   return pdPASS;
 }

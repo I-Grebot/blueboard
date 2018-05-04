@@ -110,12 +110,12 @@ void motion_cs_init(void)
   trajectory_set_windows(&robot.cs.traj, PHYS_TRAJ_DEFAULT_WIN_D, PHYS_TRAJ_DEFAULT_WIN_A_DEG, PHYS_TRAJ_DEFAULT_WIN_A_START_DEG);
 
   /* Blocking detection */
-  bd_init(&robot.cs.bd_l);
-  bd_init(&robot.cs.bd_r);
-  bd_set_current_thresholds(&robot.cs.bd_r, PHYS_BD_K1, PHYS_BD_K2, PHYS_BD_THR, PHYS_BD_CPT);
-  bd_set_current_thresholds(&robot.cs.bd_l, PHYS_BD_K1, PHYS_BD_K2, PHYS_BD_THR, PHYS_BD_CPT);
-  bd_set_speed_threshold(&robot.cs.bd_l, PHYS_BD_SPD);
-  bd_set_speed_threshold(&robot.cs.bd_r, PHYS_BD_SPD);
+  bd_init(&robot.cs.bd_a);
+  bd_init(&robot.cs.bd_d);
+  bd_set_current_thresholds(&robot.cs.bd_a, PHYS_BD_K1, PHYS_BD_K2, PHYS_BD_THR, PHYS_BD_CPT);
+  bd_set_current_thresholds(&robot.cs.bd_d, PHYS_BD_K1, PHYS_BD_K2, PHYS_BD_THR, PHYS_BD_CPT);
+  bd_set_speed_threshold(&robot.cs.bd_a, PHYS_BD_SPD);
+  bd_set_speed_threshold(&robot.cs.bd_d, PHYS_BD_SPD);
 
   /* CS EVENT */
   //scheduler_add_periodical_event_priority(do_cs, NULL, 5000 / SCHEDULER_UNIT, 150);  /* 5 ms */
@@ -126,8 +126,7 @@ void motion_cs_init(void)
   /* init struct robot */
   //robot.cs.cs_events = DO_CS | DO_RS | DO_POS | DO_BD | DO_POWER ;
   robot.cs.cs_events =  DO_RS | DO_POS | DO_BD | DO_STATUS;
-  //right_current = 0;
-  //left_current = 0;
+
 }
 
 /* -----------------------------------------------------------------------------
@@ -192,9 +191,12 @@ void motion_cs_task(void *pvParameters)
       position_manage(&robot.cs.pos);
     }
 
-    /* Blocking-detection manager:
-     * TODO: Add me */
-    /* trajectory_hardstop(pRobot.traj);*/
+    // Blocking-detection manager:
+    if(robot.cs.cs_events & DO_BD)
+    {
+    	bd_manage_from_cs(&robot.cs.bd_a, &robot.cs.cs_a);
+    	bd_manage_from_cs(&robot.cs.bd_d, &robot.cs.cs_d);
+    }
 
     /* Wakes-up when required */
     vTaskDelayUntil( &xNextWakeTime, pdMS_TO_TICKS(OS_AVERSIVE_PERIOD_MS));
