@@ -140,10 +140,10 @@
 #define DSV_INDEX_ID        22
 
 // Positions
-#define DSV_LEFT_ARM_POS_DOWN                    200
-#define DSV_LEFT_ARM_POS_UP                      510
+#define DSV_LEFT_ARM_POS_DOWN                    100
+#define DSV_LEFT_ARM_POS_UP                      360
 
-#define DSV_RIGHT_ARM_POS_DOWN                   800
+#define DSV_RIGHT_ARM_POS_DOWN                   735
 #define DSV_RIGHT_ARM_POS_UP                     475
 
 #define DSV_OPENER_POS_RIGHT                     650
@@ -151,7 +151,7 @@
 #define DSV_OPENER_POS_LEFT                      150
 
 #define DSV_PUSHER_OUT						 	 540
-#define DSV_PUSHER_IN						 	 360
+#define DSV_PUSHER_IN						 	 350
 
 #define DSV_INDEX_POS_GET					     350
 #define DSV_INDEX_POS_SET				         650

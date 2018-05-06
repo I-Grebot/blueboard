@@ -65,7 +65,7 @@ void sys_modules_task(void *pvParameters)
 {
   BaseType_t notified;
   uint32_t sw_notification;
-
+  uint8_t shoot_nb;
   sys_modules_init();
 
   ( void ) pvParameters;
@@ -123,18 +123,31 @@ void sys_modules_task(void *pvParameters)
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_PUSH))
         {
         	if(sys_mod.pusher_pos==DSV_PUSHER_IN)
-        		sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_OUT);
+        		sys_mod_set_servo(&sys_mod.pusher,sys_mod.pusher_pos=DSV_PUSHER_OUT);
         	else
-        		sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
+        		sys_mod_set_servo(&sys_mod.pusher,sys_mod.pusher_pos=DSV_PUSHER_IN);
         }
 
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_OPEN))
         {
         	if(sys_mod.opener_pos==DSV_OPENER_POS_RIGHT)
-        		sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
+        		sys_mod_set_servo(&sys_mod.opener,sys_mod.opener_pos=DSV_OPENER_POS_LEFT);
         	else
-        		sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
+        		sys_mod_set_servo(&sys_mod.opener,sys_mod.opener_pos=DSV_OPENER_POS_RIGHT);
         }
+
+/*        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_SHOOT))
+        {
+          for(shoot_nb=0;shoot_nb<10;shoot_nb++)
+          {
+        	sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_SET);
+        	sys_mod_set_shoot_cmd(SW_SHOOTER_SHOOT_HIGH);
+          	vTaskDelay(pdMS_TO_TICKS(500));
+        	sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_GET);
+        	sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
+          	vTaskDelay(pdMS_TO_TICKS(500));
+          }
+        }*/
         break;
 
      default:
@@ -233,8 +246,6 @@ BaseType_t sys_mod_proc_self_test(void)
 
   sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
 
-
-
   return pdPASS;
 }
 
@@ -283,7 +294,13 @@ void sys_mod_do_push(TaskHandle_t* caller)
 
 void sys_mod_do_index(TaskHandle_t* caller, uint16_t position)
 {
-	sys_mod_set_servo(&sys_mod.index,position);
+	sys_mod_set_servo(&sys_mod.index,sys_mod.index.current_position=position);
+}
+
+void sys_mod_do_shoot(TaskHandle_t* caller)
+{
+	sys_mod.calling_task = caller;
+	xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_SHOOT, eSetBits);
 }
 
 void sys_mod_set_color(uint8_t color)

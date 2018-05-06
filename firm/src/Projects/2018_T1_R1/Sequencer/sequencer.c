@@ -313,11 +313,6 @@ void sequencer_print_match(void)
       match.timer_msec/1000,
       match.scored_points
       );
-  DEBUG_INFO_NOPFX("[POS] %i %i %i"DEBUG_EOL,
-		  robot.cs.pos.pos_s16.x,
-		  robot.cs.pos.pos_s16.y,
-		  robot.cs.pos.pos_s16.a
-		  );
 }
 
 const char* match_state_to_str(match_state_e state)

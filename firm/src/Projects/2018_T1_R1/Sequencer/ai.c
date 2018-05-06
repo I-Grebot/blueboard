@@ -87,6 +87,7 @@ BaseType_t ai_init(void)
 BaseType_t ai_self_test(void)
 {
 	sys_mod_do_self_test(&handle_task_sequencer);
+	vTaskDelay(pdMS_TO_TICKS(8000));
     ai_task_stall_at_start();
 
   return pdPASS;

@@ -31,6 +31,7 @@ extern robot_t robot;
 extern phys_t phys;
 extern path_t pf;
 extern TaskHandle_t handle_task_avoidance;
+extern sys_mod_t sys_mod;
 
 /**
 ********************************************************************************
@@ -72,13 +73,14 @@ void motion_move_block_on_avd(wp_t* wp)
 
       // Stop and wait 3 seconds
       motion_traj_hard_stop();
-      vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(3000));
+      vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(1000));
 
       // Clear avoidance state
       xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
 
       // Re-go
       motion_add_new_wp(wp);
+      DEBUG_INFO("NEW wp: x=%d, y=%d, d=%d, a=%d!"DEBUG_EOL,wp->coord.abs.x, wp->coord.abs.y, wp->coord.rel.d, wp->coord.rel.a);
     }
   }
 
@@ -217,17 +219,31 @@ void ai_task_stall_at_start(void)
 
 	  // Stall at start
 	  // ------------------
+	  DEBUG_INFO("[POS] before stall x  %d %d %d"DEBUG_EOL,
+	      motion_get_x(),
+		  motion_get_y(),
+		  motion_get_a()
+	      );
+
 	  wp.speed = WP_SPEED_VERY_SLOW;
 	  wp.type = WP_STALL_BACK_X;
-	  wp.coord.abs.a = 0;
+	  if(match.color == MATCH_COLOR_GREEN)
+		  wp.coord.abs.a = 0;
+	  else
+		  wp.coord.abs.a = -180;
 	  wp.coord.abs.x = ROBOT_BACK_TO_CENTER;
-	  wp.coord.abs.y = 0;
 	  wp.trajectory_must_finish = true;
 	  motion_move_block_on_avd(&wp);
 
+	  DEBUG_INFO("[POS] after stall x  %d %d %d"DEBUG_EOL,
+	      motion_get_x(),
+		  motion_get_y(),
+		  motion_get_a()
+	      );
+
 	  wp.speed = WP_SPEED_SLOW;
 	  wp.type = WP_MOVE_REL;
-	  wp.coord.rel.d = 100;
+	  wp.coord.rel.d = 200;
 	  wp.coord.rel.a = 0;
 	  wp.trajectory_must_finish = true;
 	  motion_move_block_on_avd(&wp);
@@ -242,13 +258,24 @@ void ai_task_stall_at_start(void)
 	  wp.trajectory_must_finish = true;
 	  motion_move_block_on_avd(&wp);
 
+	  DEBUG_INFO("[POS] before stall y  %d %d %d"DEBUG_EOL,
+	      motion_get_x(),
+		  motion_get_y(),
+		  motion_get_a()
+	      );
+
 	  wp.speed = WP_SPEED_VERY_SLOW;
 	  wp.type = WP_STALL_BACK_Y;
 	  wp.coord.abs.a = 90;
-	  wp.coord.abs.x = 0;
 	  wp.coord.abs.y = ROBOT_BACK_TO_CENTER;
 	  wp.trajectory_must_finish = true;
 	  motion_move_block_on_avd(&wp);
+
+	  DEBUG_INFO("[POS] after stall y  %d %d %d"DEBUG_EOL,
+	      motion_get_x(),
+		  motion_get_y(),
+		  motion_get_a()
+	      );
 
 	  wp.speed = WP_SPEED_SLOW;
 	  wp.type = WP_MOVE_REL;
@@ -281,7 +308,7 @@ void ai_task_start(void *params)
   BaseType_t notified;
   uint32_t sw_notification;
   uint8_t led;
-
+  uint8_t shoot_nb = 0;
   // Tick timer
   TickType_t new_wake_time = xTaskGetTickCount();
 
@@ -295,51 +322,47 @@ void ai_task_start(void *params)
   // Clear avoidance state in case it was triggered during init
   // (avoid dead lock)
   xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
-  avd_mask_all(false);
-
 
   // Exit
   // ------------------
   wp.speed = WP_SPEED_FAST;
   wp.type = WP_GOTO_FWD;
   wp.coord.abs = phys.exit_start;
+  wp.trajectory_must_finish = true;
+  avd_mask_back(false);
   motion_move_block_on_avd(&wp);
   match.scored_points += 10; 	// if we are here, we can say we aren't forfeit
+
 
   // push home automation switch
   // ------------------------
   wp.speed = WP_SPEED_SLOW;
   wp.type = WP_ORIENT_FRONT;
   wp.coord.abs = phys.home_automation_switch;
+  wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
 
   wp.type = WP_GOTO_FWD;
   wp.speed = WP_SPEED_SLOW;
   wp.coord.abs = phys.home_automation_switch;
-  wp.trajectory_must_finish = true;
+  wp.trajectory_must_finish = false;
   motion_move_block_on_avd(&wp);
   vTaskDelay(pdMS_TO_TICKS(1000));
-  motion_traj_hard_stop();
 
-  sys_mod_do_push(self->handle);
-  vTaskDelay(pdMS_TO_TICKS(500));				// push automation switch
   sys_mod_do_push(self->handle);
   match.scored_points += 25; 					// pushed 100% of the time
-
-  wp.speed = WP_SPEED_VERY_SLOW;
-  wp.type = WP_STALL_FRONT_Y;
-  wp.coord.abs.a = -90;
-  wp.coord.abs.x = 0;
-  wp.coord.abs.y = ROBOT_FRONT_TO_CENTER;		// we stall in the mid time
-  wp.trajectory_must_finish = true;
-  motion_move_block_on_avd(&wp);
+  vTaskDelay(pdMS_TO_TICKS(500));
+  sys_mod_do_push(self->handle);
+  vTaskDelay(pdMS_TO_TICKS(500));
 
   wp.speed = WP_SPEED_NORMAL;
   wp.type = WP_GOTO_BWD;
-  wp.coord.abs.a = 90;
+  wp.coord.abs.a = -90;
   wp.coord.abs.x = SWITCH_CENTER_X;
   wp.coord.abs.y = TABLE_Y_MAX/2;
   wp.trajectory_must_finish = false;
+  avd_mask_back(true);
+  avd_mask_front(false);
   motion_move_block_on_avd(&wp);
   while(!motion_is_traj_near());
 
@@ -356,18 +379,32 @@ void ai_task_start(void *params)
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
 
+  DEBUG_INFO("[POS] before stall y  %d %d %d"DEBUG_EOL,
+      motion_get_x(),
+	  motion_get_y(),
+	  motion_get_a()
+      );
+
   wp.type = WP_STALL_BACK_Y;				// stall y
   wp.speed = WP_SPEED_VERY_SLOW;
   wp.coord.abs.a = -90;
   wp.coord.abs.y = TABLE_Y_MAX-ROBOT_BACK_TO_CENTER;
   wp.trajectory_must_finish = true;
+  avd_mask_all(false);
   motion_move_block_on_avd(&wp);
+
+  DEBUG_INFO("[POS] after y stall %d %d %d"DEBUG_EOL,
+      motion_get_x(),
+	  motion_get_y(),
+	  motion_get_a()
+      );
 
   wp.type = WP_MOVE_REL;
   wp.speed = WP_SPEED_SLOW;
   wp.coord.rel.d = ROBOT_RADIUS+15-ROBOT_BACK_TO_CENTER;
   wp.coord.rel.a = 0;
   wp.trajectory_must_finish = true;
+  avd_mask_front(true);
   motion_move_block_on_avd(&wp);
 
   wp.type = WP_MOVE_REL;
@@ -380,23 +417,42 @@ void ai_task_start(void *params)
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
 
+  DEBUG_INFO("[POS] before stall x  %d %d %d"DEBUG_EOL,
+      motion_get_x(),
+	  motion_get_y(),
+	  motion_get_a()
+      );
+
   wp.type = WP_STALL_BACK_X;				// stall x
   wp.speed = WP_SPEED_VERY_SLOW;
-  wp.coord.rel.a = 0;
-  wp.coord.abs.y = ROBOT_BACK_TO_CENTER;
+  if(match.color == MATCH_COLOR_GREEN)
+	  wp.coord.abs.a = 0;
+  else
+	  wp.coord.abs.a = 180;
+  wp.coord.abs.x = ROBOT_BACK_TO_CENTER;
   wp.trajectory_must_finish = true;
+  avd_mask_all(false);
   motion_move_block_on_avd(&wp);
+
+  DEBUG_INFO("[POS] after stall x  %d %d %d"DEBUG_EOL,
+      motion_get_x(),
+	  motion_get_y(),
+	  motion_get_a()
+      );
 
   if(match.color == MATCH_COLOR_GREEN)
 	  sys_mod_do_right_arm(self->handle,DSV_RIGHT_ARM_POS_DOWN);
   else
 	  sys_mod_do_left_arm(self->handle,DSV_LEFT_ARM_POS_DOWN);
 
+  vTaskDelay(pdMS_TO_TICKS(500));
+
   wp.type = WP_GOTO_FWD;
   wp.speed = WP_SPEED_SLOW;
   wp.coord.abs.y = BEE_START_Y;
   wp.coord.abs.x = ROBOT_BACK_TO_CENTER+300;
   wp.trajectory_must_finish = true;
+  avd_mask_front(true);
   motion_move_block_on_avd(&wp);
   match.scored_points += 50; 					// bee smash the balloon 100% of the time
 
@@ -436,14 +492,14 @@ void ai_task_start(void *params)
 
   wp.type = WP_ORIENT_BEHIND;
   wp.speed = WP_SPEED_NORMAL;
-  wp.coord.abs.x = motion_get_x();
+  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
   wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
 
-  wp.type = WP_GOTO_FWD;
+  wp.type = WP_GOTO_BWD;
   wp.speed = WP_SPEED_NORMAL;
-  wp.coord.abs.x = motion_get_x();
+  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
   wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
@@ -457,22 +513,105 @@ void ai_task_start(void *params)
   wp.type = WP_GOTO_FWD;
   wp.speed = WP_SPEED_SLOW;
   wp.coord.abs = phys.wastewater_recuperator;
-  wp.trajectory_must_finish = false;
-  motion_move_block_on_avd(&wp);
-  vTaskDelay(pdMS_TO_TICKS(1500));
-
-  sys_mod_do_open(self->handle);
-  match.scored_points += 10; 				// recuperator open 100% of the time
-
-  wp.type = WP_STALL_FRONT_X;				// stall x
-  wp.speed = WP_SPEED_VERY_SLOW;
-  wp.coord.rel.a = 180;
-  wp.coord.abs.y = ROBOT_FRONT_TO_CENTER;
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);
 
-  /*Todo: shoot the water in water tower */
-  /* go to the other water recuperator */
+  sys_mod_do_open(self->handle);
+  match.scored_points += 10; 				// recuperator open 100% of the time
+  vTaskDelay(pdMS_TO_TICKS(1500));
+
+  wp.type = WP_GOTO_BWD;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
+  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+   wp.type = WP_GOTO_FWD;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs.x = 200;
+  wp.coord.abs.y = START_LINE_Y;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_ORIENT_FRONT;
+   wp.speed = WP_SPEED_NORMAL;
+   wp.coord.abs.x = 200;
+   wp.coord.abs.y = 0;
+   wp.trajectory_must_finish = true;
+   motion_move_block_on_avd(&wp);
+
+
+  //vTaskDelay(pdMS_TO_TICKS(15000));
+  for(shoot_nb=0;shoot_nb<10;shoot_nb++)
+  {
+	sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_SET);
+	sys_mod_set_shoot_cmd(SW_SHOOTER_SHOOT_HIGH);
+  	vTaskDelay(pdMS_TO_TICKS(500));
+	sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_GET);
+	sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
+  	vTaskDelay(pdMS_TO_TICKS(500));
+  }
+
+  wp.type = WP_ORIENT_BEHIND;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs.x = 0;
+  wp.coord.abs.y = START_LINE_Y;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  DEBUG_INFO("[POS] before stall y  %d %d %d"DEBUG_EOL,
+      motion_get_x(),
+	  motion_get_y(),
+	  motion_get_a()
+      );
+
+  wp.type = WP_STALL_BACK_X;				// stall y
+  wp.speed = WP_SPEED_VERY_SLOW;
+  if(match.color == MATCH_COLOR_GREEN)
+	  wp.coord.abs.a = 0;
+  else
+	  wp.coord.abs.a = 180;
+  wp.coord.abs.x = ROBOT_BACK_TO_CENTER;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  DEBUG_INFO("[POS] after stall y  %d %d %d"DEBUG_EOL,
+      motion_get_x(),
+	  motion_get_y(),
+	  motion_get_a()
+      );
+
+  wp.type = WP_MOVE_REL;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.rel.d = 200;
+  wp.coord.rel.a = 0;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_GOTO_FWD;
+  wp.speed = WP_SPEED_FAST;
+  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
+  wp.coord.abs.y = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].y-200;
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_ORIENT_FRONT;
+  wp.speed = WP_SPEED_NORMAL;
+  wp.coord.abs = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O];
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  wp.type = WP_GOTO_FWD;
+  wp.speed = WP_SPEED_SLOW;
+  wp.coord.abs = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O];
+  wp.trajectory_must_finish = true;
+  motion_move_block_on_avd(&wp);
+
+  sys_mod_do_open(self->handle);
+  match.scored_points += 10; 				// recuperator open 100% of the time
+  vTaskDelay(pdMS_TO_TICKS(1500));
+
   motion_traj_stop();
 
   for(;;)
@@ -486,44 +625,3 @@ void ai_task_start(void *params)
     }
   }
 }
-
-// GET_ORES_S_1A
-// GET_ORES_S_1B
-// GET_ORES_B_1
-
-// THROW_ORES
-
-// GET_MODS_M_S
-// GET_MODS_M_TA
-// GET_MODS_M_TB
-// GET_MODS_M_TC
-
-
-// BUILD_MODS_S
-// BUILD_MODS_C
-
-// -----------------------------------------------------------------------------
-// FUNNY task
-//   Description: called once at the end, triggers the funny-action
-// -----------------------------------------------------------------------------
-
-
-// -----------------------------------------------------------------------------
-// FUNNY task
-//   Description: called once at the end, triggers the funny-action
-// -----------------------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------------------
-// WON'T DO List
-
-// GET_MODS_P_S
-// GET_MODS_P_TA/B/C
-
-// GET_ORES_S_2A
-// GET_ORES_S_2B
-// GET_ORES_B_2
-
-
-

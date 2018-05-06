@@ -482,6 +482,7 @@ void sys_mod_do_right_arm(TaskHandle_t* caller, uint16_t position);
 void sys_mod_do_open(TaskHandle_t* caller);
 void sys_mod_do_push(TaskHandle_t* caller);
 void sys_mod_do_index(TaskHandle_t* caller, uint16_t position);
+void sys_mod_do_shoot(TaskHandle_t* caller);
 
 
 // -----------------------------------------------------------------------------
