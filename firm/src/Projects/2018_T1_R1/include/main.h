@@ -424,8 +424,11 @@ void ai_on_failure_policy(task_t* task);
 
 // AI tasks
 void ai_task_stall_at_start(void);
-void ai_task_start(void *params);
-
+void ai_task_switch(void *params);
+void ai_task_bee(void *params);
+void ai_task_cubes(void *params);
+void ai_task_our_water(void *params);
+void ai_task_mixed_water(void *params);
 
 BaseType_t ai_move_with_pf(wp_t* wp);
 void motion_move_block_on_avd(wp_t* wp);

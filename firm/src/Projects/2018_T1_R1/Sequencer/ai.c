@@ -77,6 +77,8 @@ BaseType_t ai_init(void)
   motion_set_y(phys.reset.y);
   motion_set_a(phys.reset.a);
 
+  phys_update_with_color(&phys.reset);	// need to set back in green to ensure good trajectory at start.
+
   // Initialize modules system
   sys_mod_do_init(&handle_task_sequencer);
 
@@ -130,12 +132,14 @@ void ai_manage(bool notified, uint32_t sw_notification)
     {
       match.paused = true;
       led_set_mode(BB_LED_STATIC);
+      DEBUG_INFO("[TASK] Match Pause"DEBUG_EOL);
     }
 
     else if(sw_notification & OS_NOTIFY_MATCH_RESUME)
     {
       match.paused = false;
       led_set_mode(BB_LED_BLINK_SLOW);
+      DEBUG_INFO("[TASK] Match Resume"DEBUG_EOL);
     }
 
     // Hardware events
@@ -154,7 +158,7 @@ void ai_manage(bool notified, uint32_t sw_notification)
       //  task_mgt.active_task->state = TASK_STATE_SUSPENDED;
       //}
 
-      task_print(task_mgt.active_task);
+      //task_print(task_mgt.active_task);
 
     }
 
@@ -173,7 +177,7 @@ void ai_manage(bool notified, uint32_t sw_notification)
   }*/
 
   // Stop motion
-  else if(match.timer_msec >= MATCH_DURATION_MSEC) {
+  if(match.timer_msec >= MATCH_DURATION_MSEC) {
 
     vTaskDelete(task_mgt.active_task->handle);
     motion_traj_hard_stop();
@@ -258,9 +262,7 @@ void ai_manage(bool notified, uint32_t sw_notification)
 
   // Active task is not valid
   } else {
-	  led_set_color(BB_LED_BLUE);
-	  led_set_mode(BB_LED_STATIC);
-
+      DEBUG_INFO("[TASK] Active task isn't valid"DEBUG_EOL);
 //    xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
 //
 //
@@ -326,12 +328,35 @@ void ai_tasks_def(void)
 {
   uint8_t id;
 
-  // START Task
-  id = TASK_ID_START;
-  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_START");
-  tasks[id].function = ai_task_start;
+  // Switch Task
+  id = TASK_ID_SWITCH_PUSH;
+  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_SWITCH");
+  tasks[id].function = ai_task_switch;
   tasks[id].value = TASK_INIT_VALUE_START;
 
+  // Bee Task
+  id = TASK_ID_LAUCH_BEE;
+  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_BEE");
+  tasks[id].function = ai_task_bee;
+  tasks[id].value = TASK_INIT_VALUE_START;
+
+  // Switch Task
+  id = TASK_ID_RECOVER_CUBES;
+  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_CUBE");
+  tasks[id].function = ai_task_cubes;
+  tasks[id].value = TASK_INIT_VALUE_START;
+
+  // Switch Task
+  id = TASK_ID_EMPTY_OUR_WATER;
+  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_OUR_WATER");
+  tasks[id].function = ai_task_our_water;
+  tasks[id].value = TASK_INIT_VALUE_START;
+
+  // Switch Task
+  id = TASK_ID_EMPTY_MIXED_WATER;
+  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_MIXED_WATER");
+  tasks[id].function = ai_task_mixed_water;
+  tasks[id].value = TASK_INIT_VALUE_START;
 }
 
 /**

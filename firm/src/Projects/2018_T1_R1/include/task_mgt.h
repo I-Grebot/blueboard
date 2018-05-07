@@ -37,10 +37,14 @@
 // --------------------------
 
 // Special tasks
-#define TASK_ID_START            0   // Exit starting area
+#define TASK_ID_SWITCH_PUSH			0   // Go to push automatique switch
+#define TASK_ID_LAUCH_BEE	  		1   // Go to kick ass the bee
+#define TASK_ID_RECOVER_CUBES		2   // Go to get some cubes
+#define TASK_ID_EMPTY_OUR_WATER 	3   // Go to empty our water recuperator
+#define TASK_ID_EMPTY_MIXED_WATER 	4   // Go to empty mixed water recuperator
 
 // Total Number of tasks
-#define TASKS_NB                 1   // Must equal exactly the number of tasks!
+#define TASKS_NB                 	5   // Must equal exactly the number of tasks!
 
 // Initial values of the different tasks
 // -------------------------------------

@@ -59,7 +59,7 @@ typedef struct {
   // Game elements
   poi_t construction_cubes[6];			// Construction modules arranged on the table
   poi_t wastewater_recuperator;      	// Recuperator containing only our color
-  poi_t mixed_wastewater_recuperator[2];// Recuperator containing half green half orange
+  poi_t mixed_wastewater_recuperator[2];   // Recuperator containing half green half orange
 
   // Robot offsets
   poi_t offset_center;      			// Center of the robot
@@ -71,6 +71,7 @@ typedef struct {
   poi_t home_automation_switch;  		// Coordinate of the home automation switch (green)
   poi_t cube_deposit;					// About the middle of the cube's deposit (green)
   poi_t water_tower;					// Coordinate of the water tower (green)
+  poi_t treatment_plan;					// Coordinate of the treatment plan (green)
 
   // Path-finder static polygons
   path_poly_t* pf_opp_start_zone;
@@ -87,6 +88,9 @@ typedef struct {
 
 // IDs for each object
 
+#define PHYS_ID_MIXED_G 0
+#define PHYS_ID_MIXED_O 1
+
 // Mono modules on the table
 #define PHYS_ID_CUBES_WG   0		// WEST  (GREEN SIDE)
 #define PHYS_ID_CUBES_SG   1		// SOUTH (GREEN SIDE)
@@ -94,10 +98,6 @@ typedef struct {
 #define PHYS_ID_CUBES_WO   3		// WEST  (ORANGE SIDE)
 #define PHYS_ID_CUBES_NO   4		// NORTH (ORANGE SIDE)
 #define PHYS_ID_CUBES_EO   5		// EAST  (ORANGE SIDE)
-
-// Wastewater recuperator
-#define PHYS_ID_MIXED_G   0			// Mixed wastewater on our side
-#define PHYS_ID_MIXED_O   1			// Mixed wastewater on opponent side
 
 // -----------------------------------------------------------------------------
 // MAIN ROBOT & MATCH DEFINITIONS
@@ -120,7 +120,7 @@ typedef enum {
 // Define the possible match colors
 typedef enum {
   MATCH_COLOR_GREEN   = SW_COLOR_TEAM1,
-  MATCH_COLOR_ORANGE = SW_COLOR_TEAM2,
+  MATCH_COLOR_ORANGE  = SW_COLOR_TEAM2,
   MATCH_COLOR_UNKNOWN // To be used when we don't know (yet)
 } match_color_e;
 

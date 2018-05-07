@@ -67,7 +67,7 @@ void phys_init(void)
   phys.construction_cubes[PHYS_ID_CUBES_EO].a   =    0;
 
   // Recuperator containing only one color
-  phys.wastewater_recuperator.x	=  ROBOT_FRONT_TO_CENTER;
+  phys.wastewater_recuperator.x	=  ROBOT_FRONT_TO_CENTER - 20;
   phys.wastewater_recuperator.y =  WASTEWATER_RECUPERATOR_Y;
   phys.wastewater_recuperator.a =  0;
 
@@ -77,18 +77,18 @@ void phys_init(void)
 
   // Recuperator containing half green half orange
   phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x  =  610  ;
-  phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].y  =  TABLE_Y_MAX - ROBOT_FRONT_TO_CENTER;
+  phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].y  =  TABLE_Y_MAX - ROBOT_FRONT_TO_CENTER + 20;
   phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].a  =  90;
 
   phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x  =  TABLE_X_MAX - 610;
-  phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].y  =  TABLE_Y_MAX - ROBOT_FRONT_TO_CENTER;
+  phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].y  =  TABLE_Y_MAX - ROBOT_FRONT_TO_CENTER + 20;
   phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].a  =  90;
 
   // Sequencing and intermediate POIs
   // --------------------------------
 
-  // Coordinate of the robot at startup
-  phys.reset.x  = 		  	ROBOT_LENGTH-ROBOT_FRONT_TO_CENTER;
+  // Coordinate of the robot after startup procedure
+  phys.reset.x  = 		  	200;
   phys.reset.y  =  		  	START_LINE_Y;
   phys.reset.a  =   		0;// facing opponent zone
 
