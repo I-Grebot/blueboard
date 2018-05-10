@@ -143,7 +143,8 @@ void sequencer_task( void *pvParameters )
       if((SW_START == MATCH_START_REMOVED) ||  // Hardware init
          match.sw_init)                         // Software init
       {
-        match.state = MATCH_STATE_INIT;
+          match.scored_points = 5+5;	// start with 5pts for the bee and 5pts for the automation pannel
+    	  match.state = MATCH_STATE_INIT;
         sequencer_print_match();
       }
       break;
@@ -157,7 +158,6 @@ void sequencer_task( void *pvParameters )
       {
           ai_init();
     	  match.state = MATCH_STATE_SELF_CHECK;
-         // match.scored_points++;
           sequencer_print_match();
       }
       break;
@@ -167,15 +167,14 @@ void sequencer_task( void *pvParameters )
     //-------------------------------------------------------------------------
       if(notified && (sw_notification & OS_FEEDBACK_SYS_MOD_INIT))
       {
+    	  //sys_mod_proc_do_shoot();
     	  ai_self_test();
       }
-
       if(notified && (sw_notification & OS_FEEDBACK_SYS_MOD_SELF_TEST))
       {
     	  match.state = MATCH_STATE_WAIT_START;
     	  sequencer_print_match();
       }
-
       break;
 
     // Awaiting for doomsday
@@ -212,7 +211,6 @@ void sequencer_task( void *pvParameters )
         match.state = MATCH_STATE_RUN;
 
         match.timer_msec = 0;
-        match.scored_points = 5+5;	// start with 5pts for the bee and 5pts for the automation pannel
 
         // Sample the color, just in case the jack was removed during init
         sequencer_color_sample();

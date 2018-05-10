@@ -67,10 +67,10 @@
 #define SW_SHOOTER_CMD0   END7_WRITE
 
 // Commands decoding
-#define SW_SHOOTER_WAIT         3U // matches default GPIO config with a pull-down
-#define SW_SHOOTER_INIT         2U
-#define SW_SHOOTER_SHOOT_HIGH   1U
-#define SW_SHOOTER_SHOOT_LOW    0U
+#define SW_SHOOTER_WAIT         0U // 00
+#define SW_SHOOTER_INIT         2U // 01
+#define SW_SHOOTER_SHOOT_HIGH   1U // 10
+#define SW_SHOOTER_SHOOT_LOW    3U // 11
 
 /**
 ********************************************************************************

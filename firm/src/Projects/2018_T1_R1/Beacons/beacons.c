@@ -56,6 +56,7 @@ BaseType_t beacons_init(void)
 
   // Beacons interface is shared with HMI SPI
   // bb_hmi_init() is supposed to be already launched
+	  return pdFALSE;
 
 }
 

@@ -410,7 +410,7 @@ void phys_pf_poly_to_str(path_poly_t* poly, uint8_t idx_poly, char* str, size_t 
 
   for(idx_pt = 0; idx_pt < poly->n; idx_pt++)
   {
-    snprintf(str, len, "%d;%d ",
+    snprintf(str, len, "%ld;%ld ",
              10*poly->pts[idx_pt].x,
              10*poly->pts[idx_pt].y);
     str += strlen(str);

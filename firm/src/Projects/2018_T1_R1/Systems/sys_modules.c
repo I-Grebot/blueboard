@@ -165,7 +165,9 @@ BaseType_t sys_mod_proc_init(void)
 
   DEBUG_INFO("[SYS_MOD] Initializing"DEBUG_EOL);
 
-  // Initialize analog servos
+  // Initialize ServoIFace
+  sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
+  sys_mod.shooter_height = SW_SHOOTER_SHOOT_HIGH;
 
   // Initializing digital servos
   while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
@@ -186,15 +188,12 @@ BaseType_t sys_mod_proc_init(void)
   while(dxl_set_torque(&sys_mod.pusher, DSV_PUSHER_TORQUE)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_torque(&sys_mod.index, DSV_INDEX_TORQUE)!=DXL_STATUS_NO_ERROR);
 
-  while(dxl_set_position(&sys_mod.left_arm, DSV_LEFT_ARM_POS_UP)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_position(&sys_mod.right_arm, DSV_RIGHT_ARM_POS_UP)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_position(&sys_mod.opener, DSV_OPENER_POS_CENTER)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_position(&sys_mod.pusher, DSV_PUSHER_IN)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_position(&sys_mod.index, DSV_INDEX_POS_GET)!=DXL_STATUS_NO_ERROR);
+  sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_UP);
+  sys_mod_set_servo(&sys_mod.right_arm,DSV_RIGHT_ARM_POS_UP);
+  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
+  sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
+  sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
 
-  // Initialize ServoIFace
-  sys_mod_set_shoot_cmd(SW_SHOOTER_WAIT);
-  vTaskDelay(pdMS_TO_TICKS(1000));
   return pdPASS;
 }
 
@@ -223,12 +222,12 @@ BaseType_t sys_mod_proc_self_test(void)
 
   DEBUG_INFO("[SYS_MOD] Start Self-Test"DEBUG_EOL);
 
+  sys_mod_proc_do_shoot();
+
   // Test
   while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
-  sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_SET);
-  sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
   sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
   sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
   sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_DOWN);
@@ -238,31 +237,25 @@ BaseType_t sys_mod_proc_self_test(void)
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_OUT);
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
 
-
-  sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
-  vTaskDelay(pdMS_TO_TICKS(1000));
-  sys_mod_set_shoot_cmd(SW_SHOOTER_SHOOT_HIGH);
-  vTaskDelay(pdMS_TO_TICKS(1000));
-  sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
-  vTaskDelay(pdMS_TO_TICKS(1000));
-
   return pdPASS;
 }
 
 BaseType_t sys_mod_proc_do_shoot(void)
 {
-	uint8_t shoot_nb=0;
+	static uint8_t shoot_nb=0;
 
     for(shoot_nb=0;shoot_nb<10;shoot_nb++)
     {
     	sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_SET);
-    	sys_mod_set_shoot_cmd(SW_SHOOTER_SHOOT_HIGH);
-    		vTaskDelay(pdMS_TO_TICKS(1000));
+		vTaskDelay(pdMS_TO_TICKS(100));
     	sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
+		vTaskDelay(pdMS_TO_TICKS(200));
+    	sys_mod_set_shoot_cmd(sys_mod.shooter_height);
+		vTaskDelay(pdMS_TO_TICKS(200));
     	sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
-    	vTaskDelay(pdMS_TO_TICKS(1000));
+    	vTaskDelay(pdMS_TO_TICKS(500));
     }
-	  return pdPASS;
+	return pdPASS;
 }
 
 // ----------------------------------------------------------------------------
@@ -312,8 +305,9 @@ void sys_mod_do_index(TaskHandle_t* caller, uint16_t position)
 	sys_mod_set_servo(&sys_mod.index,sys_mod.index.current_position=position);
 }
 
-void sys_mod_do_shoot(TaskHandle_t* caller)
+void sys_mod_do_shoot(TaskHandle_t* caller, uint8_t height)
 {
+	sys_mod.shooter_height = height;
 	sys_mod.calling_task = caller;
 	xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_SHOOT, eSetBits);
 }

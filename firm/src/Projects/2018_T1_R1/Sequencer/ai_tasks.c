@@ -469,54 +469,7 @@ void ai_task_bee(void *params)
   }
 
  }
-void ai_task_cubes(void *params){
-	  // A waypoint for our motions
-	  wp_t wp;
 
-	  // A pointer to corresponding task-structure (self) is passed
-	  task_t* self = (task_t*) params;
-
-	  // OS Software notifier
-	  BaseType_t notified;
-	  uint32_t sw_notification;
-
-	  // Tick timer
-	  TickType_t new_wake_time = xTaskGetTickCount();
-
-	  // Static items of the waypoints
-	  wp.offset.x = 0;
-	  wp.offset.y = 0;
-	  wp.offset.a = 0;
-	  wp.trajectory_must_finish = true;
-
-	  // Clear avoidance state in case it was triggered during init
-	  // (avoid dead lock)
-	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
-
-	  wp.type = WP_GOTO_FWD;						// go for the cube
-	  wp.speed = WP_SPEED_NORMAL;
-	  wp.coord.abs = phys.construction_cubes[PHYS_ID_CUBES_SG];
-	  wp.trajectory_must_finish = true;
-	  avd_mask_front(true);
-	  avd_mask_back(false);
-	  motion_move_block_on_avd(&wp);
-
-	  wp.type = WP_GOTO_FWD;
-	  wp.speed = WP_SPEED_NORMAL;
-	  wp.coord.abs = phys.cube_deposit;
-	  wp.trajectory_must_finish = true;
-	  avd_mask_front(true);
-	  avd_mask_back(false);
-	  motion_move_block_on_avd(&wp);
-	  match.scored_points += 2; 				// let says half the cubes are in the deposit
-
-	  self->state = TASK_STATE_SUCCESS;
-
-      for(;;)
-	  {
-	     vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
-      }
-}
 void ai_task_our_water(void *params){
 	  // A waypoint for our motions
 	  wp_t wp;
@@ -541,14 +494,23 @@ void ai_task_our_water(void *params){
 	  // (avoid dead lock)
 	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
 
-	  wp.type = WP_GOTO_BWD;
+	  wp.type = WP_GOTO_FWD;
+	  wp.speed = WP_SPEED_NORMAL;
+	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
+	  wp.coord.abs.y = phys.construction_cubes[PHYS_ID_CUBES_EG].y;
+	  wp.trajectory_must_finish = true;
+	  avd_mask_front(true);
+	  avd_mask_back(false);
+	  motion_move_block_on_avd(&wp);				// start trajectory to avoid cube SG
+
+	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
 	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
 	  wp.trajectory_must_finish = true;
-	  avd_mask_front(false);
-	  avd_mask_back(true);
-	  motion_move_block_on_avd(&wp);
+	  avd_mask_front(true);
+	  avd_mask_back(false);
+	  motion_move_block_on_avd(&wp);			//  Avoid cube SG
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_SLOW;
@@ -591,13 +553,13 @@ void ai_task_our_water(void *params){
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
-	  sys_mod_do_shoot(&(self->handle));
+	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_HIGH);
 	  do
 	  {
 		  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
 	  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_SHOOT));
 
-	  //match.scored_points += 40; 				// 8 balls in the water tower 100% of the time
+	  match.scored_points += 15; 				// 8 balls in the water tower 100% of the time
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
@@ -640,7 +602,7 @@ void ai_task_mixed_water(void *params){
 	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
 
 	  wp.type = WP_GOTO_FWD;
-	  wp.speed = WP_SPEED_FAST;
+	  wp.speed = WP_SPEED_SLOW;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
 	  wp.coord.abs.y = TABLE_Y_MAX/2;
 	  wp.trajectory_must_finish = true;
@@ -722,7 +684,7 @@ void ai_task_mixed_water(void *params){
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
 
-	  sys_mod_do_shoot(&(self->handle));
+	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_LOW);
 	  motion_traj_hard_stop();
 
 	  for(;;)
@@ -735,4 +697,53 @@ void ai_task_mixed_water(void *params){
 	      self->state = TASK_STATE_SUCCESS;
 	    }
 	  }
-	}
+}
+
+void ai_task_cubes(void *params){
+	  // A waypoint for our motions
+	  wp_t wp;
+
+	  // A pointer to corresponding task-structure (self) is passed
+	  task_t* self = (task_t*) params;
+
+	  // OS Software notifier
+	  BaseType_t notified;
+	  uint32_t sw_notification;
+
+	  // Tick timer
+	  TickType_t new_wake_time = xTaskGetTickCount();
+
+	  // Static items of the waypoints
+	  wp.offset.x = 0;
+	  wp.offset.y = 0;
+	  wp.offset.a = 0;
+	  wp.trajectory_must_finish = true;
+
+	  // Clear avoidance state in case it was triggered during init
+	  // (avoid dead lock)
+	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+
+	  wp.type = WP_GOTO_FWD;						// go for the cube
+	  wp.speed = WP_SPEED_NORMAL;
+	  wp.coord.abs = phys.construction_cubes[PHYS_ID_CUBES_SG];
+	  wp.trajectory_must_finish = true;
+	  avd_mask_front(true);
+	  avd_mask_back(false);
+	  motion_move_block_on_avd(&wp);
+
+	  wp.type = WP_GOTO_FWD;
+	  wp.speed = WP_SPEED_NORMAL;
+	  wp.coord.abs = phys.cube_deposit;
+	  wp.trajectory_must_finish = true;
+	  avd_mask_front(true);
+	  avd_mask_back(false);
+	  motion_move_block_on_avd(&wp);
+	  match.scored_points += 2; 				// let says half the cubes are in the deposit
+
+	  self->state = TASK_STATE_SUCCESS;
+
+      for(;;)
+	  {
+	     vTaskDelayUntil( &new_wake_time, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+      }
+}

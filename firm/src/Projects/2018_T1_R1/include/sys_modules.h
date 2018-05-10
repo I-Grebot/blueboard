@@ -46,6 +46,7 @@ typedef struct
   uint16_t pusher_pos;
   uint16_t opener_pos;
   uint16_t index_pos;
+  uint8_t shooter_height;
 
   // System management
   sys_mode_state_e current_state;

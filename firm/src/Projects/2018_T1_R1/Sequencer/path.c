@@ -241,7 +241,7 @@ path_seg_cross_e path_intersect_segment(path_proc_pt_t* s1, path_proc_pt_t* s2,
   int8_t u1;
   int8_t u2;
 
-  DEBUG_TRACE_NOPFX("    Seg: [(%d;%d) ; (%d;%d)] / [(%d;%d) ; (%d;%d)] ",
+  DEBUG_TRACE_NOPFX("    Seg: [(%ld;%ld) ; (%ld;%ld)] / [(%ld;%ld) ; (%ld;%ld)] ",
       s1->x, s1->y, s2->x, s2->y, t1->x, t1->y, t2->x, t2->y);
 
   // Check to see if at least, lines cross
@@ -291,7 +291,7 @@ path_seg_cross_e path_intersect_segment(path_proc_pt_t* s1, path_proc_pt_t* s2,
     return PATH_SEG_CROSS_POINT;
   }
 
-  DEBUG_TRACE_NOPFX("[cross = (%d;%d) ] ", p->x, p->y);
+  DEBUG_TRACE_NOPFX("[cross = (%ld;%ld) ] ", p->x, p->y);
   // General case
   // We need to check if p (crossing point of lines) is contained in the segments
   u1 = prod_scal_sign(p->x - s1->x, p->y - s1->y, p->x - s2->x, p->y - s2->y);
@@ -600,7 +600,7 @@ void path_compute_rays_weight(const path_poly_t* polys, const uint8_t* rays, uin
     weight[i>>2] = norm2 + 1;
 
     // Display Ray infos
-    DEBUG_INFO_NOPFX("[PHYS] [RAY] %d %d;%d %d;%d"DEBUG_EOL,
+    DEBUG_INFO_NOPFX("[PHYS] [RAY] %d %ld;%ld %ld;%ld"DEBUG_EOL,
         weight[i>>2],
         10*x1, 10*y1,
         10*x2, 10*y2);

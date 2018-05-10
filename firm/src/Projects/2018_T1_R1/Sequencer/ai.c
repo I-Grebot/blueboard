@@ -90,7 +90,6 @@ BaseType_t ai_self_test(void)
 {
     ai_task_stall_at_start();
 	sys_mod_do_self_test(&handle_task_sequencer);
-	//sys_mod_proc_do_shoot();
 	//ai_task_test_odometry();
   return pdPASS;
 }
@@ -345,23 +344,23 @@ void ai_tasks_def(void)
   tasks[id].function = ai_task_bee;
   tasks[id].value = TASK_INIT_VALUE_START;
 
-  // [2] Cubes Task
-  id = TASK_ID_RECOVER_CUBES;
-  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_CUBE");
-  tasks[id].function = ai_task_cubes;
-  tasks[id].value = TASK_INIT_VALUE_START;
-
-  // [3] Our Water Task
+  // [2] Our Water Task
   id = TASK_ID_EMPTY_OUR_WATER;
   snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_OUR_WATER");
   tasks[id].function = ai_task_our_water;
   tasks[id].value = TASK_INIT_VALUE_START;
 
-  // [4] Mixed water Task
+  // [3] Mixed water Task
   id = TASK_ID_EMPTY_MIXED_WATER;
   snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_MIXED_WATER");
   tasks[id].function = ai_task_mixed_water;
   tasks[id].value = TASK_INIT_VALUE_START;
+
+ /* // [5] Cubes Task
+  id = TASK_ID_RECOVER_CUBES;
+  snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_CUBE");
+  tasks[id].function = ai_task_cubes;
+  tasks[id].value = TASK_INIT_VALUE_START;*/
 }
 
 /**

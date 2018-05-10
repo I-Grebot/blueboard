@@ -135,5 +135,5 @@ uint16_t bb_hmi_tx_rx(size_t len, uint8_t* data_wr, uint8_t* data_rd)
   }
 
   HMI_CSN_WRITE(BB_HMI_FRAME_IDLE);
-
+  return 0;
 }
