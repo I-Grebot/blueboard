@@ -325,7 +325,7 @@ void ai_task_switch(void *params)
 
   // Exit
   // ------------------
-  wp.speed = WP_SPEED_FAST;
+  wp.speed = WP_SPEED_NORMAL;
   wp.type = WP_GOTO_FWD;
   wp.coord.abs = phys.exit_start;
   wp.trajectory_must_finish = true;
@@ -364,8 +364,6 @@ void ai_task_switch(void *params)
   avd_mask_back(true);
   avd_mask_front(false);
   motion_move_block_on_avd(&wp);
-  while(!motion_is_traj_near())
-	  vTaskDelay(pdMS_TO_TICKS(500));
 
   self->state = TASK_STATE_SUCCESS;
 
@@ -510,14 +508,13 @@ void ai_task_our_water(void *params){
 	  // Clear avoidance state in case it was triggered during init
 	  // (avoid dead lock)
 	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+	  avd_mask_all(false);
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
 	  wp.coord.abs.y = phys.construction_cubes[PHYS_ID_CUBES_EG].y;
 	  wp.trajectory_must_finish = true;
-	  avd_mask_front(true);
-	  avd_mask_back(false);
 	  motion_move_block_on_avd(&wp);				// start trajectory to avoid cube SG
 
 	  wp.type = WP_GOTO_FWD;
@@ -556,7 +553,8 @@ void ai_task_our_water(void *params){
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
-	  wp.coord.abs = phys.reset;
+	  wp.coord.abs.x = phys.reset.x;
+	  wp.coord.abs.y = phys.reset.y + 100;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_front(true);
 	  avd_mask_back(false);
@@ -576,7 +574,7 @@ void ai_task_our_water(void *params){
 		  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
 	  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_SHOOT));
 
-	  match.scored_points += 15; 				// 8 balls in the water tower 100% of the time
+	  match.scored_points += 15; 				// 3 balls in the water tower
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
@@ -619,7 +617,7 @@ void ai_task_mixed_water(void *params){
 	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
 
 	  wp.type = WP_GOTO_FWD;
-	  wp.speed = WP_SPEED_SLOW;
+	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
 	  wp.coord.abs.y = TABLE_Y_MAX/2;
 	  wp.trajectory_must_finish = true;
@@ -670,11 +668,18 @@ void ai_task_mixed_water(void *params){
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_SLOW;
 	  wp.coord.abs = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O];
-	  wp.trajectory_must_finish = false;
+	  wp.trajectory_must_finish = true;
 	  motion_move_block_on_avd(&wp);
 	  avd_mask_front(true);
 	  avd_mask_back(false);
-	  vTaskDelay(pdMS_TO_TICKS(2000));
+
+	  wp.type = WP_STALL_FRONT_Y;
+	  wp.speed = WP_SPEED_VERY_SLOW;
+	  wp.coord.abs.a = 90;
+	  wp.coord.abs.x = TABLE_Y_MAX-ROBOT_FRONT_TO_CENTER;
+	  wp.trajectory_must_finish = true;
+	  motion_move_block_on_avd(&wp);				// stall Y axis
+
 
 	  sys_mod_do_open(&(self->handle));
 	  do
@@ -686,7 +691,7 @@ void ai_task_mixed_water(void *params){
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
-	  wp.coord.abs.y = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].y-400;
+	  wp.coord.abs.y = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].y-300;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
@@ -694,8 +699,8 @@ void ai_task_mixed_water(void *params){
 
 	  wp.type = WP_ORIENT_FRONT;
 	  wp.speed = WP_SPEED_NORMAL;
-	  wp.coord.abs.x = 1700;
-	  wp.coord.abs.y = 1875;
+	  wp.coord.abs.x = TABLE_X_MAX/2;
+	  wp.coord.abs.y = TABLE_Y_MAX;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
