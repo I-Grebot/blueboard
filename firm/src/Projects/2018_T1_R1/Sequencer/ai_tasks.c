@@ -201,13 +201,30 @@ void ai_task_test_odometry(void)
 	  avd_mask_all(false);
 
 	  /* ROTATION */
+      if(match.color == MATCH_COLOR_GREEN){
+	  	  // Clear avoidance state in case it was triggered during init
+	  	  // (avoid dead lock)
+	  	  avd_mask_all(false);
 
-	  motion_set_speed(SPEED_NORMAL_D,800);
-	  motion_move_relative(0,-3600);		//10turns
-	  while(!motion_is_traj_finished())
-		  vTaskDelay(pdMS_TO_TICKS(100));
-	  vTaskDelay(pdMS_TO_TICKS(2000));
-	  motion_move_relative(0,-3600);	//10turns
+	  	  /* ROTATION */
+	      motion_set_speed(SPEED_NORMAL_D,200);
+	      motion_move_relative(0,-3600);		//10turns
+	      while(!motion_is_traj_finished())
+		     vTaskDelay(pdMS_TO_TICKS(100));
+		  vTaskDelay(pdMS_TO_TICKS(5000));
+      }
+      else{
+	  	  // Clear avoidance state in case it was triggered during init
+	  	  // (avoid dead lock)
+	  	  avd_mask_all(false);
+
+	  	  /* ROTATION */
+	      motion_set_speed(SPEED_NORMAL_D,200);
+	      motion_move_relative(0,3600);		//10turns
+	      while(!motion_is_traj_finished())
+			 vTaskDelay(pdMS_TO_TICKS(100));
+		  vTaskDelay(pdMS_TO_TICKS(5000));
+      }
 
 
 	  /* TRANSLATION */

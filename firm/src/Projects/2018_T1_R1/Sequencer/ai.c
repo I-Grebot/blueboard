@@ -90,7 +90,7 @@ BaseType_t ai_self_test(void)
 {
     ai_task_stall_at_start();
 	sys_mod_do_self_test(&handle_task_sequencer);
-	//ai_task_test_odometry();
+	ai_task_test_odometry();
   return pdPASS;
 }
 
