@@ -168,6 +168,7 @@ BaseType_t sys_mod_proc_init(void)
   // Initialize ServoIFace
   sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
   sys_mod.shooter_height = SW_SHOOTER_SHOOT_HIGH;
+  sys_mod.shooter_number = 2;
 
   // Initializing digital servos
   while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
@@ -244,7 +245,7 @@ BaseType_t sys_mod_proc_do_shoot(void)
 {
 	static uint8_t shoot_nb=0;
 
-    for(shoot_nb=0;shoot_nb<10;shoot_nb++)
+    for(shoot_nb=0;shoot_nb<sys_mod.shooter_number;shoot_nb++)
     {
     	sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_SET);
 		vTaskDelay(pdMS_TO_TICKS(100));
@@ -305,9 +306,10 @@ void sys_mod_do_index(TaskHandle_t* caller, uint16_t position)
 	sys_mod_set_servo(&sys_mod.index,sys_mod.index.current_position=position);
 }
 
-void sys_mod_do_shoot(TaskHandle_t* caller, uint8_t height)
+void sys_mod_do_shoot(TaskHandle_t* caller, uint8_t height, uint8_t number)
 {
 	sys_mod.shooter_height = height;
+	sys_mod.shooter_number = number;
 	sys_mod.calling_task = caller;
 	xTaskNotify(handle_task_sys_modules, OS_NOTIFY_SYS_MOD_SHOOT, eSetBits);
 }

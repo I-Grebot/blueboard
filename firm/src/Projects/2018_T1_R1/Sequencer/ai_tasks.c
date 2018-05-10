@@ -570,7 +570,7 @@ void ai_task_our_water(void *params){
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
-	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_HIGH);
+	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_HIGH,10);
 	  do
 	  {
 		  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
@@ -701,7 +701,7 @@ void ai_task_mixed_water(void *params){
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
 
-	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_LOW);
+	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_LOW,10);
 	  motion_traj_hard_stop();
 
 	  for(;;)

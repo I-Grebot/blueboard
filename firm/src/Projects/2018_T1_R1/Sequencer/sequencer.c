@@ -168,32 +168,7 @@ void sequencer_task( void *pvParameters )
       if(notified && (sw_notification & OS_FEEDBACK_SYS_MOD_INIT))
       {
     	  //sys_mod_proc_do_shoot();
-    	  //ai_self_test();
-    	  motion_set_speed(200,200);
-    	  motion_move_relative(950,0);
-/*    	  if(match.color == MATCH_COLOR_GREEN){
-    	  	  // Clear avoidance state in case it was triggered during init
-    	  	  // (avoid dead lock)
-    	  	  avd_mask_all(false);
-
-	      motion_set_speed(SPEED_NORMAL_D,200);
-	      motion_move_relative(0,-3600);		//10turns
-	      while(!motion_is_traj_finished())
-		     vTaskDelay(pdMS_TO_TICKS(100));
-		  vTaskDelay(pdMS_TO_TICKS(5000));
-      }
-      else{
-	  	  // Clear avoidance state in case it was triggered during init
-	  	  // (avoid dead lock)
-	  	  avd_mask_all(false);
-
-	      motion_set_speed(SPEED_NORMAL_D,200);
-	      motion_move_relative(0,3600);		//10turns
-	      while(!motion_is_traj_finished())
-			 vTaskDelay(pdMS_TO_TICKS(100));
-		  vTaskDelay(pdMS_TO_TICKS(5000));
-      }*/
-
+    	  ai_self_test();
       }
       if(notified && (sw_notification & OS_FEEDBACK_SYS_MOD_SELF_TEST))
       {
