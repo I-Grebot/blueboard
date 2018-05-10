@@ -65,7 +65,7 @@ void sys_modules_task(void *pvParameters)
 {
   BaseType_t notified;
   uint32_t sw_notification;
-  uint8_t shoot_nb;
+
   sys_modules_init();
 
   ( void ) pvParameters;
@@ -81,24 +81,22 @@ void sys_modules_task(void *pvParameters)
       // Must re-init after error
       case SYS_MOD_RESET:
       case SYS_MOD_ERROR:
-
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_INIT))
         {
           sys_mod.current_state = SYS_MOD_INIT;
-          sys_mod_proc_init();
+       	  sys_mod_proc_init();
+          xTaskNotify(*sys_mod.calling_task, OS_FEEDBACK_SYS_MOD_INIT, eSetBits);
         }
-
         break;
 
       case SYS_MOD_INIT:
-
         // Only manage transition to self-test (required)
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_SELF_TEST))
         {
           sys_mod.current_state = SYS_MOD_SELF_TEST;
           sys_mod_proc_self_test();
+          xTaskNotify(*sys_mod.calling_task, OS_FEEDBACK_SYS_MOD_SELF_TEST, eSetBits);
         }
-
         break;
 
 
@@ -109,45 +107,41 @@ void sys_modules_task(void *pvParameters)
 
 
       case SYS_MOD_READY:
-
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_LEFT_ARM))
         {
         	sys_mod_set_servo(&sys_mod.left_arm,sys_mod.left_arm_pos);
+            xTaskNotify(*sys_mod.calling_task, OS_FEEDBACK_SYS_MOD_LEFT_ARM, eSetBits);
         }
 
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_RIGHT_ARM))
         {
         	sys_mod_set_servo(&sys_mod.right_arm,sys_mod.right_arm_pos);
+            xTaskNotify(*sys_mod.calling_task, OS_FEEDBACK_SYS_MOD_RIGHT_ARM, eSetBits);
         }
 
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_PUSH))
         {
-        	if(sys_mod.pusher_pos==DSV_PUSHER_IN)
-        		sys_mod_set_servo(&sys_mod.pusher,sys_mod.pusher_pos=DSV_PUSHER_OUT);
+        	if(sys_mod.pusher.current_position==DSV_PUSHER_IN)
+        		sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_OUT);
         	else
-        		sys_mod_set_servo(&sys_mod.pusher,sys_mod.pusher_pos=DSV_PUSHER_IN);
+        		sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
+            xTaskNotify(*sys_mod.calling_task, OS_FEEDBACK_SYS_MOD_PUSH, eSetBits);
         }
 
         if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_OPEN))
         {
-        	if(sys_mod.opener_pos==DSV_OPENER_POS_RIGHT)
-        		sys_mod_set_servo(&sys_mod.opener,sys_mod.opener_pos=DSV_OPENER_POS_LEFT);
+        	if(sys_mod.opener.current_position==DSV_OPENER_POS_RIGHT)
+        		sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
         	else
-        		sys_mod_set_servo(&sys_mod.opener,sys_mod.opener_pos=DSV_OPENER_POS_RIGHT);
+        		sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
+            xTaskNotify(*sys_mod.calling_task, OS_FEEDBACK_SYS_MOD_OPEN, eSetBits);
         }
 
-/*        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_SHOOT))
+        if(notified && (sw_notification & OS_NOTIFY_SYS_MOD_SHOOT))
         {
-          for(shoot_nb=0;shoot_nb<10;shoot_nb++)
-          {
-        	sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_SET);
-        	sys_mod_set_shoot_cmd(SW_SHOOTER_SHOOT_HIGH);
-          	vTaskDelay(pdMS_TO_TICKS(500));
-        	sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_GET);
-        	sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
-          	vTaskDelay(pdMS_TO_TICKS(500));
-          }
-        }*/
+        	sys_mod_proc_do_shoot();
+            xTaskNotify(*sys_mod.calling_task, OS_FEEDBACK_SYS_MOD_SHOOT, eSetBits);
+        }
         break;
 
      default:
@@ -200,20 +194,23 @@ BaseType_t sys_mod_proc_init(void)
 
   // Initialize ServoIFace
   sys_mod_set_shoot_cmd(SW_SHOOTER_WAIT);
-
+  vTaskDelay(pdMS_TO_TICKS(1000));
   return pdPASS;
 }
 
 BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position)
 {
   uint16_t return_position=0;
-  uint8_t timout=0;
+  static uint8_t timout=0;
   while(dxl_set_position(servo, position)!=DXL_STATUS_NO_ERROR);
-  for(timout=0;timout<40;timout++)
+  for(timout=0;timout<20;timout++)
   {
+	  servo->current_position=position;
 	  dxl_get_position(servo, &return_position);	// Check position
 	  if((return_position<=position+5) && (return_position>=position-5))
+	  {
 		return pdPASS;
+	  }
 	  else
 	    vTaskDelay(pdMS_TO_TICKS(100));
   }
@@ -231,24 +228,42 @@ BaseType_t sys_mod_proc_self_test(void)
   while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
   sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_SET);
+  sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
   sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
-  sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_DOWN);
   sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
+  sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_DOWN);
+  sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_UP);
   sys_mod_set_servo(&sys_mod.right_arm,DSV_RIGHT_ARM_POS_DOWN);
-  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_CENTER);
+  sys_mod_set_servo(&sys_mod.right_arm,DSV_RIGHT_ARM_POS_UP);
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_OUT);
-  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
-  sys_mod_set_servo(&sys_mod.left_arm,sys_mod.left_arm_pos=DSV_LEFT_ARM_POS_UP);
-  sys_mod_set_servo(&sys_mod.opener,sys_mod.opener_pos=DSV_OPENER_POS_RIGHT);
-  sys_mod_set_servo(&sys_mod.right_arm,sys_mod.right_arm_pos=DSV_RIGHT_ARM_POS_UP);
-  sys_mod_set_servo(&sys_mod.pusher,sys_mod.pusher_pos=DSV_PUSHER_IN);
-  sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_GET);
+  sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
+
 
   sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  sys_mod_set_shoot_cmd(SW_SHOOTER_SHOOT_HIGH);
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
+  vTaskDelay(pdMS_TO_TICKS(1000));
 
   return pdPASS;
 }
 
+BaseType_t sys_mod_proc_do_shoot(void)
+{
+	uint8_t shoot_nb=0;
+
+    for(shoot_nb=0;shoot_nb<10;shoot_nb++)
+    {
+    	sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_SET);
+    	sys_mod_set_shoot_cmd(SW_SHOOTER_SHOOT_HIGH);
+    		vTaskDelay(pdMS_TO_TICKS(1000));
+    	sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
+    	sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
+    	vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+	  return pdPASS;
+}
 
 // ----------------------------------------------------------------------------
 // Public accessors

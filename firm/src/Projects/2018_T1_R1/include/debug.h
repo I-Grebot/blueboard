@@ -63,7 +63,7 @@
  *       in "INF", All debug messages are printed
  * */
 
-#define DEBUG_LEVEL     DEBUG_LEVEL_TRACE
+#define DEBUG_LEVEL     DEBUG_LEVEL_INFO
 
 /**
 ********************************************************************************

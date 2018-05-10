@@ -182,24 +182,31 @@
  */
 
 // Main sequencer notifiers
-#define OS_NOTIFY_AVOIDANCE_EVT       0x00000001    // Avoidance event: must be assess quickly
-#define OS_NOTIFY_AVOIDANCE_CLR       0x00000002    // Avoidance clear flag
+#define OS_NOTIFY_AVOIDANCE_EVT       	0x00000001    // Avoidance event: must be assess quickly
+#define OS_NOTIFY_AVOIDANCE_CLR       	0x00000002    // Avoidance clear flag
 // ...
-#define OS_NOTIFY_INIT_START          0x00000100    // Software start of the initialization phase
-#define OS_NOTIFY_MATCH_START         0x00000200    // Software start of the match notification
-#define OS_NOTIFY_MATCH_PAUSE         0x00000400    // Software pause of the match (freeze everything)
-#define OS_NOTIFY_MATCH_RESUME        0x00000800    // Software resume of the match (continues)
-#define OS_NOTIFY_MATCH_ABORT         0x00001000    // Software abort of the match (clean end, no reset)
+#define OS_NOTIFY_INIT_START          	0x00000100    // Software start of the initialization phase
+#define OS_NOTIFY_MATCH_START         	0x00000200    // Software start of the match notification
+#define OS_NOTIFY_MATCH_PAUSE         	0x00000400    // Software pause of the match (freeze everything)
+#define OS_NOTIFY_MATCH_RESUME        	0x00000800    // Software resume of the match (continues)
+#define OS_NOTIFY_MATCH_ABORT         	0x00001000    // Software abort of the match (clean end, no reset)
 
 // Modules system notifiers
-#define OS_NOTIFY_SYS_MOD_INIT        0x00000001    // Initialize the modules system
-#define OS_NOTIFY_SYS_MOD_SELF_TEST   0x00000002    // Launch self-test procedure
-#define OS_NOTIFY_SYS_MOD_LEFT_ARM    0x00000010    // Initiate procedure to move left arm
-#define OS_NOTIFY_SYS_MOD_RIGHT_ARM   0x00000020    // Initiate procedure to move right arm
-#define OS_NOTIFY_SYS_MOD_PUSH        0x00000040    // Initiate procedure to push the switch
-#define OS_NOTIFY_SYS_MOD_OPEN        0x00000080    // Initiate procedure to open water recuperator
-#define OS_NOTIFY_SYS_MOD_SHOOT       0x00000100    // Initiate procedure to shoot
+#define OS_NOTIFY_SYS_MOD_INIT        	0x00000001    // Initialize the modules system
+#define OS_NOTIFY_SYS_MOD_SELF_TEST   	0x00000002    // Launch self-test procedure
+#define OS_NOTIFY_SYS_MOD_LEFT_ARM    	0x00000010    // Initiate procedure to move left arm
+#define OS_NOTIFY_SYS_MOD_RIGHT_ARM   	0x00000020    // Initiate procedure to move right arm
+#define OS_NOTIFY_SYS_MOD_PUSH        	0x00000040    // Initiate procedure to push the switch
+#define OS_NOTIFY_SYS_MOD_OPEN        	0x00000080    // Initiate procedure to open water recuperator
+#define OS_NOTIFY_SYS_MOD_SHOOT       	0x00000100    // Initiate procedure to shoot
 
+#define OS_FEEDBACK_SYS_MOD_INIT        0x10000001    // Return on initialization
+#define OS_FEEDBACK_SYS_MOD_SELF_TEST   0x10000002    // Return on self-test
+#define OS_FEEDBACK_SYS_MOD_LEFT_ARM    0x10000010    // Return on move left arm
+#define OS_FEEDBACK_SYS_MOD_RIGHT_ARM   0x10000020    // Return on move right arm
+#define OS_FEEDBACK_SYS_MOD_PUSH        0x10000040    // Return on push the switch
+#define OS_FEEDBACK_SYS_MOD_OPEN        0x10000080    // Return on open water recuperator
+#define OS_FEEDBACK_SYS_MOD_SHOOT       0x10000100    // Return onshoot
 /**
 ********************************************************************************
 **
@@ -423,6 +430,7 @@ void ai_on_suspend_policy(task_t* task);
 void ai_on_failure_policy(task_t* task);
 
 // AI tasks
+void ai_task_test_odometry(void);
 void ai_task_stall_at_start(void);
 void ai_task_switch(void *params);
 void ai_task_bee(void *params);
@@ -479,6 +487,7 @@ void sys_mod_set_color(uint8_t color);
 
 BaseType_t sys_mod_proc_init(void);
 BaseType_t sys_mod_proc_self_test(void);
+BaseType_t sys_mod_proc_do_shoot(void);
 BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position);
 void sys_mod_do_left_arm(TaskHandle_t* caller, uint16_t position);
 void sys_mod_do_right_arm(TaskHandle_t* caller, uint16_t position);

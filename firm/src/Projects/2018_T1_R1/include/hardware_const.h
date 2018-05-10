@@ -63,8 +63,8 @@
 */
 
 // Command for the trollet
-#define SW_SHOOTER_CMD0   END8_WRITE
-#define SW_SHOOTER_CMD1   END7_WRITE
+#define SW_SHOOTER_CMD1   END8_WRITE
+#define SW_SHOOTER_CMD0   END7_WRITE
 
 // Commands decoding
 #define SW_SHOOTER_WAIT         3U // matches default GPIO config with a pull-down
@@ -144,14 +144,14 @@
 #define DSV_LEFT_ARM_POS_UP                      360
 
 #define DSV_RIGHT_ARM_POS_DOWN                   735
-#define DSV_RIGHT_ARM_POS_UP                     475
+#define DSV_RIGHT_ARM_POS_UP                     495
 
 #define DSV_OPENER_POS_RIGHT                     650
 #define DSV_OPENER_POS_CENTER                    400
 #define DSV_OPENER_POS_LEFT                      150
 
-#define DSV_PUSHER_OUT						 	 540
-#define DSV_PUSHER_IN						 	 350
+#define DSV_PUSHER_OUT						 	 530
+#define DSV_PUSHER_IN						 	 380
 
 #define DSV_INDEX_POS_GET					     350
 #define DSV_INDEX_POS_SET				         650

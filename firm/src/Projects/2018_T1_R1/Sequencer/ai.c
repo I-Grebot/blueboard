@@ -88,10 +88,10 @@ BaseType_t ai_init(void)
 // Self-Test procedure
 BaseType_t ai_self_test(void)
 {
-	sys_mod_do_self_test(&handle_task_sequencer);
-	vTaskDelay(pdMS_TO_TICKS(8000));
     ai_task_stall_at_start();
-
+	sys_mod_do_self_test(&handle_task_sequencer);
+	//sys_mod_proc_do_shoot();
+	//ai_task_test_odometry();
   return pdPASS;
 }
 
@@ -154,11 +154,17 @@ void ai_manage(bool notified, uint32_t sw_notification)
       // - Increase the task's trials count.
       // - Apply the A.I. "on_suspend" policy, which can contain failure conditions
       //   or other dependencies freeing conditions
-      //if(av.state == AV_STATE_DETECT) {
-      //  task_mgt.active_task->state = TASK_STATE_SUSPENDED;
-      //}
+/*      if(av.state == AV_STATE_DETECT) {
+    	  // Increment the number of trials
+    	  task_mgt.active_task->trials++;
 
-      //task_print(task_mgt.active_task);
+    	  // After 10 trials, a task is considered as suspended
+    	  if(task_mgt.active_task->trials >= 10){
+    		  task_mgt.active_task->state = TASK_STATE_SUSPENDED;
+    	  }
+      }*/
+
+
 
     }
 
@@ -198,6 +204,8 @@ void ai_manage(bool notified, uint32_t sw_notification)
       // Apply the dedicated policies
       case TASK_STATE_SUSPENDED:
         ai_on_suspend_policy(task_mgt.active_task);
+        DEBUG_INFO("[TASK] Removing task %s (SUSPENDED)"DEBUG_EOL, task_mgt.active_task->name);
+        vTaskDelete(task_mgt.active_task->handle);
         break;
 
       case TASK_STATE_FAILED:
@@ -263,13 +271,10 @@ void ai_manage(bool notified, uint32_t sw_notification)
   // Active task is not valid
   } else {
       DEBUG_INFO("[TASK] Active task isn't valid"DEBUG_EOL);
-//    xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
-//
-//
-//    // Launch a new task if we can find one that is OK
-//    // (will be managed at next ai_manage() call)
-    task_mgt.active_task = task_get_next();
 
+    // Launch a new task if we can find one that is OK
+    // (will be managed at next ai_manage() call)
+    task_mgt.active_task = task_get_next();
   }
 
 } // ai_manage()
@@ -328,31 +333,31 @@ void ai_tasks_def(void)
 {
   uint8_t id;
 
-  // Switch Task
+  // [0] Switch Task
   id = TASK_ID_SWITCH_PUSH;
   snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_SWITCH");
   tasks[id].function = ai_task_switch;
   tasks[id].value = TASK_INIT_VALUE_START;
 
-  // Bee Task
+  // [1] Bee Task
   id = TASK_ID_LAUCH_BEE;
   snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_BEE");
   tasks[id].function = ai_task_bee;
   tasks[id].value = TASK_INIT_VALUE_START;
 
-  // Switch Task
+  // [2] Cubes Task
   id = TASK_ID_RECOVER_CUBES;
   snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_CUBE");
   tasks[id].function = ai_task_cubes;
   tasks[id].value = TASK_INIT_VALUE_START;
 
-  // Switch Task
+  // [3] Our Water Task
   id = TASK_ID_EMPTY_OUR_WATER;
   snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_OUR_WATER");
   tasks[id].function = ai_task_our_water;
   tasks[id].value = TASK_INIT_VALUE_START;
 
-  // Switch Task
+  // [4] Mixed water Task
   id = TASK_ID_EMPTY_MIXED_WATER;
   snprintf(tasks[id].name, configMAX_TASK_NAME_LEN, "AI_MIXED_WATER");
   tasks[id].function = ai_task_mixed_water;
@@ -461,69 +466,38 @@ void ai_compute_task_priorities(void)
 // ...
 void ai_on_suspend_policy(task_t* task)
 {
+	// A waypoint for escapment
+	wp_t wp;
 
-  // Increment the number of trials
-  task->trials++;
+	// Static items of the waypoints
+	wp.offset.x = 0;
+	wp.offset.y = 0;
+	wp.offset.a = 0;
+	wp.trajectory_must_finish = true;
 
-  // After 5 trials, a task is considered as failed.
-  // Also, LANDING task cannot fail, because they value too much points.
-  // (we will try to achieve them endlessly if needed).
-  /*if((task->trials > 100) &&  // TBC
-     (task->id != TASK_ID_SPOT_S_LAND) &&
-     (task->id != TASK_ID_SPOT_N_LAND)) {
-    task->state = TASK_STATE_FAILED;
-    ai_on_failure_policy(task);
-  }*/
+	vTaskSuspend(task->handle);
+    motion_traj_hard_stop();
+    xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+    avd_mask_all(false);
 
-  // Remove some dependencies immediatly when a task becomes SUSPENDED
-  // This ensures a nice dynamic adaptation of the robot.
-/*switch(task->id) {
+    switch(task->id) {
+    	case TASK_ID_SWITCH_PUSH:
+		// Woaw... opponent really fast!
+		// We will escape a bit in our zone and we will
+    	// try to come back to it later to do the switch
+    	wp.speed = WP_SPEED_FAST;
+        wp.type = WP_GOTO_BWD;
+    	wp.coord.abs.x = phys.exit_start.x/2;
+    	wp.coord.abs.y = phys.exit_start.y;
+ 		motion_move_block_on_avd(&wp);
+    	break;
 
-    case TASK_ID_START:
-      task_remove_dep(&tasks[TASK_ID_SPOT_S1], task);
-      break;
-
-    // No dependance
-    case TASK_ID_SPOT_S1:
-      break;
-
-    // Woaw... opponent really fast! already in the S3/S4/Claps zone!
-    // Leave it like that if we have not already processed the upper part, we
-    // will try to come back to it later to do the north zone
-    case TASK_ID_SPOT_S2:
-
-      // Always allows to get immediately the S4 spot
-      task_remove_dep(&tasks[TASK_ID_SPOT_S4], &tasks[TASK_ID_SPOT_S3]);
-
-      // Allows to land only a dual spot light with S4
-      // S2, S3 are considered lost
-      // We can still try to do the claps, so we also remove dependencies
-      if(tasks[TASK_ID_SPOT_N_LAND].state == TASK_STATE_SUCCESS) {
-        task_remove_dep(&tasks[TASK_ID_SPOT_S_LAND], &tasks[TASK_ID_SPOT_S2]);
-        task_remove_dep(&tasks[TASK_ID_SPOT_S_LAND], &tasks[TASK_ID_SPOT_S3]);
-        task_remove_dep(&tasks[TASK_ID_CLAP_1], &tasks[TASK_ID_SPOT_S3]);
-      }
-      break;
-
-    // This is unlikely, change nothing
-    case TASK_ID_SPOT_S3:
-      break;
-
-    // TBC
-    case TASK_ID_SPOT_S4:
-      break;
-
-    // TODO
-    default:
-      break;
-
-
+		// TODO
+		default:
+		  break;
   }
-*/
-
   // Safely back actuators
   // TODO
-
 }
 
 
@@ -531,13 +505,6 @@ void ai_on_suspend_policy(task_t* task)
 // lost, so we will never look back to it.
 void ai_on_failure_policy(task_t* task)
 {
-
   // Cleanup all dependencies of the other tasks
   task_remove_dep_from_all(task);
-
 }
-
-
-
-
-

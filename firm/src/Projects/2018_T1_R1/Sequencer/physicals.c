@@ -89,12 +89,12 @@ void phys_init(void)
 
   // Coordinate of the robot after startup procedure
   phys.reset.x  = 		  	200;
-  phys.reset.y  =  		  	START_LINE_Y;
+  phys.reset.y  =  		  	220;
   phys.reset.a  =   		0;// facing opponent zone
 
   // 1st exit point
   phys.exit_start.x  = 		SWITCH_CENTER_X;
-  phys.exit_start.y  = 		START_LINE_Y;
+  phys.exit_start.y  = 		220;
   phys.exit_start.a  = 		0;
 
   // starting area of the bee

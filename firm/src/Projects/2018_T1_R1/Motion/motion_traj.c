@@ -167,6 +167,8 @@ void motion_turnto_behind(double pos_x, double pos_y)
 
 void motion_stall(int16_t d)
 {
+	bd_reset(&robot.cs.bd_a);
+	bd_reset(&robot.cs.bd_d);
 	trajectory_only_d_rel(&robot.cs.traj,d);
 	while(!(bd_get(&robot.cs.bd_a)||bd_get(&robot.cs.bd_d)));
 	motion_traj_hard_stop();
@@ -174,28 +176,28 @@ void motion_stall(int16_t d)
 
 void motion_stall_front_x(int16_t pos_x, int16_t pos_a)
 {
-	motion_stall(200);
+	motion_stall(500);
 	motion_set_x(pos_x);
 	motion_set_a(pos_a);
 }
 
 void motion_stall_back_x(int16_t pos_x, int16_t pos_a)
 {
-	motion_stall(-200);
+	motion_stall(-500);
 	motion_set_x(pos_x);
 	motion_set_a(pos_a);
 }
 
 void motion_stall_front_y(int16_t pos_y, int16_t pos_a)
 {
-	motion_stall(200);
+	motion_stall(500);
 	motion_set_y(pos_y);
 	motion_set_a(pos_a);
 }
 
 void motion_stall_back_y(int16_t pos_y, int16_t pos_a)
 {
-	motion_stall(-200);
+	motion_stall(-500);
 	motion_set_y(pos_y);
 	motion_set_a(pos_a);
 }

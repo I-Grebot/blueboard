@@ -31,7 +31,6 @@ extern robot_t robot;
 extern phys_t phys;
 extern path_t pf;
 extern TaskHandle_t handle_task_avoidance;
-extern sys_mod_t sys_mod;
 
 /**
 ********************************************************************************
@@ -80,7 +79,6 @@ void motion_move_block_on_avd(wp_t* wp)
 
       // Re-go
       motion_add_new_wp(wp);
-      DEBUG_INFO("NEW wp: x=%d, y=%d, d=%d, a=%d!"DEBUG_EOL,wp->coord.abs.x, wp->coord.abs.y, wp->coord.rel.d, wp->coord.rel.a);
     }
   }
 
@@ -194,10 +192,32 @@ BaseType_t ai_move_with_pf(wp_t* wp)
 
 }*/
 
+
+void ai_task_test_odometry(void)
+{
+	  // Clear avoidance state in case it was triggered during init
+	  // (avoid dead lock)
+	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+	  avd_mask_all(false);
+
+	  /* ROTATION */
+
+	  motion_set_speed(SPEED_NORMAL_D,800);
+	  motion_move_relative(0,-3600);		//10turns
+	  while(!motion_is_traj_finished())
+		  vTaskDelay(pdMS_TO_TICKS(100));
+	  vTaskDelay(pdMS_TO_TICKS(2000));
+	  motion_move_relative(0,-3600);	//10turns
+
+
+	  /* TRANSLATION */
+	  motion_set_speed(SPEED_SLOW_D,800);
+	  motion_move_relative(1000,0);
+}
+
 // -----------------------------------------------------------------------------
-// START task
-//   Description: called once at the beginning of the match, exit the starting
-//                area and do nothing more.
+// Stall at start task
+//   Description: call during startup to stall for starting position
 // -----------------------------------------------------------------------------
 
 
@@ -215,16 +235,11 @@ void ai_task_stall_at_start(void)
 
 	  // Clear avoidance state in case it was triggered during init
 	  // (avoid dead lock)
+	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
 	  avd_mask_all(false);
 
 	  // Stall at start
 	  // ------------------
-	  DEBUG_INFO("[POS] before stall x  %d %d %d"DEBUG_EOL,
-	      motion_get_x(),
-		  motion_get_y(),
-		  motion_get_a()
-	      );
-
 	  wp.speed = WP_SPEED_VERY_SLOW;
 	  wp.type = WP_STALL_BACK_X;
 	  wp.coord.abs.a = phys.reset.a;
@@ -232,30 +247,18 @@ void ai_task_stall_at_start(void)
 	  wp.trajectory_must_finish = true;
 	  motion_move_block_on_avd(&wp);				// Stall x axis
 
-	  DEBUG_INFO("[POS] after stall x  %d %d %d"DEBUG_EOL,
-	      motion_get_x(),
-		  motion_get_y(),
-		  motion_get_a()
-	      );
-
 	  wp.speed = WP_SPEED_SLOW;
 	  wp.type = WP_GOTO_FWD;
 	  wp.coord.abs = phys.reset;
 	  wp.trajectory_must_finish = true;
-	  motion_move_block_on_avd(&wp);
+	  motion_move_block_on_avd(&wp);				// go to reset pos
 
 	  wp.speed = WP_SPEED_SLOW;
 	  wp.type = WP_ORIENT_BEHIND;
 	  wp.coord.abs.x = phys.reset.x;
 	  wp.coord.abs.y = 0;
 	  wp.trajectory_must_finish = true;
-	  motion_move_block_on_avd(&wp);
-
-	  DEBUG_INFO("[POS] before stall y  %d %d %d"DEBUG_EOL,
-	      motion_get_x(),
-		  motion_get_y(),
-		  motion_get_a()
-	      );
+	  motion_move_block_on_avd(&wp);				// turn to face the bee
 
 	  wp.speed = WP_SPEED_VERY_SLOW;
 	  wp.type = WP_STALL_BACK_Y;
@@ -264,24 +267,18 @@ void ai_task_stall_at_start(void)
 	  wp.trajectory_must_finish = true;
 	  motion_move_block_on_avd(&wp);				// Stall y axis
 
-	  DEBUG_INFO("[POS] after stall y  %d %d %d"DEBUG_EOL,
-	      motion_get_x(),
-		  motion_get_y(),
-		  motion_get_a()
-	      );
-
 	  wp.speed = WP_SPEED_SLOW;
 	  wp.type = WP_GOTO_FWD;
 	  wp.coord.abs = phys.reset;
 	  wp.trajectory_must_finish = true;
-	  motion_move_block_on_avd(&wp);
+	  motion_move_block_on_avd(&wp);				// go to reset pos
 
 	  wp.speed = WP_SPEED_SLOW;
 	  wp.type = WP_ORIENT_BEHIND;
 	  wp.coord.abs.x = 0;
 	  wp.coord.abs.y = phys.reset.y;
 	  wp.trajectory_must_finish = true;
-	  motion_move_block_on_avd(&wp);
+	  motion_move_block_on_avd(&wp);				// turn to face opponent
 }
 void ai_task_switch(void *params)
 {
@@ -307,6 +304,7 @@ void ai_task_switch(void *params)
   // Clear avoidance state in case it was triggered during init
   // (avoid dead lock)
   xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+  avd_mask_all(false);
 
   // Exit
   // ------------------
@@ -317,7 +315,6 @@ void ai_task_switch(void *params)
   avd_mask_back(false);
   avd_mask_front(true);
   motion_move_block_on_avd(&wp);
-  match.scored_points += 10; 	// if we are here, we can say we aren't forfeit
 
   // push home automation switch
   // ------------------------
@@ -330,11 +327,17 @@ void ai_task_switch(void *params)
   motion_move_block_on_avd(&wp);
   vTaskDelay(pdMS_TO_TICKS(1000));
 
-  sys_mod_do_push(self->handle);
+  sys_mod_do_push(&(self->handle));
+  do
+  {
+	  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_PUSH));
   match.scored_points += 25; 					// pushed 100% of the time
-  vTaskDelay(pdMS_TO_TICKS(500));
-  sys_mod_do_push(self->handle);
-  vTaskDelay(pdMS_TO_TICKS(500));
+  sys_mod_do_push(&(self->handle));
+  do
+  {
+	  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
+  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_PUSH));
 
   wp.speed = WP_SPEED_NORMAL;
   wp.type = WP_GOTO_BWD;
@@ -378,6 +381,7 @@ void ai_task_bee(void *params)
   // Clear avoidance state in case it was triggered during init
   // (avoid dead lock)
   xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
+  avd_mask_all(false);
 
   wp.type = WP_GOTO_BWD;
   wp.speed = WP_SPEED_NORMAL;
@@ -387,19 +391,13 @@ void ai_task_bee(void *params)
   avd_mask_front(false);
   motion_move_block_on_avd(&wp);
 
-  wp.type = WP_ORIENT_BEHIND;				// we are at the hive, need to stall
+  wp.type = WP_ORIENT_BEHIND;					// we are at the hive, need to stall
   wp.speed = WP_SPEED_SLOW;
   wp.coord.abs.x = BEE_START_X;
   wp.coord.abs.y = TABLE_Y_MAX;
   wp.trajectory_must_finish = true;
   avd_mask_all(false);
   motion_move_block_on_avd(&wp);
-
-  DEBUG_INFO("[POS] before stall y  %d %d %d"DEBUG_EOL,
-      motion_get_x(),
-	  motion_get_y(),
-	  motion_get_a()
-      );
 
   wp.type = WP_STALL_BACK_Y;
   wp.speed = WP_SPEED_VERY_SLOW;
@@ -408,18 +406,13 @@ void ai_task_bee(void *params)
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);				// stall y axis
 
-  DEBUG_INFO("[POS] after y stall %d %d %d"DEBUG_EOL,
-      motion_get_x(),
-	  motion_get_y(),
-	  motion_get_a()
-      );
-
   wp.type = WP_GOTO_FWD;
   wp.speed = WP_SPEED_SLOW;
   wp.coord.abs.x = phys.beehive.x;
   wp.coord.abs.y = BEE_START_Y;
   wp.trajectory_must_finish = true;
   avd_mask_front(true);
+  avd_mask_back(false);
   motion_move_block_on_avd(&wp);
 
   wp.type = WP_ORIENT_BEHIND;
@@ -430,12 +423,6 @@ void ai_task_bee(void *params)
   avd_mask_all(false);
   motion_move_block_on_avd(&wp);
 
-  DEBUG_INFO("[POS] before stall x  %d %d %d"DEBUG_EOL,
-      motion_get_x(),
-	  motion_get_y(),
-	  motion_get_a()
-      );
-
   wp.type = WP_STALL_BACK_X;
   wp.speed = WP_SPEED_VERY_SLOW;
   wp.coord.abs.a = 0;
@@ -443,18 +430,15 @@ void ai_task_bee(void *params)
   wp.trajectory_must_finish = true;
   motion_move_block_on_avd(&wp);				// stall x axis
 
-  DEBUG_INFO("[POS] after stall x  %d %d %d"DEBUG_EOL,
-      motion_get_x(),
-	  motion_get_y(),
-	  motion_get_a()
-      );
-
   if(match.color == MATCH_COLOR_GREEN)
-	  sys_mod_do_right_arm(self->handle,DSV_RIGHT_ARM_POS_DOWN);
+	  sys_mod_do_right_arm(&(self->handle),DSV_RIGHT_ARM_POS_DOWN);
   else
-	  sys_mod_do_left_arm(self->handle,DSV_LEFT_ARM_POS_DOWN);
+	  sys_mod_do_left_arm(&(self->handle),DSV_LEFT_ARM_POS_DOWN);
 
-  vTaskDelay(pdMS_TO_TICKS(500));
+  do
+  {
+	  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
+  }while(!((sw_notification & OS_FEEDBACK_SYS_MOD_LEFT_ARM)||(sw_notification & OS_FEEDBACK_SYS_MOD_RIGHT_ARM)));
 
   wp.type = WP_GOTO_FWD;
   wp.speed = WP_SPEED_SLOW;
@@ -462,15 +446,20 @@ void ai_task_bee(void *params)
   wp.coord.abs.x = ROBOT_BACK_TO_CENTER+300;
   wp.trajectory_must_finish = true;
   avd_mask_front(true);
+  avd_mask_back(false);
   motion_move_block_on_avd(&wp);
   match.scored_points += 50; 					// bee smash the balloon 100% of the time
 
   if(match.color == MATCH_COLOR_GREEN)
-	  sys_mod_do_right_arm(self->handle,DSV_RIGHT_ARM_POS_UP);
+	  sys_mod_do_right_arm(&(self->handle),DSV_RIGHT_ARM_POS_UP);
   else
-	  sys_mod_do_left_arm(self->handle,DSV_LEFT_ARM_POS_UP);
+	  sys_mod_do_left_arm(&(self->handle),DSV_LEFT_ARM_POS_UP);
 
-  vTaskDelay(pdMS_TO_TICKS(750));
+  do
+  {
+	  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
+  }while(!((sw_notification & OS_FEEDBACK_SYS_MOD_LEFT_ARM)||(sw_notification & OS_FEEDBACK_SYS_MOD_RIGHT_ARM)));
+
 
   self->state = TASK_STATE_SUCCESS;
 
@@ -507,17 +496,19 @@ void ai_task_cubes(void *params){
 	  wp.type = WP_GOTO_FWD;						// go for the cube
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs = phys.construction_cubes[PHYS_ID_CUBES_SG];
-	  wp.trajectory_must_finish = false;
+	  wp.trajectory_must_finish = true;
+	  avd_mask_front(true);
+	  avd_mask_back(false);
 	  motion_move_block_on_avd(&wp);
-	  while(!motion_is_traj_near())
-		  vTaskDelay(pdMS_TO_TICKS(500));
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs = phys.cube_deposit;
 	  wp.trajectory_must_finish = true;
+	  avd_mask_front(true);
+	  avd_mask_back(false);
 	  motion_move_block_on_avd(&wp);
-	  match.scored_points += 3; 				// let says half the cubes are in the deposit
+	  match.scored_points += 2; 				// let says half the cubes are in the deposit
 
 	  self->state = TASK_STATE_SUCCESS;
 
@@ -537,7 +528,6 @@ void ai_task_our_water(void *params){
 	  BaseType_t notified;
 	  uint32_t sw_notification;
 
-	  uint8_t shoot_nb = 0;
 	  // Tick timer
 	  TickType_t new_wake_time = xTaskGetTickCount();
 
@@ -556,30 +546,41 @@ void ai_task_our_water(void *params){
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
 	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
 	  wp.trajectory_must_finish = true;
+	  avd_mask_front(false);
+	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_SLOW;
 	  wp.coord.abs = phys.wastewater_recuperator;
 	  wp.trajectory_must_finish = false;
+	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 	  vTaskDelay(pdMS_TO_TICKS(1500));
 
-	  sys_mod_do_open(self->handle);
+	  sys_mod_do_open(&(self->handle));
+	  do
+	  {
+		  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
+	  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_OPEN));
+	  vTaskDelay(pdMS_TO_TICKS(2000));
 	  match.scored_points += 10; 				// recuperator open 100% of the time
-	  vTaskDelay(pdMS_TO_TICKS(1500));
 
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
 	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
 	  wp.trajectory_must_finish = true;
+	  avd_mask_front(false);
+	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs = phys.reset;
 	  wp.trajectory_must_finish = true;
+	  avd_mask_front(true);
+	  avd_mask_back(false);
 	  motion_move_block_on_avd(&wp);
 
 	  wp.type = WP_ORIENT_FRONT;
@@ -587,30 +588,25 @@ void ai_task_our_water(void *params){
 	  wp.coord.abs.x = phys.reset.x;
 	  wp.coord.abs.y = 0;
 	  wp.trajectory_must_finish = true;
+	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
-
-	  //vTaskDelay(pdMS_TO_TICKS(15000));
-	  for(shoot_nb=0;shoot_nb<10;shoot_nb++)
+	  sys_mod_do_shoot(&(self->handle));
+	  do
 	  {
-		sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_SET);
-		sys_mod_set_shoot_cmd(SW_SHOOTER_SHOOT_HIGH);
-	  	vTaskDelay(pdMS_TO_TICKS(500));
-		sys_mod_set_servo(&sys_mod.index,sys_mod.index_pos=DSV_INDEX_POS_GET);
-		sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
-	  	vTaskDelay(pdMS_TO_TICKS(500));
-	  }
+		  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
+	  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_SHOOT));
 
-	  match.scored_points += 40; 				// 8 balls in the water tower 100% of the time
+	  //match.scored_points += 40; 				// 8 balls in the water tower 100% of the time
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
 	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
-	  wp.trajectory_must_finish = false;
+	  wp.trajectory_must_finish = true;
+	  avd_mask_front(true);
+	  avd_mask_back(false);
 	  motion_move_block_on_avd(&wp);
-	  while(!motion_is_traj_near())
-		  vTaskDelay(pdMS_TO_TICKS(500));
 
       self->state = TASK_STATE_SUCCESS;
 
@@ -629,7 +625,6 @@ void ai_task_mixed_water(void *params){
 	  // OS Software notifier
 	  BaseType_t notified;
 	  uint32_t sw_notification;
-	  uint8_t shoot_nb = 0;
 
 	  // Tick timer
 	  TickType_t new_wake_time = xTaskGetTickCount();
@@ -677,24 +672,12 @@ void ai_task_mixed_water(void *params){
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
-	  DEBUG_INFO("[POS] before stall x  %d %d %d"DEBUG_EOL,
-	      motion_get_x(),
-		  motion_get_y(),
-		  motion_get_a()
-	      );
-
 	  wp.type = WP_STALL_BACK_X;
 	  wp.speed = WP_SPEED_VERY_SLOW;
 	  wp.coord.abs.a = 180;
 	  wp.coord.abs.x = TABLE_X_MAX-ROBOT_BACK_TO_CENTER;
 	  wp.trajectory_must_finish = true;
 	  motion_move_block_on_avd(&wp);				// stall x axis
-
-	  DEBUG_INFO("[POS] after stall x  %d %d %d"DEBUG_EOL,
-	      motion_get_x(),
-		  motion_get_y(),
-		  motion_get_a()
-	      );
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
@@ -712,11 +695,14 @@ void ai_task_mixed_water(void *params){
 	  motion_move_block_on_avd(&wp);
 	  avd_mask_front(true);
 	  avd_mask_back(false);
-	  vTaskDelay(pdMS_TO_TICKS(1500));
+	  vTaskDelay(pdMS_TO_TICKS(2000));
 
-	  sys_mod_do_open(self->handle);
+	  sys_mod_do_open(&(self->handle));
+	  do
+	  {
+		  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
+	  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_OPEN));
 	  match.scored_points += 10; 				// recuperator open 100% of the time
-	  vTaskDelay(pdMS_TO_TICKS(1500));
 
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_NORMAL;
@@ -726,6 +712,18 @@ void ai_task_mixed_water(void *params){
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
+
+	  wp.type = WP_ORIENT_FRONT;
+	  wp.speed = WP_SPEED_NORMAL;
+	  wp.coord.abs.x = 1700;
+	  wp.coord.abs.y = 1875;
+	  wp.trajectory_must_finish = true;
+	  avd_mask_front(false);
+	  avd_mask_back(true);
+	  motion_move_block_on_avd(&wp);
+
+	  sys_mod_do_shoot(&(self->handle));
+	  motion_traj_hard_stop();
 
 	  for(;;)
 	  {

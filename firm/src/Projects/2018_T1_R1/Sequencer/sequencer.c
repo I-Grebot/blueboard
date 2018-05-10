@@ -114,7 +114,7 @@ void sequencer_task( void *pvParameters )
   phys_init();
   tasks_init();
 
-  // Sequencer main loop
+  // Sequencer main loop-
   for( ;; )
   {
     // Wait for potential new notification, block for the strategy evaluation period
@@ -157,6 +157,7 @@ void sequencer_task( void *pvParameters )
       {
           ai_init();
     	  match.state = MATCH_STATE_SELF_CHECK;
+         // match.scored_points++;
           sequencer_print_match();
       }
       break;
@@ -164,12 +165,17 @@ void sequencer_task( void *pvParameters )
     // I'am a big boy now
     case MATCH_STATE_SELF_CHECK:
     //-------------------------------------------------------------------------
+      if(notified && (sw_notification & OS_FEEDBACK_SYS_MOD_INIT))
+      {
+    	  ai_self_test();
+      }
 
-      ai_self_test();
+      if(notified && (sw_notification & OS_FEEDBACK_SYS_MOD_SELF_TEST))
+      {
+    	  match.state = MATCH_STATE_WAIT_START;
+    	  sequencer_print_match();
+      }
 
-      match.state = MATCH_STATE_WAIT_START;
-
-      sequencer_print_match();
       break;
 
     // Awaiting for doomsday

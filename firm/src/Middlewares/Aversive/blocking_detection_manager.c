@@ -73,21 +73,27 @@ void bd_manage_from_speed_cmd(struct blocking_detection * bd,
 		cmd = -cmd;
 
 	/* if current-based blocking_detection enabled */
-	if ( bd->cpt_thres ) {
+	if ( bd->cpt_thres )
+	{
 		i = bd->k1 * cmd - bd->k2 * speed;
 		
 		bd->DBG_current = i;
 		bd->DBG_speed = speed;
 		bd->DBG_cmd = cmd;
 		
-		if ((uint32_t)i > bd->i_thres && 
-		    (bd->speed_thres == 0 || ABS(speed) < bd->speed_thres)) {
+		if ((i > bd->i_thres) && ((bd->speed_thres == 0) || (ABS(speed) < bd->speed_thres)))
+		{
+/*
 			if (bd->cpt == bd->cpt_thres - 1)
-			  DEBUG_WARNING("BLOCKING cmd=%ld, speed=%ld i=%ld", cmd, speed, i);
+			  DEBUG_WARNING("BLOCKING ");//cmd=%ld, speed=%ld i=%ld", cmd, speed, i);
+*/
 			if (bd->cpt < bd->cpt_thres)
+			{
 				bd->cpt++;
+			}
 		}
-		else {
+		else
+		{
 			bd->cpt=0;
 		}
 #if BD_DEBUG
