@@ -38,12 +38,14 @@ void sys_modules_init(void)
   dxl_init_servo(&sys_mod.pusher, &dsv_chan2.dxl, "RX-28");
   dxl_init_servo(&sys_mod.opener, &dsv_chan2.dxl, "RX-28");
   dxl_init_servo(&sys_mod.index, &dsv_chan1.dxl, "XL320");
+  dxl_init_servo(&sys_mod.thumb, &dsv_chan1.dxl, "XL320");
 
   sys_mod.left_arm.id = DSV_LEFT_ARM_ID;
   sys_mod.right_arm.id = DSV_RIGHT_ARM_ID;
   sys_mod.opener.id = DSV_OPENER_ID;
   sys_mod.pusher.id = DSV_PUSHER_ID;
   sys_mod.index.id = DSV_INDEX_ID;
+  sys_mod.thumb.id = DSV_THUMB_ID;
 
   sys_mod.current_state = SYS_MOD_RESET;
 }
@@ -165,35 +167,39 @@ BaseType_t sys_mod_proc_init(void)
 
   DEBUG_INFO("[SYS_MOD] Initializing"DEBUG_EOL);
 
-  // Initialize ServoIFace
-  sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
-  sys_mod.shooter_height = SW_SHOOTER_SHOOT_HIGH;
-  sys_mod.shooter_number = 2;
-
   // Initializing digital servos
   while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_speed(&sys_mod.pusher, DSV_PUSHER_SPEED)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
 
   while(dxl_set_torque_enable(&sys_mod.left_arm, 1)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_torque_enable(&sys_mod.right_arm, 1)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_torque_enable(&sys_mod.opener, 1)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_torque_enable(&sys_mod.pusher, 1)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_torque_enable(&sys_mod.index, 1)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque_enable(&sys_mod.thumb, 1)!=DXL_STATUS_NO_ERROR);
 
   while(dxl_set_torque(&sys_mod.left_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_torque(&sys_mod.right_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_torque(&sys_mod.opener, DSV_OPENER_TORQUE)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_torque(&sys_mod.pusher, DSV_PUSHER_TORQUE)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_torque(&sys_mod.index, DSV_INDEX_TORQUE)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR);
 
   sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_UP);
   sys_mod_set_servo(&sys_mod.right_arm,DSV_RIGHT_ARM_POS_UP);
   sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
   sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
+  sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
+
+  // Initialize ServoIFace
+  sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
+  sys_mod.shooter_height = SW_SHOOTER_SHOOT_HIGH;
+  sys_mod.shooter_number = 2;
 
   return pdPASS;
 }
@@ -237,6 +243,12 @@ BaseType_t sys_mod_proc_self_test(void)
   sys_mod_set_servo(&sys_mod.right_arm,DSV_RIGHT_ARM_POS_UP);
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_OUT);
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
+  sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_UP);
+  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_HIGH)!=DXL_STATUS_NO_ERROR);
+  sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
+  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR);
 
   return pdPASS;
 }
@@ -248,11 +260,22 @@ BaseType_t sys_mod_proc_do_shoot(void)
     for(shoot_nb=0;shoot_nb<sys_mod.shooter_number;shoot_nb++)
     {
     	sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_SET);
-		vTaskDelay(pdMS_TO_TICKS(100));
-    	sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
+    	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_UP);
+    	while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
+    	while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_HIGH)!=DXL_STATUS_NO_ERROR);
+    	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
+  	    while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
+  	    while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR);
+  	    sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
 		vTaskDelay(pdMS_TO_TICKS(200));
     	sys_mod_set_shoot_cmd(sys_mod.shooter_height);
-		vTaskDelay(pdMS_TO_TICKS(200));
+    	if(sys_mod.shooter_height==SW_SHOOTER_SHOOT_HIGH)
+    	{
+    		vTaskDelay(pdMS_TO_TICKS(200));
+    	}
+    	else{
+    		vTaskDelay(pdMS_TO_TICKS(400));
+    	}
     	sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
     	vTaskDelay(pdMS_TO_TICKS(500));
     }

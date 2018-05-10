@@ -138,6 +138,7 @@
 #define DSV_OPENER_ID       50
 #define DSV_PUSHER_ID       10
 #define DSV_INDEX_ID        22
+#define DSV_THUMB_ID		99
 
 // Positions
 #define DSV_LEFT_ARM_POS_DOWN                    100
@@ -156,6 +157,8 @@
 #define DSV_INDEX_POS_GET					     350
 #define DSV_INDEX_POS_SET				         650
 
+#define DSV_THUMB_POS_UP					     350
+#define DSV_THUMB_POS_DOWN				         650
 
 // Speeds
 #define DSV_ARMS_SPEED_FAST                     1023
@@ -164,12 +167,16 @@
 #define DSV_OPENER_SPEED_SLOW                    300
 #define DSV_PUSHER_SPEED                         300
 #define DSV_INDEX_SPEED                          500
+#define DSV_THUMB_SPEED_FAST                    1000
+#define DSV_THUMB_SPEED_SLOW                     300
 
 // Torques
 #define DSV_ARMS_TORQUE                          500
 #define DSV_OPENER_TORQUE                        500
 #define DSV_PUSHER_TORQUE                        250
 #define DSV_INDEX_TORQUE                         500
+#define DSV_THUMB_TORQUE_HIGH                   1023
+#define DSV_THUMB_TORQUE_LOW                     250
 
 /**
 ********************************************************************************

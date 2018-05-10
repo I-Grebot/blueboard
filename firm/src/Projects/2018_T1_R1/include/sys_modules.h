@@ -39,6 +39,7 @@ typedef struct
   dxl_servo_t pusher;         // RX28
   dxl_servo_t opener;         // RX28
   dxl_servo_t index;          // XL320
+  dxl_servo_t thumb;          // XL320
 
   // Parameters
   uint16_t left_arm_pos;
@@ -46,6 +47,7 @@ typedef struct
   uint16_t pusher_pos;
   uint16_t opener_pos;
   uint16_t index_pos;
+  uint16_t thumb_pos;
   uint8_t shooter_height;
   uint8_t shooter_number;
 
