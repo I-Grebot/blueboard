@@ -65,7 +65,6 @@ void sequencer_init(void)
   match.scored_points = 0;
   match.timer_msec = 0;
   match.sw_init = false;
-
 }
 
 /**
@@ -310,7 +309,7 @@ void sequencer_color_sample(void)
 // Print current match state
 void sequencer_print_match(void)
 {
-  DEBUG_INFO_NOPFX("[MATCH] %-16s %-8s %-16s %-03u %-05u"DEBUG_EOL,
+DEBUG_MATCH("[MATCH] %-16s %-8s %-16s %-03u %-05u"DEBUG_EOL,
       match_state_to_str(match.state),
       match_color_to_str(match.color),
       task_mgt.active_task == NULL ? "IDLE" : task_mgt.active_task->name,

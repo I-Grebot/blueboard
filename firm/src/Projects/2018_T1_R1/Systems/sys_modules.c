@@ -22,6 +22,7 @@
 // External variables
 extern dsv_channel_t dsv_chan1;
 extern dsv_channel_t dsv_chan2;
+extern match_t match;
 
 // Local private variables
 sys_mod_t sys_mod;
@@ -67,7 +68,7 @@ void sys_modules_task(void *pvParameters)
 {
   BaseType_t notified;
   uint32_t sw_notification;
-
+  static uint8_t waiter;
   sys_modules_init();
 
   ( void ) pvParameters;
@@ -136,6 +137,8 @@ void sys_modules_task(void *pvParameters)
         		sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
         	else
         		sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
+        	waiter = 0;
+        	sys_mod.current_state = SYS_MOD_BALL_UNBLOCK;
             xTaskNotify(*sys_mod.calling_task, OS_FEEDBACK_SYS_MOD_OPEN, eSetBits);
         }
 
@@ -145,6 +148,24 @@ void sys_modules_task(void *pvParameters)
             xTaskNotify(*sys_mod.calling_task, OS_FEEDBACK_SYS_MOD_SHOOT, eSetBits);
         }
         break;
+
+      case SYS_MOD_BALL_UNBLOCK:
+    	  if(waiter >= 20){
+        	  if(sys_mod.opener.current_position==DSV_OPENER_POS_RIGHT){
+        		  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
+        		  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
+         	 	  sys_mod.current_state = SYS_MOD_READY;
+        	  }
+        	  else{
+        		  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
+        		  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
+         	 	  sys_mod.current_state = SYS_MOD_READY;
+        	  }
+    	  }
+    	  else{
+        	  waiter++;
+    	  }
+    	 break;
 
      default:
         sys_mod.current_state = SYS_MOD_ERROR;
@@ -173,26 +194,44 @@ BaseType_t sys_mod_proc_init(void)
   sys_mod.shooter_number = 2;
 
   // Initializing digital servos
-  while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_speed(&sys_mod.pusher, DSV_PUSHER_SPEED)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_speed(&sys_mod.pusher, DSV_PUSHER_SPEED)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
 
-  while(dxl_set_torque_enable(&sys_mod.left_arm, 1)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque_enable(&sys_mod.right_arm, 1)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque_enable(&sys_mod.opener, 1)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque_enable(&sys_mod.pusher, 1)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque_enable(&sys_mod.index, 1)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque_enable(&sys_mod.thumb, 1)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque_enable(&sys_mod.left_arm, 1)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque_enable(&sys_mod.right_arm, 1)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque_enable(&sys_mod.opener, 1)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque_enable(&sys_mod.pusher, 1)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque_enable(&sys_mod.index, 1)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque_enable(&sys_mod.thumb, 1)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
 
-  while(dxl_set_torque(&sys_mod.left_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque(&sys_mod.right_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque(&sys_mod.opener, DSV_OPENER_TORQUE)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque(&sys_mod.pusher, DSV_PUSHER_TORQUE)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque(&sys_mod.index, DSV_INDEX_TORQUE)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_torque(&sys_mod.left_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque(&sys_mod.right_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque(&sys_mod.opener, DSV_OPENER_TORQUE)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque(&sys_mod.pusher, DSV_PUSHER_TORQUE)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque(&sys_mod.index, DSV_INDEX_TORQUE)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
 
   sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_UP);
   sys_mod_set_servo(&sys_mod.right_arm,DSV_RIGHT_ARM_POS_UP);
@@ -208,13 +247,14 @@ BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position)
 {
   uint16_t return_position=0;
   static uint8_t timout=0;
-  while(dxl_set_position(servo, position)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_position(servo, position)!=DXL_STATUS_NO_ERROR){
+	  vTaskDelay(pdMS_TO_TICKS(10));}
   if(servo->id == DSV_THUMB_ID){
 	  servo->current_position=position;
 		return pdPASS;
   }
   else{
-	  for(timout=0;timout<20;timout++)
+	  for(timout=0;timout<10;timout++)
 	  {
 		  servo->current_position=position;
 		  dxl_get_position(servo, &return_position);	// Check position
@@ -222,8 +262,9 @@ BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position)
 		  {
 			return pdPASS;
 		  }
-		  else
+		  else{
 		    vTaskDelay(pdMS_TO_TICKS(100));
+		  }
 	  }
   }
 
@@ -239,9 +280,12 @@ BaseType_t sys_mod_proc_self_test(void)
   sys_mod_proc_do_shoot();
 
   // Test
-  while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
   sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
   sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
   sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_DOWN);
@@ -251,11 +295,15 @@ BaseType_t sys_mod_proc_self_test(void)
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_OUT);
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
   sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_UP);
-  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_HIGH)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_HIGH)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
   sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
-  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
-  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR);
+  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
+  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR){
+		vTaskDelay(pdMS_TO_TICKS(10));}
 
   return pdPASS;
 }
@@ -266,14 +314,21 @@ BaseType_t sys_mod_proc_do_shoot(void)
 
     for(shoot_nb=0;shoot_nb<sys_mod.shooter_number;shoot_nb++)
     {
+    	if(match.timer_msec >= MATCH_DURATION_MSEC){
+    		break;
+    	}
     	sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_SET);
     	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_UP);
-    	while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
-    	while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_HIGH)!=DXL_STATUS_NO_ERROR);
+    	while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
+    	while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_HIGH)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
 		vTaskDelay(pdMS_TO_TICKS(200));
     	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
-  	    while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
-  	    while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR);
+  	    while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
+  	    while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
   	    sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
 		vTaskDelay(pdMS_TO_TICKS(200));
     	sys_mod_set_shoot_cmd(sys_mod.shooter_height);
@@ -350,16 +405,22 @@ void sys_mod_set_color(uint8_t color)
 	switch(color)
 	{
 	  case MATCH_COLOR_GREEN :
-		while(dxl_set_led(&sys_mod.index,DXL_LED_GREEN)!=DXL_STATUS_NO_ERROR);
-		while(dxl_set_led(&sys_mod.thumb,DXL_LED_GREEN)!=DXL_STATUS_NO_ERROR);
+		while(dxl_set_led(&sys_mod.index,DXL_LED_GREEN)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
+		while(dxl_set_led(&sys_mod.thumb,DXL_LED_GREEN)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
 	    break;
 	  case MATCH_COLOR_ORANGE :
-		while(dxl_set_led(&sys_mod.index,DXL_LED_YELLOW)!=DXL_STATUS_NO_ERROR);
-		while(dxl_set_led(&sys_mod.thumb,DXL_LED_YELLOW)!=DXL_STATUS_NO_ERROR);
+		while(dxl_set_led(&sys_mod.index,DXL_LED_YELLOW)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
+		while(dxl_set_led(&sys_mod.thumb,DXL_LED_YELLOW)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
 	    break;
 	  default:
-		while(dxl_set_led(&sys_mod.index,DXL_LED_RED)!=DXL_STATUS_NO_ERROR);
-		while(dxl_set_led(&sys_mod.thumb,DXL_LED_RED)!=DXL_STATUS_NO_ERROR);
+		while(dxl_set_led(&sys_mod.index,DXL_LED_RED)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
+		while(dxl_set_led(&sys_mod.thumb,DXL_LED_RED)!=DXL_STATUS_NO_ERROR){
+    		vTaskDelay(pdMS_TO_TICKS(10));}
 		break;
 	}
 }

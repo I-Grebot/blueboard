@@ -172,7 +172,7 @@
 
 // Torques
 #define DSV_ARMS_TORQUE                          500
-#define DSV_OPENER_TORQUE                        500
+#define DSV_OPENER_TORQUE                       1023
 #define DSV_PUSHER_TORQUE                        250
 #define DSV_INDEX_TORQUE                         500
 #define DSV_THUMB_TORQUE_HIGH                   1023

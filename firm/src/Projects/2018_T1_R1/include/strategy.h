@@ -45,7 +45,7 @@
 #define WAIT_BEFORE_START_MSEC          300U
 
 // Match duration (RUN state)
-#define MATCH_DURATION_MSEC             100000U
+#define MATCH_DURATION_MSEC             92000U
 
 
 // Place-holder for physicals definitions (robot or game elements)

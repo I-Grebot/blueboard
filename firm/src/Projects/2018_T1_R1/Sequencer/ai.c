@@ -110,11 +110,11 @@ BaseType_t ai_start(void)
 // Called at the end of the match
 BaseType_t ai_stop(void)
 {
+  bb_power_down();
   avd_disable();
 
   motion_traj_hard_stop();
   motion_power_disable();
-  bb_power_down();
 
   return pdPASS;
 }
