@@ -134,7 +134,7 @@
 
 // Servos IDs
 #define DSV_LEFT_ARM_ID     30
-#define DSV_RIGHT_ARM_ID    40
+#define DSV_RIGHT_ARM_ID    5
 #define DSV_OPENER_ID       50
 #define DSV_PUSHER_ID       10
 #define DSV_INDEX_ID        22
@@ -144,8 +144,8 @@
 #define DSV_LEFT_ARM_POS_DOWN                    100
 #define DSV_LEFT_ARM_POS_UP                      360
 
-#define DSV_RIGHT_ARM_POS_DOWN                   735
-#define DSV_RIGHT_ARM_POS_UP                     495
+#define DSV_RIGHT_ARM_POS_DOWN                   690
+#define DSV_RIGHT_ARM_POS_UP                     420
 
 #define DSV_OPENER_POS_RIGHT                     650
 #define DSV_OPENER_POS_CENTER                    400
@@ -172,10 +172,10 @@
 
 // Torques
 #define DSV_ARMS_TORQUE                          500
-#define DSV_OPENER_TORQUE                       1023
+#define DSV_OPENER_TORQUE                       1000
 #define DSV_PUSHER_TORQUE                        250
 #define DSV_INDEX_TORQUE                         500
-#define DSV_THUMB_TORQUE_HIGH                   1023
+#define DSV_THUMB_TORQUE_HIGH                   1000
 #define DSV_THUMB_TORQUE_LOW                     250
 
 /**

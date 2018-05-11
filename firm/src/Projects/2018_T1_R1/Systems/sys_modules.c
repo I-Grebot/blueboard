@@ -31,6 +31,38 @@ static TaskHandle_t handle_task_sys_modules;
 // Local private functions
 static void sys_modules_task(void *pvParameters);
 
+static inline void
+safe_call(dxl_status_t (*f)(dxl_servo_t*, uint16_t), dxl_servo_t* servo, uint16_t param)
+{
+	dxl_status_t (*f_tmp)(dxl_servo_t*, uint16_t);
+	dxl_servo_t* servo_tmp;
+	uint16_t param_tmp;
+	static uint8_t retry=0;
+
+	f_tmp = f;
+	servo_tmp = servo;
+	param_tmp = param;
+/*	if (f_tmp) {
+		for(retry=0;retry<5;retry++){
+			if(f_tmp(servo_tmp,param_tmp)!=DXL_STATUS_NO_ERROR){
+				break;
+			}
+			else{
+				vTaskDelay(pdMS_TO_TICKS(10));
+			}
+		}
+	}*/
+	f_tmp(servo_tmp,param_tmp);
+	vTaskDelay(pdMS_TO_TICKS(10));
+	f_tmp(servo_tmp,param_tmp);
+	vTaskDelay(pdMS_TO_TICKS(10));
+	f_tmp(servo_tmp,param_tmp);
+	vTaskDelay(pdMS_TO_TICKS(10));
+	f_tmp(servo_tmp,param_tmp);
+	vTaskDelay(pdMS_TO_TICKS(10));
+	f_tmp(servo_tmp,param_tmp);
+}
+
 void sys_modules_init(void)
 {
   // Initialize the hardware handlers
@@ -194,18 +226,12 @@ BaseType_t sys_mod_proc_init(void)
   sys_mod.shooter_number = 2;
 
   // Initializing digital servos
-  while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_speed(&sys_mod.pusher, DSV_PUSHER_SPEED)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_speed(&sys_mod.index, DSV_INDEX_SPEED)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
+  safe_call(dxl_set_speed, &sys_mod.left_arm, DSV_ARMS_SPEED_SLOW);
+  safe_call(dxl_set_speed, &sys_mod.right_arm, DSV_ARMS_SPEED_SLOW);
+  safe_call(dxl_set_speed, &sys_mod.opener, DSV_OPENER_SPEED_SLOW);
+  safe_call(dxl_set_speed, &sys_mod.pusher, DSV_PUSHER_SPEED);
+  safe_call(dxl_set_speed, &sys_mod.index, DSV_INDEX_SPEED);
+  safe_call(dxl_set_speed, &sys_mod.thumb, DSV_THUMB_SPEED_SLOW);
 
   while(dxl_set_torque_enable(&sys_mod.left_arm, 1)!=DXL_STATUS_NO_ERROR){
 		vTaskDelay(pdMS_TO_TICKS(10));}
@@ -220,18 +246,12 @@ BaseType_t sys_mod_proc_init(void)
   while(dxl_set_torque_enable(&sys_mod.thumb, 1)!=DXL_STATUS_NO_ERROR){
 		vTaskDelay(pdMS_TO_TICKS(10));}
 
-  while(dxl_set_torque(&sys_mod.left_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_torque(&sys_mod.right_arm, DSV_ARMS_TORQUE)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_torque(&sys_mod.opener, DSV_OPENER_TORQUE)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_torque(&sys_mod.pusher, DSV_PUSHER_TORQUE)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_torque(&sys_mod.index, DSV_INDEX_TORQUE)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
+  safe_call(dxl_set_torque, &sys_mod.left_arm, DSV_ARMS_TORQUE);
+  safe_call(dxl_set_torque, &sys_mod.right_arm, DSV_ARMS_TORQUE);
+  safe_call(dxl_set_torque, &sys_mod.opener, DSV_OPENER_TORQUE);
+  safe_call(dxl_set_torque, &sys_mod.pusher, DSV_PUSHER_TORQUE);
+  safe_call(dxl_set_torque, &sys_mod.index, DSV_INDEX_TORQUE);
+  safe_call(dxl_set_torque, &sys_mod.thumb, DSV_THUMB_TORQUE_LOW);
 
   sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_UP);
   sys_mod_set_servo(&sys_mod.right_arm,DSV_RIGHT_ARM_POS_UP);
@@ -247,8 +267,7 @@ BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position)
 {
   uint16_t return_position=0;
   static uint8_t timout=0;
-  while(dxl_set_position(servo, position)!=DXL_STATUS_NO_ERROR){
-	  vTaskDelay(pdMS_TO_TICKS(10));}
+  safe_call(dxl_set_position, servo, position);
   if(servo->id == DSV_THUMB_ID){
 	  servo->current_position=position;
 		return pdPASS;
@@ -280,12 +299,9 @@ BaseType_t sys_mod_proc_self_test(void)
   sys_mod_proc_do_shoot();
 
   // Test
-  while(dxl_set_speed(&sys_mod.opener, DSV_OPENER_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
+  safe_call(dxl_set_speed, &sys_mod.left_arm, DSV_ARMS_SPEED_FAST);
+  safe_call(dxl_set_speed, &sys_mod.right_arm, DSV_ARMS_SPEED_FAST);
+  safe_call(dxl_set_speed, &sys_mod.opener, DSV_OPENER_SPEED_FAST);
   sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
   sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
   sys_mod_set_servo(&sys_mod.left_arm,DSV_LEFT_ARM_POS_DOWN);
@@ -294,16 +310,6 @@ BaseType_t sys_mod_proc_self_test(void)
   sys_mod_set_servo(&sys_mod.right_arm,DSV_RIGHT_ARM_POS_UP);
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_OUT);
   sys_mod_set_servo(&sys_mod.pusher,DSV_PUSHER_IN);
-  sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_UP);
-  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_HIGH)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
-  while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
-  while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR){
-		vTaskDelay(pdMS_TO_TICKS(10));}
 
   return pdPASS;
 }
@@ -319,17 +325,13 @@ BaseType_t sys_mod_proc_do_shoot(void)
     	}
     	sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_SET);
     	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_UP);
-    	while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_FAST)!=DXL_STATUS_NO_ERROR){
-    		vTaskDelay(pdMS_TO_TICKS(10));}
-    	while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_HIGH)!=DXL_STATUS_NO_ERROR){
-    		vTaskDelay(pdMS_TO_TICKS(10));}
+    	safe_call(dxl_set_speed, &sys_mod.thumb, DSV_THUMB_SPEED_FAST);
+    	safe_call(dxl_set_torque, &sys_mod.thumb, DSV_THUMB_TORQUE_HIGH);
 		vTaskDelay(pdMS_TO_TICKS(200));
     	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
-  	    while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR){
-    		vTaskDelay(pdMS_TO_TICKS(10));}
-  	    while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR){
-    		vTaskDelay(pdMS_TO_TICKS(10));}
-  	    sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
+    	safe_call(dxl_set_speed, &sys_mod.thumb, DSV_THUMB_SPEED_SLOW);
+    	safe_call(dxl_set_torque, &sys_mod.thumb, DSV_THUMB_TORQUE_LOW);
+   	    sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
 		vTaskDelay(pdMS_TO_TICKS(200));
     	sys_mod_set_shoot_cmd(sys_mod.shooter_height);
     	if(sys_mod.shooter_height==SW_SHOOTER_SHOOT_HIGH)
