@@ -167,6 +167,11 @@ BaseType_t sys_mod_proc_init(void)
 
   DEBUG_INFO("[SYS_MOD] Initializing"DEBUG_EOL);
 
+  // Initialize ServoIFace
+  sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
+  sys_mod.shooter_height = SW_SHOOTER_SHOOT_HIGH;
+  sys_mod.shooter_number = 2;
+
   // Initializing digital servos
   while(dxl_set_speed(&sys_mod.left_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
   while(dxl_set_speed(&sys_mod.right_arm, DSV_ARMS_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
@@ -196,11 +201,6 @@ BaseType_t sys_mod_proc_init(void)
   sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
   sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
 
-  // Initialize ServoIFace
-  sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
-  sys_mod.shooter_height = SW_SHOOTER_SHOOT_HIGH;
-  sys_mod.shooter_number = 2;
-
   return pdPASS;
 }
 
@@ -209,17 +209,24 @@ BaseType_t sys_mod_set_servo(dxl_servo_t* servo, uint16_t position)
   uint16_t return_position=0;
   static uint8_t timout=0;
   while(dxl_set_position(servo, position)!=DXL_STATUS_NO_ERROR);
-  for(timout=0;timout<20;timout++)
-  {
+  if(servo->id == DSV_THUMB_ID){
 	  servo->current_position=position;
-	  dxl_get_position(servo, &return_position);	// Check position
-	  if((return_position<=position+5) && (return_position>=position-5))
-	  {
 		return pdPASS;
-	  }
-	  else
-	    vTaskDelay(pdMS_TO_TICKS(100));
   }
+  else{
+	  for(timout=0;timout<20;timout++)
+	  {
+		  servo->current_position=position;
+		  dxl_get_position(servo, &return_position);	// Check position
+		  if((return_position<=position+5) && (return_position>=position-5))
+		  {
+			return pdPASS;
+		  }
+		  else
+		    vTaskDelay(pdMS_TO_TICKS(100));
+	  }
+  }
+
   return pdFAIL;
 }
 
@@ -263,6 +270,7 @@ BaseType_t sys_mod_proc_do_shoot(void)
     	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_UP);
     	while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_FAST)!=DXL_STATUS_NO_ERROR);
     	while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_HIGH)!=DXL_STATUS_NO_ERROR);
+		vTaskDelay(pdMS_TO_TICKS(200));
     	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
   	    while(dxl_set_speed(&sys_mod.thumb, DSV_THUMB_SPEED_SLOW)!=DXL_STATUS_NO_ERROR);
   	    while(dxl_set_torque(&sys_mod.thumb, DSV_THUMB_TORQUE_LOW)!=DXL_STATUS_NO_ERROR);
@@ -277,7 +285,7 @@ BaseType_t sys_mod_proc_do_shoot(void)
     		vTaskDelay(pdMS_TO_TICKS(400));
     	}
     	sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
-    	vTaskDelay(pdMS_TO_TICKS(500));
+		vTaskDelay(pdMS_TO_TICKS(500));
     }
 	return pdPASS;
 }
@@ -343,12 +351,15 @@ void sys_mod_set_color(uint8_t color)
 	{
 	  case MATCH_COLOR_GREEN :
 		while(dxl_set_led(&sys_mod.index,DXL_LED_GREEN)!=DXL_STATUS_NO_ERROR);
+		while(dxl_set_led(&sys_mod.thumb,DXL_LED_GREEN)!=DXL_STATUS_NO_ERROR);
 	    break;
 	  case MATCH_COLOR_ORANGE :
 		while(dxl_set_led(&sys_mod.index,DXL_LED_YELLOW)!=DXL_STATUS_NO_ERROR);
+		while(dxl_set_led(&sys_mod.thumb,DXL_LED_YELLOW)!=DXL_STATUS_NO_ERROR);
 	    break;
 	  default:
 		while(dxl_set_led(&sys_mod.index,DXL_LED_RED)!=DXL_STATUS_NO_ERROR);
+		while(dxl_set_led(&sys_mod.thumb,DXL_LED_RED)!=DXL_STATUS_NO_ERROR);
 		break;
 	}
 }

@@ -574,7 +574,7 @@ void ai_task_our_water(void *params){
 		  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
 	  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_SHOOT));
 
-	  match.scored_points += 15; 				// 3 balls in the water tower
+	  match.scored_points += 20; 				// 4	 balls in the water tower
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
@@ -691,20 +691,22 @@ void ai_task_mixed_water(void *params){
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
-	  wp.coord.abs.y = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].y-300;
+	  wp.coord.abs.y = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].y-200;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
 
-	  wp.type = WP_ORIENT_FRONT;
-	  wp.speed = WP_SPEED_NORMAL;
-	  wp.coord.abs.x = TABLE_X_MAX/2;
-	  wp.coord.abs.y = TABLE_Y_MAX;
-	  wp.trajectory_must_finish = true;
-	  avd_mask_front(false);
-	  avd_mask_back(true);
+	  wp.type = WP_GOTO_BWD;
+	  wp.speed = WP_SPEED_SLOW;
+	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x-100;
+	  wp.coord.abs.y = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].y-100;
+	  wp.trajectory_must_finish = false;
+	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
+	  vTaskDelay(pdMS_TO_TICKS(1000));
+
+	  match.scored_points += 10; 				// recuperator open 100% of the time
 
 	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_LOW,10);
 	  motion_traj_hard_stop();

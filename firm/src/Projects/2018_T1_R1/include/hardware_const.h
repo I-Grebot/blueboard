@@ -138,7 +138,7 @@
 #define DSV_OPENER_ID       50
 #define DSV_PUSHER_ID       10
 #define DSV_INDEX_ID        22
-#define DSV_THUMB_ID		99
+#define DSV_THUMB_ID		23
 
 // Positions
 #define DSV_LEFT_ARM_POS_DOWN                    100
@@ -155,7 +155,7 @@
 #define DSV_PUSHER_IN						 	 380
 
 #define DSV_INDEX_POS_GET					     350
-#define DSV_INDEX_POS_SET				         650
+#define DSV_INDEX_POS_SET				         550
 
 #define DSV_THUMB_POS_UP					     350
 #define DSV_THUMB_POS_DOWN				         650
