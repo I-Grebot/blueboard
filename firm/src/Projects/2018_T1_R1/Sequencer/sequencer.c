@@ -144,7 +144,7 @@ void sequencer_task( void *pvParameters )
       {
           match.scored_points = 5+5;	// start with 5pts for the bee and 5pts for the automation pannel
     	  match.state = MATCH_STATE_INIT;
-        sequencer_print_match();
+          sequencer_print_match();
       }
       break;
 

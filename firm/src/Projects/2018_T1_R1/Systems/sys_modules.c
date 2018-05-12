@@ -37,13 +37,13 @@ safe_call(dxl_status_t (*f)(dxl_servo_t*, uint16_t), dxl_servo_t* servo, uint16_
 	dxl_status_t (*f_tmp)(dxl_servo_t*, uint16_t);
 	dxl_servo_t* servo_tmp;
 	uint16_t param_tmp;
-	static uint8_t retry=0;
+//	static uint8_t retry=0;
 
 	f_tmp = f;
 	servo_tmp = servo;
 	param_tmp = param;
 /*	if (f_tmp) {
-		for(retry=0;retry<5;retry++){
+		for(retry=0;retry<50;retry++){
 			if(f_tmp(servo_tmp,param_tmp)!=DXL_STATUS_NO_ERROR){
 				break;
 			}

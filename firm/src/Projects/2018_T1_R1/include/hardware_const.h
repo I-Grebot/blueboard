@@ -155,7 +155,7 @@
 #define DSV_PUSHER_IN						 	 380
 
 #define DSV_INDEX_POS_GET					     350
-#define DSV_INDEX_POS_SET				         550
+#define DSV_INDEX_POS_SET				         570
 
 #define DSV_THUMB_POS_UP					     350
 #define DSV_THUMB_POS_DOWN				         650
