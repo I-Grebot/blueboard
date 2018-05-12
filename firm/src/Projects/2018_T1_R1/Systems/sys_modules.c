@@ -327,12 +327,12 @@ BaseType_t sys_mod_proc_do_shoot(void)
     	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_UP);
     	safe_call(dxl_set_speed, &sys_mod.thumb, DSV_THUMB_SPEED_FAST);
     	safe_call(dxl_set_torque, &sys_mod.thumb, DSV_THUMB_TORQUE_HIGH);
-		vTaskDelay(pdMS_TO_TICKS(200));
+		vTaskDelay(pdMS_TO_TICKS(150));
     	sys_mod_set_servo(&sys_mod.thumb,DSV_THUMB_POS_DOWN);
     	safe_call(dxl_set_speed, &sys_mod.thumb, DSV_THUMB_SPEED_SLOW);
     	safe_call(dxl_set_torque, &sys_mod.thumb, DSV_THUMB_TORQUE_LOW);
    	    sys_mod_set_servo(&sys_mod.index,DSV_INDEX_POS_GET);
-		vTaskDelay(pdMS_TO_TICKS(200));
+		vTaskDelay(pdMS_TO_TICKS(150));
     	sys_mod_set_shoot_cmd(sys_mod.shooter_height);
     	if(sys_mod.shooter_height==SW_SHOOTER_SHOOT_HIGH)
     	{
@@ -342,7 +342,7 @@ BaseType_t sys_mod_proc_do_shoot(void)
     		vTaskDelay(pdMS_TO_TICKS(400));
     	}
     	sys_mod_set_shoot_cmd(SW_SHOOTER_INIT);
-		vTaskDelay(pdMS_TO_TICKS(500));
+		vTaskDelay(pdMS_TO_TICKS(200));
     }
 	return pdPASS;
 }

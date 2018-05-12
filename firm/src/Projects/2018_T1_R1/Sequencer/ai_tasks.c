@@ -572,7 +572,7 @@ void ai_task_our_water(void *params){
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
-	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_HIGH,10);
+	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_HIGH,7);
 	  do
 	  {
 		  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS) );
