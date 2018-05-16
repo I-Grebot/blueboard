@@ -604,7 +604,7 @@ void ai_task_our_water(void *params){
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.reset.x;
-	  wp.coord.abs.y = phys.reset.y + 250;
+	  wp.coord.abs.y = phys.reset.y + 350;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
@@ -612,7 +612,7 @@ void ai_task_our_water(void *params){
 	  wp.type = WP_ORIENT_FRONT;
 	  wp.speed = WP_SPEED_NORMAL;
 	  if(match.color == MATCH_COLOR_GREEN){
-		  wp.coord.abs.x = 200;
+		  wp.coord.abs.x = 250;
 	  }
 	  else{
 		  wp.coord.abs.x = 150;
@@ -622,7 +622,7 @@ void ai_task_our_water(void *params){
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
-	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_HIGH,7);
+	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_HIGH,8);
 
 	  do
 	  {
@@ -630,7 +630,7 @@ void ai_task_our_water(void *params){
 	  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_SHOOT));
 
 
-	  match.scored_points += 10; 				// 4	 balls in the water tower
+	  match.scored_points += 15; 				// 4	 balls in the water tower
 
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_FAST;
@@ -674,38 +674,36 @@ void ai_task_mixed_water(void *params){
 	  // (avoid dead lock)
 	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
 
+	  trajectory_set_windows(&robot.cs.traj, TRAJECTORY_NEAR_WINDOW_D, TRAJECTORY_NEAR_WINDOW_A, PHYS_TRAJ_DEFAULT_WIN_A_START_DEG);
+
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_FAST;
 	  wp.coord.abs.x = 1800;
 	  wp.coord.abs.y = TABLE_Y_MAX/2;
-	  wp.trajectory_must_finish = false;
+	  wp.trajectory_must_finish = true;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
-	  while(!motion_is_traj_near())
-		  vTaskDelay(pdMS_TO_TICKS(100));
 
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
 	  wp.coord.abs.y = 1600;
-	  wp.trajectory_must_finish = false;
+	  wp.trajectory_must_finish = true;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
-	  while(!motion_is_traj_near())
-		  vTaskDelay(pdMS_TO_TICKS(100));
 
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = 2800;
 	  wp.coord.abs.y = 1600;
-	  wp.trajectory_must_finish = false;
+	  wp.trajectory_must_finish = true;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
-	  while(!motion_is_traj_near())
-		  vTaskDelay(pdMS_TO_TICKS(100));
+
+	  trajectory_set_windows(&robot.cs.traj, PHYS_TRAJ_DEFAULT_WIN_D, PHYS_TRAJ_DEFAULT_WIN_A_DEG, PHYS_TRAJ_DEFAULT_WIN_A_START_DEG);
 
 	  wp.type = WP_STALL_BACK_X;
 	  wp.speed = WP_SPEED_VERY_SLOW;
@@ -735,7 +733,7 @@ void ai_task_mixed_water(void *params){
 	  wp.type = WP_STALL_FRONT_Y;
 	  wp.speed = WP_SPEED_VERY_SLOW;
 	  wp.coord.abs.a = 90;
-	  wp.coord.abs.x = TABLE_Y_MAX-ROBOT_FRONT_TO_CENTER;
+	  wp.coord.abs.y = TABLE_Y_MAX-ROBOT_FRONT_TO_CENTER;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);				// stall Y axis
@@ -744,33 +742,33 @@ void ai_task_mixed_water(void *params){
 	  match.scored_points += 10; 				// recuperator open 100% of the time
 
 	  wp.type = WP_GOTO_BWD;
-	  wp.speed = WP_SPEED_FAST;
-	  wp.coord.abs.x = ROBOT_FRONT_TO_CENTER+20;
-	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
+	  wp.speed = WP_SPEED_NORMAL;
+	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
+	  wp.coord.abs.y = TABLE_Y_MAX-ROBOT_FRONT_TO_CENTER-20;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_FAST;
-	  wp.coord.abs.x = ROBOT_FRONT_TO_CENTER;
-	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
+	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
+	  wp.coord.abs.y = TABLE_Y_MAX-ROBOT_FRONT_TO_CENTER;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
 	  wp.type = WP_GOTO_BWD;
-	  wp.speed = WP_SPEED_FAST;
-	  wp.coord.abs.x = ROBOT_FRONT_TO_CENTER+20;
-	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
+	  wp.speed = WP_SPEED_NORMAL;
+	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
+	  wp.coord.abs.y = TABLE_Y_MAX-ROBOT_FRONT_TO_CENTER-20;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_FAST;
-	  wp.coord.abs.x = ROBOT_FRONT_TO_CENTER;
-	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
+	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
+	  wp.coord.abs.y = TABLE_Y_MAX-ROBOT_FRONT_TO_CENTER;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
@@ -810,7 +808,7 @@ void ai_task_mixed_water(void *params){
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
-	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_LOW,8);
+	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_LOW,5);
 	  motion_traj_hard_stop();
 
 	  for(;;)

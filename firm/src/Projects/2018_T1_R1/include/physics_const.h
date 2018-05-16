@@ -145,7 +145,7 @@
 #define ROBOT_BASE_WIDTH        271 // Distance between the two encoder wheels
 #define ROBOT_RADIUS            172 // In Idle position the robot can fit in a cylinder of this radius.
 
-#define TRAJECTORY_NEAR_WINDOW_D  100
+#define TRAJECTORY_NEAR_WINDOW_D  150
 #define TRAJECTORY_NEAR_WINDOW_A  10
 
 /**
