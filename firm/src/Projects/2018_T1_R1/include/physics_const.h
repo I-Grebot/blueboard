@@ -86,7 +86,7 @@
 /* Control System in Angle filters parameters */
 #define PHYS_CS_A_PID_KP                    ((int16_t)   3000)
 #define PHYS_CS_A_PID_KI                    ((int16_t)      0)
-#define PHYS_CS_A_PID_KD                    ((int16_t)    250)
+#define PHYS_CS_A_PID_KD                    ((int16_t)    300)//250
 #define PHYS_CS_A_PID_MAX_IN                ((int32_t)      0)
 #define PHYS_CS_A_PID_MAX_I                 ((int32_t)      0)
 #define PHYS_CS_A_PID_MAX_OUT               ((int32_t)      0)
@@ -94,15 +94,15 @@
 #define PHYS_CS_A_PID_DRV_FILTER            ((uint8_t)      4)
 #define PHYS_CS_A_QUAD_POS_SPEED            ((uint32_t)  2500)
 #define PHYS_CS_A_QUAD_NEG_SPEED            ((uint32_t)  2500)
-#define PHYS_CS_A_QUAD_POS_ACCEL            ((uint32_t)   50)
-#define PHYS_CS_A_QUAD_NEG_ACCEL            ((uint32_t)   50)
+#define PHYS_CS_A_QUAD_POS_ACCEL            ((uint32_t)   25)
+#define PHYS_CS_A_QUAD_NEG_ACCEL            ((uint32_t)   25)
 
 /* Trajectory Manager parameters */
 #define PHYS_TRAJ_D_DEFAULT_SPEED           ((int16_t)    1500)
 #define PHYS_TRAJ_A_DEFAULT_SPEED           ((int16_t)    800)
 #define PHYS_TRAJ_DEFAULT_WIN_D             ((double)    30.0)
 #define PHYS_TRAJ_DEFAULT_WIN_A_DEG         ((double)     5.0)
-#define PHYS_TRAJ_DEFAULT_WIN_A_START_DEG   ((double)    30.0)
+#define PHYS_TRAJ_DEFAULT_WIN_A_START_DEG   ((double)    15.0)
 
 /* Blocking detection filter constants */
 #define PHYS_BD_K1                          ((int32_t)      5)

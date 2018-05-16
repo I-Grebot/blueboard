@@ -336,13 +336,20 @@ void ai_task_switch(void *params)
   // push home automation switch
   // ------------------------
 
-  wp.type = WP_GOTO_FWD;
-  wp.speed = WP_SPEED_SLOW;
+  wp.type = WP_ORIENT_FRONT;
+  wp.speed = WP_SPEED_NORMAL;
   wp.coord.abs = phys.home_automation_switch;
-  wp.trajectory_must_finish = false;
+  wp.trajectory_must_finish = true;
   avd_mask_all(false);
   motion_move_block_on_avd(&wp);
-  vTaskDelay(pdMS_TO_TICKS(1000));
+
+  wp.type = WP_STALL_FRONT_Y;
+  wp.speed = WP_SPEED_VERY_SLOW;
+  wp.coord.abs.y = ROBOT_FRONT_TO_CENTER;
+  wp.coord.abs.a = -90;
+  wp.trajectory_must_finish = true;
+  avd_mask_all(false);
+  motion_move_block_on_avd(&wp);
 
   sys_mod_do_push(&(self->handle));
   do
@@ -351,19 +358,17 @@ void ai_task_switch(void *params)
   }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_PUSH));
   match.scored_points += 25; 					// pushed 100% of the time
   sys_mod_do_push(&(self->handle));
-  do
-  {
-	  notified = xTaskNotifyWait(0, UINT32_MAX, &sw_notification, pdMS_TO_TICKS(OS_AI_TASKS_PERIOD_MS));
-  }while(!(sw_notification & OS_FEEDBACK_SYS_MOD_PUSH));
 
-  wp.speed = WP_SPEED_NORMAL;
+  wp.speed = WP_SPEED_FAST;
   wp.type = WP_GOTO_BWD;
   wp.coord.abs.x = SWITCH_CENTER_X;
   wp.coord.abs.y = TABLE_Y_MAX/2;
-  wp.trajectory_must_finish = true;
+  wp.trajectory_must_finish = false;
   avd_mask_back(true);
   avd_mask_front(false);
   motion_move_block_on_avd(&wp);
+  while(!motion_is_traj_near())
+	  vTaskDelay(pdMS_TO_TICKS(100));
 
   self->state = TASK_STATE_SUCCESS;
 
@@ -399,7 +404,7 @@ void ai_task_bee(void *params)
   avd_mask_all(false);
 
   wp.type = WP_GOTO_BWD;
-  wp.speed = WP_SPEED_NORMAL;
+  wp.speed = WP_SPEED_FAST;
   wp.coord.abs = phys.beehive;
   wp.trajectory_must_finish = true;
   avd_mask_back(true);
@@ -407,7 +412,7 @@ void ai_task_bee(void *params)
   motion_move_block_on_avd(&wp);
 
   wp.type = WP_ORIENT_BEHIND;					// we are at the hive, need to stall
-  wp.speed = WP_SPEED_SLOW;
+  wp.speed = WP_SPEED_NORMAL;
   wp.coord.abs.x = BEE_START_X;
   wp.coord.abs.y = TABLE_Y_MAX;
   wp.trajectory_must_finish = true;
@@ -422,7 +427,7 @@ void ai_task_bee(void *params)
   motion_move_block_on_avd(&wp);				// stall y axis
 
   wp.type = WP_GOTO_FWD;
-  wp.speed = WP_SPEED_SLOW;
+  wp.speed = WP_SPEED_NORMAL;
   wp.coord.abs.x = phys.beehive.x;
   wp.coord.abs.y = BEE_START_Y;
   wp.trajectory_must_finish = true;
@@ -431,7 +436,7 @@ void ai_task_bee(void *params)
   motion_move_block_on_avd(&wp);
 
   wp.type = WP_ORIENT_BEHIND;
-  wp.speed = WP_SPEED_SLOW;
+  wp.speed = WP_SPEED_NORMAL;
   wp.coord.abs.x = 0;
   wp.coord.abs.y = BEE_START_Y;
   wp.trajectory_must_finish = true;
@@ -513,8 +518,10 @@ void ai_task_our_water(void *params){
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
 	  wp.coord.abs.y = phys.construction_cubes[PHYS_ID_CUBES_EG].y;
-	  wp.trajectory_must_finish = true;
+	  wp.trajectory_must_finish = false;
 	  motion_move_block_on_avd(&wp);				// start trajectory to avoid cube SG
+	  while(!motion_is_traj_near())
+		  vTaskDelay(pdMS_TO_TICKS(100));
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
@@ -522,7 +529,7 @@ void ai_task_our_water(void *params){
 	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_front(true);
-	  avd_mask_back(false);
+	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);			//  Avoid cube SG
 
 	  wp.type = WP_GOTO_FWD;
@@ -546,15 +553,17 @@ void ai_task_our_water(void *params){
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
 	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
-	  wp.trajectory_must_finish = true;
+	  wp.trajectory_must_finish = false;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
+	  while(!motion_is_traj_near())
+		  vTaskDelay(pdMS_TO_TICKS(100));
 
 	  wp.type = WP_GOTO_FWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.reset.x;
-	  wp.coord.abs.y = phys.reset.y + 100;
+	  wp.coord.abs.y = phys.reset.y + 150;
 	  wp.trajectory_must_finish = true;
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
@@ -562,10 +571,10 @@ void ai_task_our_water(void *params){
 	  wp.type = WP_ORIENT_FRONT;
 	  wp.speed = WP_SPEED_NORMAL;
 	  if(match.color == MATCH_COLOR_GREEN){
-		  wp.coord.abs.x = 250;
+		  wp.coord.abs.x = 200;
 	  }
 	  else{
-		  wp.coord.abs.x = 200;
+		  wp.coord.abs.x = 150;
 	  }
 	  wp.coord.abs.y = 0;
 	  wp.trajectory_must_finish = true;
@@ -581,13 +590,15 @@ void ai_task_our_water(void *params){
 	  match.scored_points += 10; 				// 4	 balls in the water tower
 
 	  wp.type = WP_GOTO_BWD;
-	  wp.speed = WP_SPEED_NORMAL;
+	  wp.speed = WP_SPEED_FAST;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_G].x;
 	  wp.coord.abs.y = WASTEWATER_RECUPERATOR_Y;
-	  wp.trajectory_must_finish = true;
+	  wp.trajectory_must_finish = false;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
+	  while(!motion_is_traj_near())
+		  vTaskDelay(pdMS_TO_TICKS(100));
 
       self->state = TASK_STATE_SUCCESS;
 
@@ -621,31 +632,37 @@ void ai_task_mixed_water(void *params){
 	  xTaskNotify(handle_task_avoidance, OS_NOTIFY_AVOIDANCE_CLR, eSetBits);
 
 	  wp.type = WP_GOTO_BWD;
-	  wp.speed = WP_SPEED_NORMAL;
+	  wp.speed = WP_SPEED_FAST;
 	  wp.coord.abs.x = 1800;
 	  wp.coord.abs.y = TABLE_Y_MAX/2;
-	  wp.trajectory_must_finish = true;
+	  wp.trajectory_must_finish = false;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
+	  while(!motion_is_traj_near())
+		  vTaskDelay(pdMS_TO_TICKS(100));
 
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = phys.mixed_wastewater_recuperator[PHYS_ID_MIXED_O].x;
 	  wp.coord.abs.y = 1600;
-	  wp.trajectory_must_finish = true;
+	  wp.trajectory_must_finish = false;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
+	  while(!motion_is_traj_near())
+		  vTaskDelay(pdMS_TO_TICKS(100));
 
 	  wp.type = WP_GOTO_BWD;
 	  wp.speed = WP_SPEED_NORMAL;
 	  wp.coord.abs.x = 2800;
 	  wp.coord.abs.y = 1600;
-	  wp.trajectory_must_finish = true;
+	  wp.trajectory_must_finish = false;
 	  avd_mask_front(false);
 	  avd_mask_back(true);
 	  motion_move_block_on_avd(&wp);
+	  while(!motion_is_traj_near())
+		  vTaskDelay(pdMS_TO_TICKS(100));
 
 	  wp.type = WP_STALL_BACK_X;
 	  wp.speed = WP_SPEED_VERY_SLOW;
@@ -673,7 +690,7 @@ void ai_task_mixed_water(void *params){
 	  motion_move_block_on_avd(&wp);
 
 	  wp.type = WP_STALL_FRONT_Y;
-	  wp.speed = WP_SPEED_VERY_SLOW;
+	  wp.speed = WP_SPEED_SLOW;
 	  wp.coord.abs.a = 90;
 	  wp.coord.abs.x = TABLE_Y_MAX-ROBOT_FRONT_TO_CENTER;
 	  wp.trajectory_must_finish = true;
@@ -717,7 +734,7 @@ void ai_task_mixed_water(void *params){
 	  avd_mask_all(false);
 	  motion_move_block_on_avd(&wp);
 
-	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_LOW,4);
+	  sys_mod_do_shoot(&(self->handle),SW_SHOOTER_SHOOT_LOW,10);
 	  motion_traj_hard_stop();
 
 	  for(;;)
