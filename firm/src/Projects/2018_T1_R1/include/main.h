@@ -200,13 +200,13 @@
 #define OS_NOTIFY_SYS_MOD_OPEN        	0x00000080    // Initiate procedure to open water recuperator
 #define OS_NOTIFY_SYS_MOD_SHOOT       	0x00000100    // Initiate procedure to shoot
 
-#define OS_FEEDBACK_SYS_MOD_INIT        0x10000001    // Return on initialization
-#define OS_FEEDBACK_SYS_MOD_SELF_TEST   0x10000002    // Return on self-test
-#define OS_FEEDBACK_SYS_MOD_LEFT_ARM    0x10000010    // Return on move left arm
-#define OS_FEEDBACK_SYS_MOD_RIGHT_ARM   0x10000020    // Return on move right arm
-#define OS_FEEDBACK_SYS_MOD_PUSH        0x10000040    // Return on push the switch
-#define OS_FEEDBACK_SYS_MOD_OPEN        0x10000080    // Return on open water recuperator
-#define OS_FEEDBACK_SYS_MOD_SHOOT       0x10000100    // Return onshoot
+#define OS_FEEDBACK_SYS_MOD_INIT        0x00001000    // Return on initialization
+#define OS_FEEDBACK_SYS_MOD_SELF_TEST   0x00002000    // Return on self-test
+#define OS_FEEDBACK_SYS_MOD_LEFT_ARM    0x00004000    // Return on move left arm
+#define OS_FEEDBACK_SYS_MOD_RIGHT_ARM   0x00008000    // Return on move right arm
+#define OS_FEEDBACK_SYS_MOD_PUSH        0x00010000    // Return on push the switch
+#define OS_FEEDBACK_SYS_MOD_OPEN        0x00020000    // Return on open water recuperator
+#define OS_FEEDBACK_SYS_MOD_SHOOT       0x00040000    // Return onshoot
 /**
 ********************************************************************************
 **

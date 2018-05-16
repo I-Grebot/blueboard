@@ -182,7 +182,7 @@ void sys_modules_task(void *pvParameters)
         break;
 
       case SYS_MOD_BALL_UNBLOCK:
-    	  if(waiter >= 20){
+    	  if(waiter >= 35){
         	  if(sys_mod.opener.current_position==DSV_OPENER_POS_RIGHT){
         		  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_LEFT);
         		  sys_mod_set_servo(&sys_mod.opener,DSV_OPENER_POS_RIGHT);
